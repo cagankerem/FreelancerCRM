@@ -44,4 +44,4 @@ next-env.d.ts
 /work/
 
 # for computers self use
-**/.DS_Store
+.DS_Store
