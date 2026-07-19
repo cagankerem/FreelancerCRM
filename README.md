@@ -1,4 +1,8 @@
-# Kapsam — tıklanabilir ürün prototipi
+# FreelanceMCP
+
+## Prototip Fazı
+
+### Kapsam — tıklanabilir ürün prototipi
 
 Kapsam, freelance yazılımcı ve tasarımcıların profesyonel teklif hazırlamasını,
 bağlantı olarak paylaşmasını, yaklaşık görüntülenme sinyallerini izlemesini ve
