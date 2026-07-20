@@ -313,6 +313,19 @@ function Toast({ message }: { message: string }) {
   );
 }
 
+function ProductFooter() {
+  return (
+    <footer className="product-footer">
+      <span>© 2026 Kapsam. Tekliflerin, senin kontrolünde.</span>
+      <nav aria-label="Yasal bağlantılar">
+        <a href="#gizlilik">Gizlilik</a>
+        <a href="#kullanim">Kullanım</a>
+        <a href="#destek">Destek</a>
+      </nav>
+    </footer>
+  );
+}
+
 function Modal({
   title,
   description,
@@ -747,6 +760,7 @@ function AppShell({
           </div>
         </header>
         {children}
+        <ProductFooter />
       </main>
       <nav className="mobile-nav" aria-label="Mobil navigasyon">
         {navItems.map((item) => (
@@ -885,8 +899,8 @@ function Dashboard({
         <aside className="panel attention-panel">
           <div className="panel-header">
             <div>
-              <h2>İlgilenmen gerekenler</h2>
-              <p>Duruma göre önerilen aksiyonlar</p>
+              <h2>AI takip önerileri</h2>
+              <p>Teklif davranışlarına göre önerilen aksiyonlar</p>
             </div>
             <span className="count-badge">3</span>
           </div>
@@ -1081,6 +1095,7 @@ function ProposalEditor({
   onSave,
   onPreview,
   onPublish,
+  onNavigate,
   notify,
 }: {
   initialDraft: DraftSnapshot;
@@ -1089,6 +1104,7 @@ function ProposalEditor({
   onSave: (draft: DraftSnapshot) => void;
   onPreview: (draft: DraftSnapshot) => void;
   onPublish: (draft: DraftSnapshot) => void;
+  onNavigate: (screen: Screen) => void;
   notify: (message: string) => void;
 }) {
   const [step, setStep] = useState(0);
@@ -1253,7 +1269,14 @@ function ProposalEditor({
   };
 
   return (
-    <div className="editor-page">
+    <div className="editor-app-shell">
+      <Sidebar
+        screen="editor"
+        profile={profile}
+        onNavigate={onNavigate}
+        onRestart={() => onNavigate("onboarding")}
+      />
+      <main className="editor-page">
       <div className="editor-topbar">
         <button type="button" className="back-button" onClick={onBack}>
           ← <span>Tekliflere dön</span>
@@ -1838,6 +1861,8 @@ function ProposalEditor({
         </aside>
       </div>
 
+      <ProductFooter />
+
       {publishModal ? (
         <Modal
           title="Teklifi yayınlamaya hazır mısın?"
@@ -1850,6 +1875,7 @@ function ProposalEditor({
           }}
         />
       ) : null}
+      </main>
     </div>
   );
 }
@@ -2648,6 +2674,7 @@ export function PrototypeApp() {
               navigate("detail");
               notify("Teklif yayınlandı ve paylaşım bağlantısı oluşturuldu.");
             }}
+            onNavigate={navigate}
             notify={notify}
           />
         </div>
