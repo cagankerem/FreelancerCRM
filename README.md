@@ -1,4 +1,4 @@
-# FreelanceMCP
+# FreelancerCRM
 
 ## Prototip Fazı
 
