@@ -463,14 +463,14 @@ Future production behavior is documented in `plan.md`; it is a goal and roadmap,
 
 Use this precedence when information conflicts:
 
-1. `prototype/app/prototype-app.tsx` — implemented product copy, synthetic data, workflows, states, and interactions.
-2. `prototype/app/globals.css` — implemented layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
+1. `v0.1.0/app/prototype-app.tsx` — implemented product copy, synthetic data, workflows, states, and interactions.
+2. `v0.1.0/app/globals.css` — implemented layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
 3. `README.md` — current prototype purpose, leading feature order, scope, and limitations.
-4. `prototype/app/page.tsx` and `prototype/app/layout.tsx` — Turkish language, product metadata, descriptions, and noindex behavior.
-5. `prototype/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
+4. `v0.1.0/app/page.tsx` and `v0.1.0/app/layout.tsx` — Turkish language, product metadata, descriptions, and noindex behavior.
+5. `v0.1.0/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
 6. `plan.md` — future product thesis, production architecture, and roadmap only.
 
-`prototype/db/schema.ts` is intentionally empty. `prototype/examples/d1` is a generic framework example, not Kapsam content. The framework-default `prototype/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
+`v0.1.0/db/schema.ts` is intentionally empty. `v0.1.0/examples/d1` is a generic framework example, not Kapsam content. The framework-default `v0.1.0/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
 
 **Color precedence exception:** the `## Colors` section and YAML color tokens in this file are the new source of truth. Do not reintroduce the current CSS palette's forest green, coral, mint, or sand values when generating a design. Continue to inherit the existing layout, spacing, typography, shape, and interaction patterns.
 

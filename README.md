@@ -1,6 +1,6 @@
 # FreelancerCRM
 
-## Prototip Fazı
+## v0.1.0
 
 ### Kapsam — tıklanabilir ürün prototipi
 
@@ -8,7 +8,7 @@ Kapsam, freelance yazılımcı ve tasarımcıların profesyonel teklif hazırlam
 bağlantı olarak paylaşmasını, yaklaşık görüntülenme sinyallerini izlemesini ve
 takip mesajı taslağı üretmesini hedefleyen bir ürün prototipidir.
 
-Bu sürüm plan.md içindeki Faz 0 / TASK-006 kapsamını doğrulamak için hazırlanmıştır.
+Bu v0.1.0 sürümü plan.md içindeki Faz 0 / TASK-006 kapsamını doğrulamak için hazırlanmıştır.
 Yalnız sentetik veri kullanır. Güncel profil ve teklif taslağı aynı tarayıcıdaki
 demo paylaşım bağlantısının açılabilmesi için yerel tarayıcı deposunda tutulur.
 
@@ -53,5 +53,5 @@ npm run lint
 npx tsc --noEmit
 ~~~
 
-Ana ürün yüzeyi app/prototype-app.tsx, görsel sistem ise app/globals.css
+Uygulama kodu `v0.1.0/` klasöründedir. Ana ürün yüzeyi app/prototype-app.tsx, görsel sistem ise app/globals.css
 dosyasındadır.
