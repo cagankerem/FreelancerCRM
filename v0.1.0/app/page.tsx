@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import { PrototypeApp } from "./prototype-app";
+
+import { LandingPage } from "./landing-page";
 
 export const metadata: Metadata = {
-  title: "Kapsam — Freelancer teklif deneyimi",
+  title: "Hızlı teklif bağlantısı ve tek pencere yönetimi",
   description:
-    "Freelancerlar için AI destekli teklif oluşturma, paylaşma ve yaklaşık görüntülenme takibi prototipi.",
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-  },
+    "Freelance yazılımcılar ve UI/UX tasarımcıları için teklif oluşturma, bağlantıyla paylaşma ve yaklaşık görüntülenme takibi.",
 };
 
 export default function Home() {
-  return <PrototypeApp />;
+  return <LandingPage />;
 }

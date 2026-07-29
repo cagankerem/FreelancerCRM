@@ -1,0 +1,11 @@
+{
+  "name": "freelancercrm-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd v0.1.0 && npm run dev",
+    "install-all": "cd v0.1.0 && npm install",
+    "build": "cd v0.1.0 && npm run build",
+    "start": "cd v0.1.0 && npm run start"
+  }
+}

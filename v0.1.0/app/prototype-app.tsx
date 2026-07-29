@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   type FormEvent,
   type ReactNode,
@@ -124,6 +125,13 @@ const navItems: Array<{ screen: Screen; label: string; marker: string }> = [
   { screen: "dashboard", label: "Genel bakış", marker: "01" },
   { screen: "proposals", label: "Teklifler", marker: "02" },
   { screen: "editor", label: "Yeni teklif", marker: "+" },
+];
+
+const demoTourSteps: Array<{ screen: Screen; label: string; marker: string }> = [
+  { screen: "dashboard", label: "Genel bakış", marker: "01" },
+  { screen: "editor", label: "Teklif hazırla", marker: "02" },
+  { screen: "public", label: "Müşteri görünümü", marker: "03" },
+  { screen: "detail", label: "Takip et", marker: "04" },
 ];
 
 const initialItems: Item[] = [
@@ -641,17 +649,19 @@ function Sidebar({
   profile,
   onNavigate,
   onRestart,
+  demoMode = false,
 }: {
   screen: Screen;
   profile: ProfileSnapshot;
   onNavigate: (next: Screen) => void;
   onRestart: () => void;
+  demoMode?: boolean;
 }) {
   return (
     <aside className="sidebar">
       <BrandMark inverse />
       <nav aria-label="Ana navigasyon">
-        <span className="nav-label">Çalışma alanı</span>
+        <span className="nav-label">{demoMode ? "Örnek çalışma alanı" : "Çalışma alanı"}</span>
         {navItems.map((item) => (
           <button
             key={item.screen}
@@ -666,38 +676,38 @@ function Sidebar({
             {item.label}
           </button>
         ))}
-        <span className="nav-label nav-label--second">Hesap</span>
+        <span className="nav-label nav-label--second">{demoMode ? "Demo" : "Hesap"}</span>
         <button type="button" className="nav-item" onClick={onRestart}>
           <span className="nav-marker" aria-hidden="true">
             03
           </span>
-          Profil & marka
+          {demoMode ? "Turu baştan başlat" : "Profil & marka"}
         </button>
-        <button type="button" className="nav-item" disabled title="Sonraki prototip aşamasında">
+        <button type="button" className="nav-item" disabled title={demoMode ? "Alpha üyeliği gerektirir" : "Sonraki prototip aşamasında"}>
           <span className="nav-marker" aria-hidden="true">
             04
           </span>
-          Plan & kullanım
+          {demoMode ? "Kayıtlı özellikler" : "Plan & kullanım"}
         </button>
       </nav>
 
       <div className="sidebar-bottom">
         <div className="quota-card">
           <div className="quota-card__title">
-            <span>Ücretsiz plan</span>
-            <strong>2 / 3</strong>
+            <span>{demoMode ? "Tanıtım modu" : "Ücretsiz plan"}</span>
+            <strong>{demoMode ? "ÖRNEK" : "2 / 3"}</strong>
           </div>
           <div className="quota-track">
             <span />
           </div>
-          <p>Bu ay 1 aktif teklif hakkın kaldı.</p>
-          <button type="button">Pro planı keşfet →</button>
+          <p>{demoMode ? "Değişiklikler yalnız bu demo oturumunda tutulur." : "Bu ay 1 aktif teklif hakkın kaldı."}</p>
+          {demoMode ? <Link href="/#waitlist">Alpha sürümüne katıl →</Link> : <button type="button">Pro planı keşfet →</button>}
         </div>
         <div className="profile-chip">
           <span className="avatar">{initials(profile.name)}</span>
           <span>
             <strong>{profile.name}</strong>
-            <small>{profile.brand}</small>
+            <small>{demoMode ? "Örnek hesap" : profile.brand}</small>
           </span>
           <button type="button" aria-label="Hesap menüsünü aç">
             ···
@@ -717,6 +727,7 @@ function AppShell({
   onNavigate,
   onRestart,
   onCreate,
+  demoMode = false,
 }: {
   screen: Screen;
   profile: ProfileSnapshot;
@@ -726,6 +737,7 @@ function AppShell({
   onNavigate: (next: Screen) => void;
   onRestart: () => void;
   onCreate: () => void;
+  demoMode?: boolean;
 }) {
   const handleNavigate = (next: Screen) => {
     if (next === "editor") {
@@ -737,11 +749,11 @@ function AppShell({
 
   return (
     <div className="app-shell">
-      <Sidebar screen={screen} profile={profile} onNavigate={handleNavigate} onRestart={onRestart} />
+      <Sidebar screen={screen} profile={profile} onNavigate={handleNavigate} onRestart={onRestart} demoMode={demoMode} />
       <main className="app-main">
         <div className="prototype-banner" role="note">
-          <span>ETKİLEŞİMLİ PROTOTİP</span>
-          Gerçek kullanıcı veya müşteri verisi içermez.
+          <span>{demoMode ? "ÜRÜN DEMOSU" : "ALPHA SÜRÜMÜ"}</span>
+          {demoMode ? "Örnek verilerle çalışır; yaptığın değişiklikler kaydedilmez." : "Kişisel çalışma alanın."}
         </div>
         <header className="app-header">
           <div>
@@ -1097,6 +1109,7 @@ function ProposalEditor({
   onPublish,
   onNavigate,
   notify,
+  demoMode = false,
 }: {
   initialDraft: DraftSnapshot;
   profile: ProfileSnapshot;
@@ -1106,6 +1119,7 @@ function ProposalEditor({
   onPublish: (draft: DraftSnapshot) => void;
   onNavigate: (screen: Screen) => void;
   notify: (message: string) => void;
+  demoMode?: boolean;
 }) {
   const [step, setStep] = useState(0);
   const [items, setItems] = useState<Item[]>(() =>
@@ -1275,6 +1289,7 @@ function ProposalEditor({
         profile={profile}
         onNavigate={onNavigate}
         onRestart={() => onNavigate("onboarding")}
+        demoMode={demoMode}
       />
       <main className="editor-page">
       <div className="editor-topbar">
@@ -1283,7 +1298,7 @@ function ProposalEditor({
         </button>
         <div className="editor-status">
           <span className="save-dot" />
-          Değişiklikler bu oturumda korunuyor
+          {demoMode ? "Demo değişiklikleri yalnız bu oturumda korunur" : "Değişiklikler bu oturumda korunuyor"}
         </div>
         <div className="editor-actions">
           <button
@@ -2513,8 +2528,46 @@ function PublicProposal({
   );
 }
 
-export function PrototypeApp() {
-  const [screen, setScreen] = useState<Screen>("onboarding");
+function DemoTour({
+  screen,
+  onSelect,
+}: {
+  screen: Screen;
+  onSelect: (screen: Screen) => void;
+}) {
+  const activeScreen = screen === "proposals" ? "dashboard" : screen;
+
+  return (
+    <header className="demo-tour">
+      <div className="demo-tour__intro">
+        <span>CANLI ÜRÜN TURU</span>
+        <p>Örnek verilerle Kapsam’ın temel akışlarını keşfet.</p>
+      </div>
+      <nav className="demo-tour__steps" aria-label="Demo adımları">
+        {demoTourSteps.map((step) => (
+          <button
+            key={step.screen}
+            type="button"
+            className={cx(activeScreen === step.screen && "is-active")}
+            aria-current={activeScreen === step.screen ? "step" : undefined}
+            onClick={() => onSelect(step.screen)}
+          >
+            <span>{step.marker}</span>
+            {step.label}
+          </button>
+        ))}
+      </nav>
+      <div className="demo-tour__actions">
+        <Link href="/">Landing’e dön</Link>
+        <Link className="demo-tour__cta" href="/#waitlist">Alpha sürümüne katıl</Link>
+      </div>
+    </header>
+  );
+}
+
+export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
+  const isDemo = mode === "demo";
+  const [screen, setScreen] = useState<Screen>(() => isDemo ? "dashboard" : "onboarding");
   const [profile, setProfile] = useState<ProfileSnapshot>(defaultProfile);
   const [draftSnapshot, setDraftSnapshot] = useState<DraftSnapshot>(() => ({
     ...defaultDraftSnapshot,
@@ -2538,6 +2591,8 @@ export function PrototypeApp() {
   };
 
   useEffect(() => {
+    if (isDemo) return;
+
     const openSharedDemo = () => {
       if (window.location.hash !== "#musteri-teklifi") return;
 
@@ -2580,10 +2635,10 @@ export function PrototypeApp() {
       window.removeEventListener("hashchange", openSharedDemo);
       if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     };
-  }, []);
+  }, [isDemo]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (isDemo || !hydrated) return;
     try {
       window.localStorage.setItem(
         "kapsam-prototype-state-v1",
@@ -2592,27 +2647,34 @@ export function PrototypeApp() {
     } catch {
       // Private browsing may block storage; the in-session prototype still works.
     }
-  }, [draftSnapshot, hydrated, profile]);
+  }, [draftSnapshot, hydrated, isDemo, profile]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   const navigate = (next: Screen) => {
     if (window.location.hash) {
       window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
     setPublicPreview(false);
-    setScreen(next);
+    setScreen(isDemo && next === "onboarding" ? "dashboard" : next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openPublic = (preview: boolean) => {
-    setPublicPreview(preview);
-    if (!preview) {
+    const shouldPreview = isDemo || preview;
+    setPublicPreview(shouldPreview);
+    if (!shouldPreview) {
       window.history.replaceState(
         null,
         "",
         window.location.pathname + window.location.search + "#musteri-teklifi",
       );
     }
-    if (!preview && !publicCounted && !linkRevoked) {
+    if (!shouldPreview && !publicCounted && !linkRevoked) {
       setViews((current) => current + 1);
       setPublicCounted(true);
     }
@@ -2636,8 +2698,26 @@ export function PrototypeApp() {
     navigate("editor");
   };
 
-  if (screen === "onboarding") {
+  const selectDemoStep = (next: Screen) => {
+    if (next === "public") {
+      openPublic(true);
+      return;
+    }
+    navigate(next);
+  };
+
+  const withDemoTour = (content: ReactNode) => {
+    if (!isDemo) return content;
     return (
+      <div className="demo-experience">
+        <DemoTour screen={screen} onSelect={selectDemoStep} />
+        <div className="demo-experience__content">{content}</div>
+      </div>
+    );
+  };
+
+  if (screen === "onboarding") {
+    return withDemoTour(
       <>
         <Onboarding
           initialProfile={profile}
@@ -2649,12 +2729,12 @@ export function PrototypeApp() {
           }}
         />
         <Toast message={toast} />
-      </>
+      </>,
     );
   }
 
   if (screen === "editor" || (screen === "public" && publicPreview)) {
-    return (
+    return withDemoTour(
       <>
         <div
           className={cx("editor-keeper", screen !== "editor" && "is-hidden")}
@@ -2676,6 +2756,7 @@ export function PrototypeApp() {
             }}
             onNavigate={navigate}
             notify={notify}
+            demoMode={isDemo}
           />
         </div>
         {screen === "public" ? (
@@ -2691,12 +2772,12 @@ export function PrototypeApp() {
           />
         ) : null}
         <Toast message={toast} />
-      </>
+      </>,
     );
   }
 
   if (screen === "public") {
-    return (
+    return withDemoTour(
       <>
         <PublicProposal
           draft={draftSnapshot}
@@ -2715,7 +2796,7 @@ export function PrototypeApp() {
           }}
         />
         <Toast message={toast} />
-      </>
+      </>,
     );
   }
 
@@ -2732,7 +2813,7 @@ export function PrototypeApp() {
         ? "TEKLİF YÖNETİMİ"
         : "NOVAworks · TKL-1048";
 
-  return (
+  return withDemoTour(
     <>
       <AppShell
         screen={screen}
@@ -2740,8 +2821,9 @@ export function PrototypeApp() {
         title={title}
         eyebrow={eyebrow}
         onNavigate={navigate}
-        onRestart={() => navigate("onboarding")}
+        onRestart={() => navigate(isDemo ? "dashboard" : "onboarding")}
         onCreate={startNewDraft}
+        demoMode={isDemo}
       >
         {screen === "dashboard" ? (
           <Dashboard
@@ -2799,6 +2881,6 @@ export function PrototypeApp() {
           }}
         />
       ) : null}
-    </>
+    </>,
   );
 }

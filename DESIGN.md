@@ -453,9 +453,9 @@ Keep these trust statements visible in their relevant contexts:
 - Revoking a link preserves historical views and responses.
 - Duplicating a proposal creates a draft and does not copy views or responses.
 
-### Current prototype boundary
+### Current demo boundary
 
-This repository currently implements a synthetic, same-browser prototype. Profile and draft data use local browser storage, and the demo share link uses `#musteri-teklifi`. Do not visually claim that the current build has real authentication, a production database, RLS, a live AI provider, payments, email or WhatsApp delivery, PDF export, CRM, or cross-device persistence.
+This repository currently implements an alpha landing page plus a guided, synthetic product tour at `/demo`. The demo opens on an example dashboard, provides direct access to the proposal builder, customer view, and follow-up detail, and does not persist demo edits. The alpha-price variant, capped landing event log, and demo waitlist data still use local browser storage. The landing form is explicitly a local demo, not a real early-access registration. The v0.1.0 product interface is intended to move under `/app`, but real authentication, a production database, durable waitlist, RLS, live AI provider, payments, email or WhatsApp delivery, PDF export, CRM, and cross-device persistence are not implemented yet and must not be claimed visually.
 
 Future production behavior is documented in `plan.md`; it is a goal and roadmap, not proof of implementation.
 
@@ -463,12 +463,13 @@ Future production behavior is documented in `plan.md`; it is a goal and roadmap,
 
 Use this precedence when information conflicts:
 
-1. `v0.1.0/app/prototype-app.tsx` — implemented product copy, synthetic data, workflows, states, and interactions.
-2. `v0.1.0/app/globals.css` — implemented layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
-3. `README.md` — current prototype purpose, leading feature order, scope, and limitations.
-4. `v0.1.0/app/page.tsx` and `v0.1.0/app/layout.tsx` — Turkish language, product metadata, descriptions, and noindex behavior.
-5. `v0.1.0/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
-6. `plan.md` — future product thesis, production architecture, and roadmap only.
+1. `v0.1.0/app/landing-page.tsx` and `v0.1.0/app/landing-page.css` — alpha landing copy, conversion flow, layout, and responsive behavior.
+2. `v0.1.0/app/demo-app.tsx` and `v0.1.0/app/prototype-app.tsx` — guided demo entry plus shared product copy, synthetic data, workflows, states, and interactions.
+3. `v0.1.0/app/globals.css` — implemented prototype layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
+4. `README.md` — current landing/prototype purpose, leading feature order, scope, and limitations.
+5. `v0.1.0/app/page.tsx`, `v0.1.0/app/demo/page.tsx`, and `v0.1.0/app/layout.tsx` — route-specific metadata, Turkish language, and prototype noindex behavior.
+6. `v0.1.0/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
+7. `plan.md` — future product thesis, production architecture, and roadmap only.
 
 `v0.1.0/db/schema.ts` is intentionally empty. `v0.1.0/examples/d1` is a generic framework example, not Kapsam content. The framework-default `v0.1.0/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
 
