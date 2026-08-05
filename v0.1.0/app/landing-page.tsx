@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/native-select";
 import { cn } from "@/lib/utils";
 
+import { DemoApp } from "./demo-app";
 import "./landing-page.css";
 
 type FormStatus =
@@ -230,57 +231,6 @@ function HeroProductWindow() {
   );
 }
 
-function PreviewCard({ type }: { type: "onboarding" | "builder" | "public" | "followup" }) {
-  if (type === "onboarding") {
-    return (
-      <article className="lp-preview-card">
-        <span className="lp-preview-label">1. Onboarding</span>
-        <h3>Hoş geldin</h3>
-        <p>Hadi ilk teklifini oluşturalım.</p>
-        <div className="lp-choice lp-choice--selected">Freelance yazılımcı</div>
-        <div className="lp-choice">UI/UX tasarımcısı</div>
-      </article>
-    );
-  }
-
-  if (type === "builder") {
-    return (
-      <article className="lp-preview-card">
-        <span className="lp-preview-label">2. Teklif oluşturucu</span>
-        <label>Proje başlığı</label>
-        <div className="lp-input-mock">Kapsam Web Sitesi</div>
-        <label>Proje kapsamı</label>
-        <div className="lp-textarea-mock">Kurumsal web sitesi tasarım ve geliştirme…</div>
-        <div className="lp-preview-facts"><span>Teslim<br /><b>4–6 hafta</b></span><span>Revizyon<br /><b>2 tur</b></span></div>
-      </article>
-    );
-  }
-
-  if (type === "public") {
-    return (
-      <article className="lp-preview-card lp-preview-card--paper">
-        <span className="lp-preview-label">3. Paylaşılan teklif</span>
-        <div className="lp-mini-url">kapsam.app/p/TR-2026-0724-01</div>
-        <span className="lp-mini-k">k.</span>
-        <h3>Kapsam Web Sitesi</h3>
-        <span className="lp-copy-line lp-copy-line--long" />
-        <span className="lp-copy-line" />
-        <span className="lp-copy-line lp-copy-line--short" />
-      </article>
-    );
-  }
-
-  return (
-    <article className="lp-preview-card">
-      <span className="lp-preview-label">4. Takip ve mesaj taslağı</span>
-      <div className="lp-mini-event"><Eye /><span><strong>Görüntülendi</strong><small>Bugün 14:32</small></span></div>
-      <div className="lp-mini-event"><Eye /><span><strong>Görüntülendi</strong><small>Bugün 10:55</small></span></div>
-      <label>Takip mesajı taslağı</label>
-      <div className="lp-textarea-mock">Merhaba, teklifimizi inceleyebildiniz mi?</div>
-    </article>
-  );
-}
-
 export function LandingPage() {
   const isHydrated = useSyncExternalStore(subscribeToHydration, getHydratedSnapshot, getServerSnapshot);
   const [price] = useState<PriceVariant>(() => {
@@ -419,8 +369,9 @@ export function LandingPage() {
 
       <section className="lp-preview lp-section" aria-labelledby="lp-preview-title">
         <div className="lp-container">
+          <h2 className="sr-only" id="lp-preview-title">Etkileşimli ürün demosu</h2>
           <div className="lp-preview-stage">
-          
+            <DemoApp layout="embedded" />
           </div>
         </div>
       </section>

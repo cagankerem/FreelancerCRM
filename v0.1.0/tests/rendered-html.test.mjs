@@ -45,6 +45,8 @@ test("server-renders the Kapsam landing experience", async () => {
   assert.match(html, /name="consent"/i);
   assert.match(html, /Aydınlatma ve gizlilik özeti/i);
   assert.match(html, /Kart bilgisi istenmez/i);
+  assert.match(html, /CANLI ÜRÜN TURU/i);
+  assert.match(html, /Tekliflerinin nabzı/i);
   assert.doesNotMatch(html, /name="robots" content="noindex/i);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
@@ -78,7 +80,8 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(page, /<LandingPage \/>/);
   assert.match(demoPage, /<DemoApp \/>/);
   assert.match(demoPage, /index:\s*false/);
-  assert.match(demoApp, /<PrototypeApp mode="demo" \/>/);
+  assert.match(demoApp, /layout\?: "page" \| "embedded"/);
+  assert.match(demoApp, /<PrototypeApp mode="demo" layout=\{layout\} \/>/);
   assert.match(landing, /kapsam-alpha-price-v1/);
   assert.match(landing, /kapsam-alpha-waitlist-v1/);
   assert.match(landing, /kapsam-alpha-events-v1/);
@@ -87,10 +90,8 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(landing, /waitlist_submit_duplicate/);
   assert.match(landing, /pricing_view/);
   assert.match(landing, /useSyncExternalStore/);
-  assert.match(landing, /preview_onboarding/);
-  assert.match(landing, /preview_builder/);
-  assert.match(landing, /preview_public/);
-  assert.match(landing, /preview_followup/);
+  assert.match(landing, /<DemoApp layout="embedded" \/>/);
+  assert.doesNotMatch(landing, /<iframe/i);
   assert.ok(landing.indexOf('className="lp-hero lp-section"') < landing.indexOf('className="lp-preview lp-section"'));
   assert.ok(landing.indexOf('className="lp-preview lp-section"') < landing.indexOf('className="lp-transformation lp-section"'));
   const navSource = landing.slice(landing.indexOf('<nav aria-label="Ana navigasyon">'), landing.indexOf("</nav>"));
@@ -104,7 +105,6 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(landing, /FieldGroup/);
   assert.match(landing, /NativeSelect/);
   assert.match(landing, /Checkbox/);
-  assert.match(landing, /href="\/demo"/);
   assert.match(landing, /Görüntülenme verileri yaklaşık sinyaldir/);
   assert.match(layout, /<html lang="tr">/);
   assert.match(prototype, /"onboarding"/);
@@ -117,6 +117,8 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(prototype, /followUpScenarioCopy/);
   assert.match(prototype, /kapsam-prototype-state-v1/);
   assert.match(prototype, /CANLI ÜRÜN TURU/);
+  assert.match(prototype, /demo-experience--embedded/);
+  assert.match(prototype, /!isEmbedded && window\.location\.hash/);
   assert.match(prototype, /isDemo \|\| !hydrated/);
   assert.match(prototype, /#musteri-teklifi/);
   assert.match(prototype, /Düzenlediğin mesaj değiştirilsin mi/);

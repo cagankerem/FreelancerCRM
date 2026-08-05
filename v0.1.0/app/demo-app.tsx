@@ -2,6 +2,10 @@
 
 import { PrototypeApp } from "./prototype-app";
 
-export function DemoApp() {
-  return <PrototypeApp mode="demo" />;
+type DemoAppProps = {
+  layout?: "page" | "embedded";
+};
+
+export function DemoApp({ layout = "page" }: DemoAppProps) {
+  return <PrototypeApp mode="demo" layout={layout} />;
 }

@@ -614,7 +614,7 @@
 .lp-preview-stage {
   position: relative;
   overflow: hidden;
-  padding: 50px 42px 38px;
+  padding: 16px;
   border-radius: 25px;
   background:
     radial-gradient(circle at 20% 110%, rgb(255 255 255 / 19%), transparent 35%),
@@ -1051,7 +1051,7 @@
   .lp-step-card { min-height: auto; padding: 24px 22px 25px 98px; }
   .lp-step-number { top: 18px; }
   .lp-step-icon { position: absolute; top: 38px; left: 21px; width: 48px; height: 48px; margin: 0; }
-  .lp-preview-stage { padding: 40px 17px 24px; border-radius: 18px; }
+  .lp-preview-stage { padding: 8px; border-radius: 18px; }
   .lp-preview-grid { grid-template-columns: 1fr; }
   .lp-preview-card { min-height: 300px; }
   .lp-trust-item { padding-inline: 12px; }

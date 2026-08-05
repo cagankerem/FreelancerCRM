@@ -25,6 +25,7 @@ type Item = {
 type Currency = "TRY" | "USD" | "EUR";
 type TaxInfo = "excluded" | "included" | "none";
 type Decision = "accepted" | "rejected" | null;
+type PrototypeLayout = "page" | "embedded";
 
 type DraftSnapshot = {
   projectName: string; clientName: string; company: string; summary: string; scope: string;
@@ -535,12 +536,15 @@ function Onboarding({
   initialProfile,
   onComplete,
   onSkip,
+  embedded = false,
 }: {
   initialProfile: ProfileSnapshot; onComplete: (profile: ProfileSnapshot) => void; onSkip: () => void;
+  embedded?: boolean;
 }) {
   const [step, setStep] = useState(0);
   const [profile, setProfile, bind] = useStringFields(initialProfile);
   const { name, brand, currency } = profile;
+  const PageRoot = embedded ? "div" : "main";
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -552,7 +556,7 @@ function Onboarding({
   };
 
   return (
-    <main className="onboarding-page">
+    <PageRoot className="onboarding-page">
       <header className="onboarding-header">
         <BrandMark />
         <button type="button" className="text-button" onClick={onSkip}>Demo verileriyle geç <span aria-hidden="true">→</span></button>
@@ -677,7 +681,7 @@ function Onboarding({
           </div>
         </aside>
       </div>
-    </main>
+    </PageRoot>
   );
 }
 
@@ -687,9 +691,10 @@ function Sidebar({
   onNavigate,
   onRestart,
   demoMode = false,
+  embedded = false,
 }: {
   screen: Screen; profile: ProfileSnapshot; onNavigate: (next: Screen) => void;
-  onRestart: () => void; demoMode?: boolean;
+  onRestart: () => void; demoMode?: boolean; embedded?: boolean;
 }) {
   return (
     <aside className="sidebar">
@@ -729,7 +734,11 @@ function Sidebar({
             <span />
           </div>
           <p>{demoMode ? "Değişiklikler yalnız bu demo oturumunda tutulur." : "Bu ay 1 aktif teklif hakkın kaldı."}</p>
-          {demoMode ? <Link href="/#waitlist">Alpha sürümüne katıl →</Link> : <button type="button">Pro planı keşfet →</button>}
+          {demoMode ? (
+            embedded
+              ? <a href="#waitlist">Alpha sürümüne katıl →</a>
+              : <Link href="/#waitlist">Alpha sürümüne katıl →</Link>
+          ) : <button type="button">Pro planı keşfet →</button>}
         </div>
         <div className="profile-chip">
           <span className="avatar">{initials(profile.name)}</span>
@@ -751,10 +760,13 @@ function AppShell({
   onRestart,
   onCreate,
   demoMode = false,
+  embedded = false,
 }: {
   screen: Screen; profile: ProfileSnapshot; title: string; eyebrow: string; children: ReactNode;
-  onNavigate: (next: Screen) => void; onRestart: () => void; onCreate: () => void; demoMode?: boolean;
+  onNavigate: (next: Screen) => void; onRestart: () => void; onCreate: () => void;
+  demoMode?: boolean; embedded?: boolean;
 }) {
+  const AppContent = embedded ? "div" : "main";
   const handleNavigate = (next: Screen) => {
     if (next === "editor") {
       onCreate();
@@ -765,8 +777,8 @@ function AppShell({
 
   return (
     <div className="app-shell">
-      <Sidebar screen={screen} profile={profile} onNavigate={handleNavigate} onRestart={onRestart} demoMode={demoMode} />
-      <main className="app-main">
+      <Sidebar screen={screen} profile={profile} onNavigate={handleNavigate} onRestart={onRestart} demoMode={demoMode} embedded={embedded} />
+      <AppContent className="app-main">
         <div className="prototype-banner" role="note">
           <span>{demoMode ? "ÜRÜN DEMOSU" : "ALPHA SÜRÜMÜ"}</span>
           {demoMode ? "Örnek verilerle çalışır; yaptığın değişiklikler kaydedilmez." : "Kişisel çalışma alanın."}
@@ -783,7 +795,7 @@ function AppShell({
         </header>
         {children}
         <ProductFooter />
-      </main>
+      </AppContent>
       <nav className="mobile-nav" aria-label="Mobil navigasyon">
         {navItems.map((item) => (
           <button
@@ -1026,11 +1038,12 @@ function ProposalEditor({
   onNavigate,
   notify,
   demoMode = false,
+  embedded = false,
 }: {
   initialDraft: DraftSnapshot; profile: ProfileSnapshot; onBack: () => void;
   onSave: (draft: DraftSnapshot) => void; onPreview: (draft: DraftSnapshot) => void;
   onPublish: (draft: DraftSnapshot) => void; onNavigate: (screen: Screen) => void;
-  notify: (message: string) => void; demoMode?: boolean;
+  notify: (message: string) => void; demoMode?: boolean; embedded?: boolean;
 }) {
   const [step, setStep] = useState(0);
   const [draft, setDraft, bind] = useStringFields(() => cloneDraft(initialDraft));
@@ -1061,6 +1074,7 @@ function ProposalEditor({
 
   const total = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const validationIssues = validateDraft(draft, total);
+  const EditorContent = embedded ? "div" : "main";
 
   const createSnapshot = (): DraftSnapshot => cloneDraft({ ...draft, total });
   const updateItems = (update: (current: Item[]) => Item[]) =>
@@ -1120,8 +1134,9 @@ function ProposalEditor({
         onNavigate={onNavigate}
         onRestart={() => onNavigate("onboarding")}
         demoMode={demoMode}
+        embedded={embedded}
       />
-      <main className="editor-page">
+      <EditorContent className="editor-page">
       <div className="editor-topbar">
         <button type="button" className="back-button" onClick={onBack}>
           ← <span>Tekliflere dön</span>
@@ -1448,7 +1463,7 @@ function ProposalEditor({
           }}
         />
       ) : null}
-      </main>
+      </EditorContent>
     </div>
   );
 }
@@ -1725,18 +1740,21 @@ function PublicProposal({
   onBack,
   onDecision,
   onMessage,
+  embedded = false,
 }: {
   draft: DraftSnapshot; profile: ProfileSnapshot; preview: boolean; decision: Decision;
   linkRevoked: boolean; onBack: () => void;
   onDecision: (value: Exclude<Decision, null>) => void; onMessage: (value: string) => void;
+  embedded?: boolean;
 }) {
   const [confirm, setConfirm] = useState<Decision>(null);
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState("Teslim planındaki geliştirme desteğini ayrıca konuşabilir miyiz?");
+  const ProposalContent = embedded ? "div" : "main";
 
   if (linkRevoked) {
     return (
-      <main className="public-error">
+      <ProposalContent className="public-error">
         <BrandMark />
         <div className="public-error-card">
           <span aria-hidden="true">×</span>
@@ -1747,7 +1765,7 @@ function PublicProposal({
           </button>
         </div>
         <small>Güvenli teklif bağlantısı · İçerik paylaşılmadı</small>
-      </main>
+      </ProposalContent>
     );
   }
 
@@ -1784,7 +1802,7 @@ function PublicProposal({
         </div>
       </header>
 
-      <main className="proposal-document">
+      <ProposalContent className="proposal-document">
         <section className="document-hero">
           <div className="document-meta-top">
             <span>TEKLİF NO · TKL-1048</span>
@@ -1919,7 +1937,7 @@ function PublicProposal({
           )}
           <small className="decision-disclaimer">Bağlantı üzerinden verilen yanıt, elektronik imza veya hukuki kimlik doğrulaması değildir.</small>
         </section>
-      </main>
+      </ProposalContent>
 
       <footer className="public-footer" id="privacy">
         <div>
@@ -1980,7 +1998,8 @@ function PublicProposal({
 function DemoTour({
   screen,
   onSelect,
-}: { screen: Screen; onSelect: (screen: Screen) => void }) {
+  embedded = false,
+}: { screen: Screen; onSelect: (screen: Screen) => void; embedded?: boolean }) {
   const activeScreen = screen === "proposals" ? "dashboard" : screen;
 
   return (
@@ -2004,15 +2023,24 @@ function DemoTour({
         ))}
       </nav>
       <div className="demo-tour__actions">
-        <Link href="/">Landing’e dön</Link>
-        <Link className="demo-tour__cta" href="/#waitlist">Alpha sürümüne katıl</Link>
+        {embedded ? null : <Link href="/">Landing’e dön</Link>}
+        {embedded
+          ? <a className="demo-tour__cta" href="#waitlist">Alpha sürümüne katıl</a>
+          : <Link className="demo-tour__cta" href="/#waitlist">Alpha sürümüne katıl</Link>}
       </div>
     </header>
   );
 }
 
-export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
+export function PrototypeApp({
+  mode = "alpha",
+  layout = "page",
+}: {
+  mode?: "alpha" | "demo";
+  layout?: PrototypeLayout;
+}) {
   const isDemo = mode === "demo";
+  const isEmbedded = isDemo && layout === "embedded";
   const [screen, setScreen] = useState<Screen>(() => isDemo ? "dashboard" : "onboarding");
   const [profile, setProfile] = useState<ProfileSnapshot>(defaultProfile);
   const [draftSnapshot, setDraftSnapshot] = useState(() => cloneDraft(defaultDraftSnapshot));
@@ -2026,6 +2054,8 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
   const [publicCounted, setPublicCounted] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const toastTimerRef = useTimeoutRef();
+  const embeddedRootRef = useRef<HTMLDivElement>(null);
+  const embeddedContentRef = useRef<HTMLDivElement>(null);
 
   const notify = (message: string) => {
     setToast(message);
@@ -2091,13 +2121,25 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
     }
   }, [draftSnapshot, hydrated, isDemo, profile]);
 
+  const resetViewport = () => {
+    if (!isEmbedded) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    embeddedContentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    window.requestAnimationFrame(() => {
+      embeddedContentRef.current?.focus({ preventScroll: true });
+    });
+  };
+
   const navigate = (next: Screen) => {
-    if (window.location.hash) {
+    if (!isEmbedded && window.location.hash) {
       window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
     setPublicPreview(false);
     setScreen(isDemo && next === "onboarding" ? "dashboard" : next);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    resetViewport();
   };
 
   const openPublic = (preview: boolean) => {
@@ -2115,7 +2157,7 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
       setPublicCounted(true);
     }
     setScreen("public");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    resetViewport();
   };
 
   const startNewDraft = (currencyOverride?: Currency) => {
@@ -2142,9 +2184,20 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
     const body = <>{content}<Toast message={toast} />{overlay}</>;
     if (!isDemo) return body;
     return (
-      <div className="demo-experience">
-        <DemoTour screen={screen} onSelect={selectDemoStep} />
-        <div className="demo-experience__content">{body}</div>
+      <div
+        ref={embeddedRootRef}
+        className={cx("demo-experience", isEmbedded && "demo-experience--embedded")}
+      >
+        <DemoTour screen={screen} onSelect={selectDemoStep} embedded={isEmbedded} />
+        <div
+          ref={embeddedContentRef}
+          className="demo-experience__content"
+          role={isEmbedded ? "region" : undefined}
+          aria-label={isEmbedded ? "Etkileşimli demo içeriği" : undefined}
+          tabIndex={isEmbedded ? -1 : undefined}
+        >
+          {body}
+        </div>
       </div>
     );
   };
@@ -2167,6 +2220,7 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
         setCustomerMessage(value);
         notify("Mesaj güvenli biçimde kaydedildi.");
       }}
+      embedded={isEmbedded}
     />
   );
 
@@ -2175,6 +2229,7 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
       <Onboarding
         initialProfile={profile}
         onSkip={() => navigate("dashboard")}
+        embedded={isEmbedded}
         onComplete={(nextProfile) => {
           setProfile(nextProfile);
           startNewDraft(nextProfile.currency);
@@ -2208,6 +2263,7 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
             onNavigate={navigate}
             notify={notify}
             demoMode={isDemo}
+            embedded={isEmbedded}
           />
         </div>
         {screen === "public" ? publicProposal : null}
@@ -2242,6 +2298,7 @@ export function PrototypeApp({ mode = "alpha" }: { mode?: "alpha" | "demo" }) {
         onRestart={() => navigate(isDemo ? "dashboard" : "onboarding")}
         onCreate={startNewDraft}
         demoMode={isDemo}
+        embedded={isEmbedded}
       >
         {screen === "dashboard" ? (
           <Dashboard
