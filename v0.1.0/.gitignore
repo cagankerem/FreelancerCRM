@@ -45,3 +45,6 @@ next-env.d.ts
 
 # for computers self use
 .DS_Store
+
+# .codex files
+.codex/
