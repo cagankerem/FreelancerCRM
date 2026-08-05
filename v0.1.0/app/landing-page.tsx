@@ -239,9 +239,6 @@ function PreviewCard({ type }: { type: "onboarding" | "builder" | "public" | "fo
         <p>Hadi ilk teklifini oluşturalım.</p>
         <div className="lp-choice lp-choice--selected">Freelance yazılımcı</div>
         <div className="lp-choice">UI/UX tasarımcısı</div>
-        <a className="lp-preview-button" href="/demo" onClick={() => trackLandingEvent("prototype_clicked", { location: "preview_onboarding" })}>
-          Devam
-        </a>
       </article>
     );
   }
@@ -255,9 +252,6 @@ function PreviewCard({ type }: { type: "onboarding" | "builder" | "public" | "fo
         <label>Proje kapsamı</label>
         <div className="lp-textarea-mock">Kurumsal web sitesi tasarım ve geliştirme…</div>
         <div className="lp-preview-facts"><span>Teslim<br /><b>4–6 hafta</b></span><span>Revizyon<br /><b>2 tur</b></span></div>
-        <a className="lp-preview-button" href="/demo" onClick={() => trackLandingEvent("prototype_clicked", { location: "preview_builder" })}>
-          AI’dan taslak al
-        </a>
       </article>
     );
   }
@@ -272,9 +266,6 @@ function PreviewCard({ type }: { type: "onboarding" | "builder" | "public" | "fo
         <span className="lp-copy-line lp-copy-line--long" />
         <span className="lp-copy-line" />
         <span className="lp-copy-line lp-copy-line--short" />
-        <a className="lp-preview-button" href="/demo" onClick={() => trackLandingEvent("prototype_clicked", { location: "preview_public" })}>
-          Paylaş
-        </a>
       </article>
     );
   }
@@ -286,9 +277,6 @@ function PreviewCard({ type }: { type: "onboarding" | "builder" | "public" | "fo
       <div className="lp-mini-event"><Eye /><span><strong>Görüntülendi</strong><small>Bugün 10:55</small></span></div>
       <label>Takip mesajı taslağı</label>
       <div className="lp-textarea-mock">Merhaba, teklifimizi inceleyebildiniz mi?</div>
-      <a className="lp-preview-button lp-preview-button--outline" href="/demo" onClick={() => trackLandingEvent("prototype_clicked", { location: "preview_followup" })}>
-        Düzenle
-      </a>
     </article>
   );
 }
@@ -432,19 +420,7 @@ export function LandingPage() {
       <section className="lp-preview lp-section" aria-labelledby="lp-preview-title">
         <div className="lp-container">
           <div className="lp-preview-stage">
-            <div className="lp-preview-stage__heading">
-              <span className="lp-eyebrow lp-eyebrow--light">ÜRÜN ÖNİZLEMESİ</span>
-              <h2 id="lp-preview-title">Tüm teklif süreci, tek pencerede.</h2>
-            </div>
-            <div className="lp-preview-grid">
-              <PreviewCard type="onboarding" />
-              <PreviewCard type="builder" />
-              <PreviewCard type="public" />
-              <PreviewCard type="followup" />
-            </div>
-            <a className="lp-preview-link" href="/demo" onClick={() => trackLandingEvent("prototype_clicked", { location: "preview" })}>
-              Prototipi incele <ArrowRight />
-            </a>
+          
           </div>
         </div>
       </section>
@@ -605,7 +581,7 @@ export function LandingPage() {
       <footer className="lp-footer">
         <div className="lp-container lp-footer__grid">
           <div><BrandMark /><p>Tekliflerini oluştur, bağlantı olarak paylaş ve yaklaşık görüntülenme sinyallerini takip et.</p><span className="lp-alpha-note">Erken erişim deneyidir.</span></div>
-          <div><strong>Ürün</strong><a href="#urun">Özellikler</a><a href="#nasil-calisir">Nasıl çalışır?</a><a href="/demo">Prototipi incele</a></div>
+          <div><strong>Ürün</strong><a href="#urun">Özellikler</a><a href="#nasil-calisir">Nasıl çalışır?</a></div>
           <div><strong>Şeffaflık</strong><a href="#guven">Gizlilik ve kapsam</a><a href="#aydinlatma">Aydınlatma özeti</a><a href="#waitlist">Form demosu</a></div>
           <div><strong>İletişim</strong><p>Kalıcı bekleme listesi ve iletişim kanalı henüz aktif değildir.</p></div>
         </div>
