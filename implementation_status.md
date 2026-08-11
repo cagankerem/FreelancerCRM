@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-08-06
+Son güncelleme: 2026-08-11
 
 ## Takip Sistemi
 
@@ -15,6 +15,7 @@ Son güncelleme: 2026-08-06
 
 - [ ] TASK-001: Next.js ve strict TypeScript temelini kur — Kısmi
   - 2026-08-06: Next.js, React ve strict TypeScript mevcut; production runtime ve server/client sınırları kesinleşmedi.
+  - 2026-08-11: Native Next.js dev/production runtime, kök komutları ve rota smoke testleri tamamlandı; Vinext/Cloudflare/Sites/Vite/Wrangler ile boş D1/SQLite-Drizzle iskeleti kaldırıldı, server-only guard ve bundle sınırı testi eksik.
 - [ ] TASK-002: Tailwind, shadcn ve form temelini kur — Kısmi
   - 2026-08-06: Tailwind ve temel UI bileşenleri mevcut; React Hook Form, Zod ve ortak form altyapısı eksik.
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır

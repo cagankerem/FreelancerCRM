@@ -196,6 +196,20 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(css, /@media \(max-width:\s*560px\)/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.doesNotMatch(packageJson, /vinext/i);
+  assert.doesNotMatch(packageJson, /cloudflare|drizzle|vite|wrangler/i);
 
-  await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
+  const removedPrototypePaths = [
+    "../.openai/hosting.json",
+    "../app/_sites-preview",
+    "../build/sites-vite-plugin.ts",
+    "../db",
+    "../drizzle.config.ts",
+    "../examples/d1",
+  ];
+
+  await Promise.all(
+    removedPrototypePaths.map((path) =>
+      assert.rejects(access(new URL(path, import.meta.url))),
+    ),
+  );
 });

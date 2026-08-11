@@ -471,7 +471,7 @@ Use this precedence when information conflicts:
 6. `apps/web/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
 7. `plan.md` — future product thesis, production architecture, and roadmap only.
 
-`apps/web/db/schema.ts` is intentionally empty. `apps/web/examples/d1` is a generic framework example, not Kapsam content. The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
+The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
 
 **Color precedence exception:** the `## Colors` section and YAML color tokens in this file are the new source of truth. Do not reintroduce the current CSS palette's forest green, coral, mint, or sand values when generating a design. Continue to inherit the existing layout, spacing, typography, shape, and interaction patterns.
 
