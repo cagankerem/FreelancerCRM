@@ -2,7 +2,7 @@
 
 ## 0. Belgenin Amacı
 
-Bu belge, ürün doğrulamasından production yayınına kadar başka bir coding agent’ın bağımlılık sırasıyla uygulayabileceği, her adımı test edilebilir ana geliştirme yol haritasıdır. Uygulama kodu veya tam SQL şeması değildir.
+Bu belge, uygulama temelinden production yayınına kadar başka bir coding agent’ın bağımlılık sırasıyla uygulayabileceği, her adımı test edilebilir ana geliştirme yol haritasıdır. Uygulama kodu veya tam SQL şeması değildir.
 
 MVP’nin temel ürün tezi:
 
@@ -249,7 +249,7 @@ Zorunlu kurallar:
 - Token log, analitik ve hata mesajlarında maskelenir.
 - `Referrer-Policy: no-referrer` uygulanır.
 
-**Teknik Varsayım:** Tam token veritabanında açık saklanmayacaktır. Yeniden kopyalanabilir bağlantı için Bölüm 11’de tanımlanan selector + HMAC verifier yapısı Faz 0 güvenlik prototipinde doğrulanacaktır.
+**Teknik Varsayım:** Tam token veritabanında açık saklanmayacaktır. Yeniden kopyalanabilir bağlantı için Bölüm 11’de tanımlanan selector + HMAC verifier yapısı, teklif veri modeli ve public resolver uygulanırken saldırı, anahtar rotasyonu ve yeniden kopyalama testleriyle doğrulanacaktır.
 
 ### 5.8 Müşteri Teklif Sayfası
 
@@ -749,7 +749,7 @@ Ortak kurallar:
 - Public istek selector ile satırı bulur ve verifier’ı constant-time doğrular.
 - İptal veya rotasyon generation/selector değiştirir.
 - Secret yalnız server/Edge secret store’dadır.
-- Bu tasarım Faz 0 spike’ında saldırı, key rotation ve yeniden kopyalama açısından doğrulanacaktır.
+- Bu tasarım teklif veri modeli ve public resolver uygulanırken saldırı, key rotation ve yeniden kopyalama açısından doğrulanacaktır.
 
 ### 11.3 Tablolar
 
@@ -1058,7 +1058,7 @@ Sağlayıcı/model kesinleştirilmez; Bölüm 34’teki benchmark sonrası seçi
 - Alan başına çıktı: en fazla 4.000 karakter
 - Toplam çıktı: en fazla 16.000 karakter
 
-Bu değerler Faz 0 maliyet ve kalite testinden sonra değiştirilebilir.
+Bu değerler production AI uygulaması sırasında yürütülen maliyet ve kalite testlerinden sonra değiştirilebilir.
 
 Kota:
 
@@ -1355,7 +1355,7 @@ Release için kritik veya yüksek güvenlik bulgusu kalamaz.
 - Maksimum boyut: 4096×4096
 - Maksimum pixel sayısı ayrıca sınırlanır.
 
-Bu değerler Faz 0 gerçek logo örnekleri ve altyapı limitleriyle doğrulanır.
+Bu değerler güvenli logo yükleme uygulanırken gerçek logo örnekleri ve altyapı limitleriyle doğrulanır.
 
 ### 19.2 Doğrulama sırası
 
@@ -1457,7 +1457,7 @@ Teklif oluşturma süresi için ayrıca `proposal_creation_started` olayı kulla
 
 ## 21. Başarı Metrikleri
 
-Kaynak gereksinimde sayısal eşik bulunmayan metrikler için kesin rakam uydurulmaz; eşik Faz 0’da veri görülmeden önce kayıt altına alınır.
+Kaynak gereksinimde sayısal eşik bulunmayan metrikler için kesin rakam uydurulmaz; eşik ilk production ölçümü başlamadan önce kayıt altına alınır.
 
 | Metrik | Event kaynağı ve hesaplama | Periyot | Başarı eşiği |
 |---|---|---|---|
@@ -1466,26 +1466,28 @@ Kaynak gereksinimde sayısal eşik bulunmayan metrikler için kesin rakam uyduru
 | İkinci teklif | 30 günde ikinci teklif / ilk teklif oluşturan | Aylık kohort | En az %30 |
 | Üçüncü teklif | Üçüncü teklif / düzenli freelancer | 60 günlük kohort | En az %20 |
 | Oluşturulan teklif sayısı | Geçerli teklif eventleri | Gün/hafta/ay | Baseline ve artış trendi |
-| Paylaşılan teklif oranı | Kararlaştırılan gönderim proxy’si / yayın | Haftalık | Faz 0’da kilitlenecek |
-| Görüntülenen teklif oranı | En az bir sayılan view alan yayın / yayın | Haftalık | Faz 0’da kilitlenecek |
+| Paylaşılan teklif oranı | Kararlaştırılan gönderim proxy’si / yayın | Haftalık | İlk production ölçümünden önce kilitlenecek |
+| Görüntülenen teklif oranı | En az bir sayılan view alan yayın / yayın | Haftalık | İlk production ölçümünden önce kilitlenecek |
 | Kabul edilen teklif oranı | Kabul / görüntülenen veya yayınlanan | Aylık | Tanısal; tek başına ürün başarısı değil |
 | Kullanıcı başına teklif | Teklif / teklif oluşturan kullanıcı | Aylık | Medyan ve dağılım; retention esas |
 | AI metninin düzenlenme oranı | Düzenlenen AI taslağı / uygulanan AI taslağı | Haftalık | Baseline; aşırı düşük/yüksek nitel araştırılır |
 | Teklif oluşturma süresi | Başlangıç → geçerli taslak/yayın medyanı | Haftalık | Başlangıç hipotezi: AI ile en az %30 azalma |
-| Takip mesajı kullanım oranı | Üretip kopyalayan / uygun kullanıcı | Haftalık | Faz 0’da kilitlenecek |
+| Takip mesajı kullanım oranı | Üretip kopyalayan / uygun kullanıcı | Haftalık | İlk production ölçümünden önce kilitlenecek |
 | Ücretliye dönüşüm | Gerçek ödeme yapan / aktif kullanıcı | Aylık | En az %5 |
 | Gerçek ödeme | Test/iade hariç tekil ödeyen | Pilot kümülatif | En az 10 |
 | İkinci ay devam | İkinci ay aktif ücretli / ilk ay ödeyen | Aylık kohort | Mutlaka ölçülür; eşik fiyat deneyi öncesi belirlenir |
 
 Payda, pencere, saat dilimi, bot, test hesabı, iade ve iptal kuralları her raporda açıkça yazılır.
 
-## 22. Ürün Doğrulama Planı
+## 22. Ürün Sonrası Doğrulama Planı
 
-### 22.1 Aşama 1: Problem Görüşmeleri
+Bu çalışmalar Faz 1 geliştirmesini bloke etmez. Kullanılabilir beta veya production ürün hazırlandıktan sonra gerçek kullanım verisi ve ürünü deneyimlemiş kullanıcı geri bildirimiyle yürütülür.
 
-- En az 20 freelancer
+### 22.1 Aşama 1: Gerçek Kullanım ve Kullanıcı Görüşmeleri
+
+- En az 20 aktif veya beta freelancer
 - İki personanın temsili
-- Çözüm anlatılmadan mevcut davranış araştırması
+- Gerçek teklif oluşturma ve paylaşma davranışının incelenmesi
 - Yönlendirici “kullanır mıydın?” sorularının kanıt sayılmaması
 
 Sorular:
@@ -1514,7 +1516,7 @@ Kayıt yöntemi:
 - Tekrarlayan tema
 - Kayıt izni ve silme tercihi
 
-### 22.2 Aşama 2: Landing Page
+### 22.2 Aşama 2: Launch Landing Page ve Edinim Ölçümü
 
 İçerik:
 
@@ -1523,38 +1525,39 @@ Kayıt yöntemi:
 - Yaklaşık görüntülenme takibi
 - Düzenlenebilir AI teklif üretimi
 - 149/249 TL fiyat deneyi
-- Erken erişim formu
+- Kayıt veya beta deneme formu
 
 Ölçümler:
 
 - Ziyaret → kayıt
 - Fiyatlandırma görüntüleme → CTA
-- Erken erişim → problem görüşmesi
+- Kayıt → ilk teklif aktivasyonu
 - Upgrade ilgisi
 - Kaynak ve varyant kırılımı
 
-PDF ve özel şablon hazır gösterilmez. Sahte kapı açıkça etiketlenir ve ödeme almaz.
+PDF ve özel şablon hazır gösterilmez. Hazır olmayan özellik için ödeme veya yanıltıcı CTA kullanılmaz.
 
-### 22.3 Aşama 3: Concierge MVP
+### 22.3 Aşama 3: Destekli Beta Kullanımı
 
+- Kullanılabilir ürün üzerinde destekli onboarding yapılır.
 - İzinli mevcut teklifler incelenir ve anonimleştirilir.
-- Şablonlar kullanıcı için manuel aktarılabilir.
-- Promptlar kullanıcıya göre elle iyileştirilebilir.
 - Hazırlama süresi kaydedilir.
 - Kullanılan, değiştirilen ve reddedilen AI alanları ölçülür.
 - Gerçek müşteriye gönderim doğrulanır.
 - 24–72 saat sonrası takip davranışı görüşülür.
-- Manuel çalışma ürün özelliği gibi vaat edilmez.
-- Tekrarlayan manuel süreç yalnız retention ve ödeme kanıtıyla ürünleştirilir.
+- Destek sırasında yapılan manuel çalışma kalıcı ürün özelliği gibi vaat edilmez.
+- Tekrarlayan destek ihtiyacı yalnız retention, kullanım ve ödeme kanıtıyla ürünleştirilir.
 
 ## 23. İlk 100 Kullanıcı Edinim Planı
 
+Bu plan kullanılabilir beta veya production ürün hazırlandıktan sonra başlar; Faz 1 geliştirmesinin giriş kapısı değildir.
+
 | Kanal | Hedef | Ücretsiz değer | Mesaj ve CTA | Başarı metriği | Spam sınırı |
 |---|---:|---|---|---|---|
-| Doğrudan görüşmeler | 30 | Teklif inceleme ve kapsam kontrolü | “Son teklif sürecini araştırıyoruz”; görüşme CTA | Görüşme, aktivasyon, gerçek teklif | Kişisel tek temas + en fazla bir takip |
+| Doğrudan görüşmeler | 30 | Teklif inceleme ve kapsam kontrolü | “Çalışan ürünü gerçek teklifinle dene”; beta kullanım CTA’sı | Aktivasyon, gerçek teklif ve kullanım sonrası geri bildirim | Kişisel tek temas + en fazla bir takip |
 | LinkedIn içerikleri | 25 | Teklif maddeleri, kapsam/fiyat ve takip örnekleri | Eğitici içerik → ücretsiz oluşturucu | Landing, kayıt, ilk teklif | Otomatik DM ve toplu etiket yok |
 | Yazılım/tasarım toplulukları | 20 | Şablon ve checklist | Önce ücretsiz değer, sonra izinli beta CTA | Kanal kayıt ve aktivasyon | Moderatör izni; izinsiz DM yok |
-| X paylaşımları | 15 | Build-in-public, önce/sonra örnekleri | Demo veya erken erişim | Tıklama ve nitelikli kayıt | Otomatik mention ve sahte sosyal kanıt yok |
+| X paylaşımları | 15 | Build-in-public, önce/sonra örnekleri | Çalışan ürün veya beta kayıt | Tıklama ve nitelikli kayıt | Otomatik mention ve sahte sosyal kanıt yok |
 | Manuel referans | 10 | Ücretsiz onboarding | Aktive kullanıcıdan izinli davet | Nitelikli referans ve ikinci teklif | Ürün içi referral sistemi yok |
 
 Üniversite öğrencileri, tasarım/yazılım toplulukları ve yakın çevre doğrudan/topluluk kanallarında değerlendirilebilir.
@@ -1599,7 +1602,6 @@ PDF ve özel şablon hazır gösterilmez. Sahte kapı açıkça etiketlenir ve �
 
 | Faz | Geçiş şartı |
 |---|---|
-| 0 | Public erişim, RLS, tracking, token ve AI spike negatifleri geçer |
 | 1A | Lint, format, type-check, unit, build ve migration CI geçer |
 | 1B | Auth/profile E2E ve Storage RLS geçer |
 | 1C | Temiz migration, RLS matrisi ve state concurrency geçer |
@@ -1683,21 +1685,6 @@ Kurallar:
 - Deploy sonrası auth, public teklif, view, yanıt, AI degrade ve webhook smoke testleri çalışır.
 
 ## 28. Geliştirme Fazları
-
-### Faz 0: Kodlamadan Önce
-
-- 20 freelancer görüşmesi
-- Teklif şablonlarının toplanması ve anonimleştirilmesi
-- Landing page
-- 149/249 TL fiyat testi
-- Bekleme listesi
-- Tıklanabilir prototip
-- Concierge MVP
-- Public teklif erişimi spike’ı
-- Görüntülenme takibi spike’ı
-- Supabase RLS spike’ı
-- AI yapılandırılmış çıktı ve maliyet spike’ı
-- Paylaşım anahtarı güvenlik spike’ı
 
 ### Faz 1A: Proje Temeli
 
@@ -1856,439 +1843,7 @@ Yalnız tekrar kullanım ve ödeme doğrulanırsa:
 
 Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasyon görevi açılmaz.
 
-### TASK-001: Problem görüşmesi protokolünü hazırla
-
-**Amaç:** Yönlendirmeyen, karşılaştırılabilir problem kanıtı toplamak.
-
-**Kapsam:** İki persona, soru seti, onam, anonim not ve tema şablonu.
-
-**Kapsam Dışı:** Satış, ürün taahhüdü ve uygulama kodu.
-
-**Bağımlılıklar:** Yok.
-
-**Teknik Notlar:** Araştırma ID’si kişisel veriden ayrı tutulur.
-
-**Güvenlik ve Veri Notları:** Kayıt izni, minimizasyon ve silme tercihi alınır.
-
-**Kabul Kriterleri:**
-
-- [ ] İki persona ve bütün davranış soruları kapsandı.
-- [ ] Onam ve silme akışı tanımlandı.
-- [ ] Yönlendirici soru kontrolü yapıldı.
-- [ ] Pilot görüşme tamamlandı.
-
-**Testler:**
-
-- Unit: Uygulanmaz.
-- Integration: Uygulanmaz.
-- E2E: Pilot görüşme → anonim not → tema.
-- Manuel kontrol: Ürün/araştırma incelemesi.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Çıktı tamamlandı.
-- [ ] Kontroller geçti.
-- [ ] Kodsuz görevde lint/type-check N/A olarak belgelendi.
-- [ ] Veri güvenliği uygulandı.
-- [ ] Dokümantasyon güncellendi.
-
-### TASK-002: En az 20 problem görüşmesi yürüt
-
-**Amaç:** Problem sıklığı, şiddeti ve ödeme davranışını doğrulamak.
-
-**Kapsam:** İki personadan en az 20 nitelikli görüşme ve anonim tema analizi.
-
-**Kapsam Dışı:** Diğer segmentlerin sonuçlara karıştırılması.
-
-**Bağımlılıklar:** TASK-001.
-
-**Teknik Notlar:** Ham nottan temaya izlenebilirlik korunur.
-
-**Güvenlik ve Veri Notları:** İzin, erişim sınırı ve veri minimizasyonu uygulanır.
-
-**Kabul Kriterleri:**
-
-- [ ] En az 20 görüşme tamamlandı.
-- [ ] Her iki persona temsil edildi.
-- [ ] Son gerçek teklif davranışı kaydedildi.
-- [ ] Kalite örneklemi denetlendi.
-
-**Testler:**
-
-- Unit: Uygulanmaz.
-- Integration: Not → tema eşlemesi.
-- E2E: Görüşme kayıt süreci.
-- Manuel kontrol: Rastgele not denetimi.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Çıktı tamamlandı.
-- [ ] Kalite kontrolü geçti.
-- [ ] Kodsuz görev N/A’ları belgelendi.
-- [ ] Veri güvenliği uygulandı.
-- [ ] Araştırma raporu güncellendi.
-
-### TASK-003: Teklif örneklerini anonimleştir ve sınıflandır
-
-**Amaç:** Alan ve prompt tasarımını gerçek tekliflere dayandırmak.
-
-**Kapsam:** İzinli örneklerin bölüm, persona, para birimi ve eksik alan matrisi.
-
-**Kapsam Dışı:** İzinsiz model aktarımı ve şablon ürünü geliştirme.
-
-**Bağımlılıklar:** TASK-001.
-
-**Teknik Notlar:** Ham ve anonim kopyalar ayrı tutulur.
-
-**Güvenlik ve Veri Notları:** İsim, şirket, iletişim ve proje sırları kaldırılır.
-
-**Kabul Kriterleri:**
-
-- [ ] İki persona örnekleri kapsandı.
-- [ ] Teklif alan matrisi çıkarıldı.
-- [ ] Anonimleştirme kontrolü geçti.
-- [ ] Silme prosedürü uygulanabilir.
-
-**Testler:**
-
-- Unit: Anonim veri kontrol listesi.
-- Integration: Uygulanmaz.
-- E2E: Örnek kabul → anonim kopya.
-- Manuel kontrol: Çift göz inceleme.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Veri seti tamamlandı.
-- [ ] Kontroller geçti.
-- [ ] Kodsuz N/A’lar belgelendi.
-- [ ] Erişim/silme uygulandı.
-- [ ] Alan matrisi güncellendi.
-
-### TASK-004: Landing page ve bekleme listesi oluştur
-
-**Amaç:** Değer önerisi ve erken erişim ilgisini ölçmek.
-
-**Kapsam:** Değer, ekran, AI/tracking anlatımı, fiyat, form ve hukuk bağlantıları.
-
-**Kapsam Dışı:** Hazır olmayan Pro özelliğini satmak.
-
-**Bağımlılıklar:** TASK-001.
-
-**Teknik Notlar:** Kaynak ve varyant eventleri eklenir.
-
-**Güvenlik ve Veri Notları:** Minimum iletişim bilgisi ve aydınlatma kullanılır.
-
-**Kabul Kriterleri:**
-
-- [ ] Zorunlu içerik ve CTA’lar mevcut.
-- [ ] PDF/özel şablon aktif gösterilmiyor.
-- [ ] Eventler doğrulandı.
-- [ ] Mobil ve erişilebilirlik kontrolü geçti.
-
-**Testler:**
-
-- Unit: Form şeması.
-- Integration: Waitlist kaydı.
-- E2E: Ziyaret → kayıt.
-- Manuel kontrol: İçerik ve cihaz görünümü.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Kod tamamlandı.
-- [ ] Testler geçti.
-- [ ] Lint ve type-check geçti.
-- [ ] Güvenlik kontrolleri uygulandı.
-- [ ] Dokümantasyon güncellendi.
-
-### TASK-005: Fiyat ve ödeme isteği deneyini kur
-
-**Amaç:** 149/249 TL, yıllık ve kurucu ilgisini ölçmek.
-
-**Kapsam:** Kararlı varyant, açık fake-door veya kapsamı açık ön sipariş ve rapor.
-
-**Kapsam Dışı:** Belirsiz teslim için ödeme almak.
-
-**Bağımlılıklar:** TASK-004.
-
-**Teknik Notlar:** Test ve production trafik ayrılır.
-
-**Güvenlik ve Veri Notları:** Sahte kapıda kart alınmaz; kart uygulamada saklanmaz.
-
-**Kabul Kriterleri:**
-
-- [ ] Varyant/payda tanımlandı.
-- [ ] Hazır olmayan kapsam açıklandı.
-- [ ] Ön sipariş varsa teslim/iade bilgisi var.
-- [ ] Deney raporu üretilebiliyor.
-
-**Testler:**
-
-- Unit: Varyant ataması.
-- Integration: Event kaydı.
-- E2E: Fiyat CTA akışı.
-- Manuel kontrol: Ticari şeffaflık.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Kod/deney tamamlandı.
-- [ ] Testler geçti.
-- [ ] Lint/type-check geçti.
-- [ ] Ödeme/veri sınırı uygulandı.
-- [ ] Deney dokümanı güncellendi.
-
-### TASK-006: Tıklanabilir prototipi test et
-
-**Amaç:** Ana akış sürtünmesini kod öncesi görmek.
-
-**Kapsam:** Onboarding, manuel/AI teklif, önizleme, paylaşım, durum ve takip.
-
-**Kapsam Dışı:** Production backend ve CRM.
-
-**Bağımlılıklar:** TASK-002, TASK-003.
-
-**Teknik Notlar:** Görev tamamlama ve takılma noktaları kaydedilir.
-
-**Güvenlik ve Veri Notları:** Yalnız sentetik veri kullanılır.
-
-**Kabul Kriterleri:**
-
-- [ ] Kritik akışlar prototipte mevcut.
-- [ ] İki persona ile test edildi.
-- [ ] Önemli sorunlar önceliklendirildi.
-- [ ] Scope dışı istekler ayrı kaydedildi.
-
-**Testler:**
-
-- Unit: Uygulanmaz.
-- Integration: Uygulanmaz.
-- E2E: Prototip görevleri.
-- Manuel kontrol: Persona testi.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Prototip tamamlandı.
-- [ ] Test raporu tamamlandı.
-- [ ] Kodsuz N/A’lar belgelendi.
-- [ ] Sentetik veri kuralı uygulandı.
-- [ ] Scope kaydı güncellendi.
-
-### TASK-007: Concierge MVP yürüt
-
-**Amaç:** Manuel süreçte gerçek değer ve tekrar eden ihtiyaçları ölçmek.
-
-**Kapsam:** İzinli teklif inceleme, manuel aktarım, prompt iyileştirme ve takip görüşmesi.
-
-**Kapsam Dışı:** Manuel hizmeti otomatik ürün özelliği gibi vaat etmek.
-
-**Bağımlılıklar:** TASK-002, TASK-003, TASK-006.
-
-**Teknik Notlar:** Süre, AI alan kullanımı ve gerçek gönderim kaydedilir.
-
-**Güvenlik ve Veri Notları:** Kullanıcı/müşteri verisi anonimleştirilir ve silme tarihi belirlenir.
-
-**Kabul Kriterleri:**
-
-- [ ] Her iki personadan pilot tamamlandı.
-- [ ] Manuel zaman ve değişiklikler ölçüldü.
-- [ ] Gerçek gönderim doğrulandı.
-- [ ] Ürünleştirilecek işler kanıtla ayrıldı.
-
-**Testler:**
-
-- Unit: Uygulanmaz.
-- Integration: Araştırma event eşlemesi.
-- E2E: Teklif → gönderim → takip görüşmesi.
-- Manuel kontrol: Veri ve scope denetimi.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Pilot tamamlandı.
-- [ ] Ölçümler doğrulandı.
-- [ ] Kodsuz N/A’lar belgelendi.
-- [ ] Veri güvenliği uygulandı.
-- [ ] Concierge raporu güncellendi.
-
-### TASK-008: Public token ve erişim spike’ı
-
-**Amaç:** Anonim erişimi tabloyu açmadan doğrulamak.
-
-**Kapsam:** Selector/HMAC token, minimum DTO, revoke, expiry ve log redaksiyonu.
-
-**Kapsam Dışı:** Nihai public UI.
-
-**Bağımlılıklar:** TASK-003.
-
-**Teknik Notlar:** Yeniden kopyalama ve key rotation test edilir.
-
-**Güvenlik ve Veri Notları:** Anonim `proposals SELECT` yoktur.
-
-**Kabul Kriterleri:**
-
-- [ ] Geçerli token minimum DTO döndürüyor.
-- [ ] Invalid/expired/revoked içerik sızdırmıyor.
-- [ ] Tam token DB’de açık tutulmuyor.
-- [ ] Eski generation reddediliyor.
-
-**Testler:**
-
-- Unit: HMAC ve token parser.
-- Integration: Public resolver.
-- E2E: Dört erişim durumu.
-- Manuel kontrol: Log ve network.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Spike kodu tamamlandı.
-- [ ] Testler geçti.
-- [ ] Lint/type-check geçti.
-- [ ] Tehdit kontrolleri uygulandı.
-- [ ] Teknik karar güncellendi.
-
-### TASK-009: RLS spike’ı
-
-**Amaç:** Tenant izolasyonu ve servis sınırını doğrulamak.
-
-**Kapsam:** Owner, other, anon ve service aktörleri için örnek politikalar ve test harness’i.
-
-**Kapsam Dışı:** Tam production şeması.
-
-**Bağımlılıklar:** TASK-008.
-
-**Teknik Notlar:** Helper fonksiyonlar aşırı yetki vermemelidir.
-
-**Güvenlik ve Veri Notları:** Service role yalnız server’dadır.
-
-**Kabul Kriterleri:**
-
-- [ ] Owner kendi kaydına erişiyor.
-- [ ] Other ve anon reddediliyor.
-- [ ] Public resolver kontrollü erişiyor.
-- [ ] Sahte `user_id` yazımı reddediliyor.
-
-**Testler:**
-
-- Unit: Policy helper.
-- Integration: Aktör matrisi.
-- E2E: Cross-user erişim.
-- Manuel kontrol: Policy incelemesi.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Spike tamamlandı.
-- [ ] RLS testleri geçti.
-- [ ] Lint/type-check geçti.
-- [ ] Service sınırı uygulandı.
-- [ ] Harness dokümante edildi.
-
-### TASK-010: Görüntülenme takibi spike’ı
-
-**Amaç:** Yaklaşık takip, performans ve minimizasyon yaklaşımını doğrulamak.
-
-**Kapsam:** Async event, dedupe, bot flag, aggregate ve write failure.
-
-**Kapsam Dışı:** Kesin kişi veya fingerprint.
-
-**Bağımlılıklar:** TASK-008.
-
-**Teknik Notlar:** IP’siz ve minimize alternatifler karşılaştırılır.
-
-**Güvenlik ve Veri Notları:** Raw IP kalıcılaştırılmaz.
-
-**Kabul Kriterleri:**
-
-- [ ] Event hatası sayfayı bloklamıyor.
-- [ ] Agregalar atomik ve doğru.
-- [ ] Bot/dedupe davranışı ölçüldü.
-- [ ] IP kararı için teknik veri üretildi.
-
-**Testler:**
-
-- Unit: Bot ve dedupe.
-- Integration: Event insert/aggregate.
-- E2E: Failure isolation.
-- Manuel kontrol: Uyarı ve privacy.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Spike tamamlandı.
-- [ ] Test/load smoke geçti.
-- [ ] Lint/type-check geçti.
-- [ ] Veri minimizasyonu uygulandı.
-- [ ] Rapor güncellendi.
-
-### TASK-011: AI yapılandırılmış çıktı ve maliyet spike’ı
-
-**Amaç:** Sınırlı ve güvenilir AI üretimini ölçmek.
-
-**Kapsam:** Provider adaptörü, yedi alan, Zod, retry, injection ve maliyet.
-
-**Kapsam Dışı:** Kesin fiyat ve production kota.
-
-**Bağımlılıklar:** TASK-003.
-
-**Teknik Notlar:** Anonim teklif corpus’u kullanılır.
-
-**Güvenlik ve Veri Notları:** Key server-only; gereksiz müşteri verisi yok.
-
-**Kabul Kriterleri:**
-
-- [ ] Yedi alan yapılandırılmış üretiliyor.
-- [ ] Invalid çıktı güvenli reddediliyor.
-- [ ] Injection sınırı aşamıyor.
-- [ ] Token/maliyet/latency raporu var.
-
-**Testler:**
-
-- Unit: Schema ve prompt builder.
-- Integration: Mock/provider.
-- E2E: Provider hata → manuel fallback.
-- Manuel kontrol: Türkçe kalite.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Spike tamamlandı.
-- [ ] Testler geçti.
-- [ ] Lint/type-check geçti.
-- [ ] AI güvenlik/maliyet kontrolleri uygulandı.
-- [ ] Benchmark güncellendi.
-
-### TASK-012: Faz 0 kanıt ve geçiş raporu
-
-**Amaç:** Devam, pivot veya durdurma kararını kanıtla vermek.
-
-**Kapsam:** Görüşme, landing, fiyat, prototip, concierge, spike ve sekiz hipotez.
-
-**Kapsam Dışı:** Bulgusuz yeni özellik.
-
-**Bağımlılıklar:** TASK-002–TASK-011.
-
-**Teknik Notlar:** Örneklem ve payda sınırlılıkları yazılır.
-
-**Güvenlik ve Veri Notları:** Rapor yalnız anonim/agrega veri taşır.
-
-**Kabul Kriterleri:**
-
-- [ ] Sekiz hipotez değerlendirildi.
-- [ ] Açık kararlar listelendi.
-- [ ] Scope değişiklikleri gerekçelendirildi.
-- [ ] Devam/pivot/durdur kararı onaylandı.
-
-**Testler:**
-
-- Unit: Uygulanmaz.
-- Integration: Metrik kaynak uzlaştırması.
-- E2E: Uygulanmaz.
-- Manuel kontrol: Kanıt ve scope review.
-
-**Tamamlanma Tanımı:**
-
-- [ ] Rapor tamamlandı.
-- [ ] Veri kalitesi kontrol edildi.
-- [ ] Kodsuz N/A’lar belgelendi.
-- [ ] Gizlilik kontrolü yapıldı.
-- [ ] Karar kaydı güncellendi.
-
-### TASK-013: Next.js ve strict TypeScript temelini kur
+### TASK-001: Next.js ve strict TypeScript temelini kur
 
 **Amaç:** Tip güvenli ve tekrar üretilebilir uygulama tabanı.
 
@@ -2296,7 +1851,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Ürün özelliği.
 
-**Bağımlılıklar:** TASK-012 devam kararı.
+**Bağımlılıklar:** Yok.
 
 **Teknik Notlar:** Server-only import guard kullanılır.
 
@@ -2324,7 +1879,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Secret sınırı uygulandı.
 - [ ] Mimari doküman güncellendi.
 
-### TASK-014: Tailwind, shadcn ve form temelini kur
+### TASK-002: Tailwind, shadcn ve form temelini kur
 
 **Amaç:** Tutarlı ve erişilebilir UI altyapısı.
 
@@ -2332,7 +1887,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Nihai ekranlar.
 
-**Bağımlılıklar:** TASK-013.
+**Bağımlılıklar:** TASK-001.
 
 **Teknik Notlar:** Tekrarlanan hard-coded değerlerden kaçınılır.
 
@@ -2360,7 +1915,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] A11y kontrolleri uygulandı.
 - [ ] UI dokümanı güncellendi.
 
-### TASK-015: Supabase, ortam ve local geliştirmeyi yapılandır
+### TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
 
 **Amaç:** Güvenli ortam ve secret ayrımı.
 
@@ -2368,7 +1923,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Production iş şeması.
 
-**Bağımlılıklar:** TASK-013.
+**Bağımlılıklar:** TASK-001.
 
 **Teknik Notlar:** Eksik env fail-fast olmalıdır.
 
@@ -2396,7 +1951,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Secret sınırı uygulandı.
 - [ ] Ortam dokümanı güncellendi.
 
-### TASK-016: Test ve CI kapılarını kur
+### TASK-004: Test ve CI kapılarını kur
 
 **Amaç:** Otomatik kalite ve güvenlik kapısı.
 
@@ -2404,7 +1959,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Tüm özellik testleri.
 
-**Bağımlılıklar:** TASK-013–TASK-015.
+**Bağımlılıklar:** TASK-001–TASK-003.
 
 **Teknik Notlar:** Sentetik deterministik test verisi kullanılır.
 
@@ -2432,7 +1987,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Least privilege uygulandı.
 - [ ] CI dokümanı güncellendi.
 
-### TASK-017: Correlation ID ve güvenli logger kur
+### TASK-005: Correlation ID ve güvenli logger kur
 
 **Amaç:** Baştan izlenebilir ve PII’siz sunucu işlemleri.
 
@@ -2440,7 +1995,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Nihai harici hata sağlayıcısı.
 
-**Bağımlılıklar:** TASK-013, TASK-015.
+**Bağımlılıklar:** TASK-001, TASK-003.
 
 **Teknik Notlar:** Edge ve Node runtime uyumlu olur.
 
@@ -2468,7 +2023,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Redaksiyon uygulandı.
 - [ ] Log sözlüğü güncellendi.
 
-### TASK-018: Kayıt, giriş ve çıkış akışlarını geliştir
+### TASK-006: Kayıt, giriş ve çıkış akışlarını geliştir
 
 **Amaç:** Kullanıcı hesabı temelini sağlamak.
 
@@ -2476,7 +2031,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Google SSO ve müşteri hesabı.
 
-**Bağımlılıklar:** TASK-015–TASK-017.
+**Bağımlılıklar:** TASK-003–TASK-005.
 
 **Teknik Notlar:** Server session yaklaşımı kullanılır.
 
@@ -2504,7 +2059,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Auth güvenliği uygulandı.
 - [ ] Akış dokümanı güncellendi.
 
-### TASK-019: Şifre sıfırlama, session ve korumalı rotaları geliştir
+### TASK-007: Şifre sıfırlama, session ve korumalı rotaları geliştir
 
 **Amaç:** Güvenli hesap kurtarma ve route izolasyonu.
 
@@ -2512,7 +2067,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Pazarlama veya teklif e-postası.
 
-**Bağımlılıklar:** TASK-018.
+**Bağımlılıklar:** TASK-006.
 
 **Teknik Notlar:** Auth e-postaları ürün otomatik gönderimi sayılmaz.
 
@@ -2540,7 +2095,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Token/session güvenliği uygulandı.
 - [ ] Auth dokümanı güncellendi.
 
-### TASK-020: Profil şeması ve RLS migration’ını oluştur
+### TASK-008: Profil şeması ve RLS migration’ını oluştur
 
 **Amaç:** Profil sahipliğini DB katmanında kurmak.
 
@@ -2548,7 +2103,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Profil UI ve logo dosyası.
 
-**Bağımlılıklar:** TASK-015, TASK-019.
+**Bağımlılıklar:** TASK-003, TASK-007.
 
 **Teknik Notlar:** Temiz DB’de tekrarlanabilir migration.
 
@@ -2576,7 +2131,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] RLS uygulandı.
 - [ ] Şema dokümanı güncellendi.
 
-### TASK-021: Onboarding ve profil/marka UI’sini geliştir
+### TASK-009: Onboarding ve profil/marka UI’sini geliştir
 
 **Amaç:** Teklif sahibi bilgilerini toplamak.
 
@@ -2584,7 +2139,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Ekip ve ajans rolleri.
 
-**Bağımlılıklar:** TASK-014, TASK-020.
+**Bağımlılıklar:** TASK-002, TASK-008.
 
 **Teknik Notlar:** RHF/Zod ve optimistic concurrency.
 
@@ -2612,7 +2167,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Veri minimizasyonu uygulandı.
 - [ ] Profil dokümanı güncellendi.
 
-### TASK-022: Güvenli logo yüklemeyi geliştir
+### TASK-010: Güvenli logo yüklemeyi geliştir
 
 **Amaç:** Marka logosunu dosya saldırılarına karşı korumak.
 
@@ -2620,7 +2175,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** SVG ve genel dosya yükleme.
 
-**Bağımlılıklar:** TASK-020, TASK-021.
+**Bağımlılıklar:** TASK-008, TASK-009.
 
 **Teknik Notlar:** Immutable nesne adı ve re-encode kullanılır.
 
@@ -2648,7 +2203,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Dosya güvenliği uygulandı.
 - [ ] Upload dokümanı güncellendi.
 
-### TASK-023: Clients migration ve RLS oluştur
+### TASK-011: Clients migration ve RLS oluştur
 
 **Amaç:** Minimum müşteri kaydı altyapısı.
 
@@ -2656,7 +2211,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** CRM alanları ve müşteri listesi ekranı.
 
-**Bağımlılıklar:** TASK-015, TASK-020.
+**Bağımlılıklar:** TASK-003, TASK-008.
 
 **Teknik Notlar:** Proposal snapshot için client silme davranışı belgelenir.
 
@@ -2684,7 +2239,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] RLS/minimizasyon uygulandı.
 - [ ] Şema dokümanı güncellendi.
 
-### TASK-024: Proposal, section ve item migration’larını oluştur
+### TASK-012: Proposal, section ve item migration’larını oluştur
 
 **Amaç:** Teklif içerik ve güvenli fiyat modelini kurmak.
 
@@ -2692,7 +2247,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Versiyonlama, özel alan ve PDF.
 
-**Bağımlılıklar:** TASK-023.
+**Bağımlılıklar:** TASK-011.
 
 **Teknik Notlar:** Floating point yok; publish alanları controlled write olur.
 
@@ -2720,7 +2275,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Fiyat/token güvenliği uygulandı.
 - [ ] Şema dokümanı güncellendi.
 
-### TASK-025: View, response, AI, subscription ve log migration’larını oluştur
+### TASK-013: View, response, AI, subscription ve log migration’larını oluştur
 
 **Amaç:** Event, yanıt, kota, abonelik ve audit modelini kurmak.
 
@@ -2728,7 +2283,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** PII analitik deposu.
 
-**Bağımlılıklar:** TASK-024.
+**Bağımlılıklar:** TASK-012.
 
 **Teknik Notlar:** Response unique constraint ve quota rezervasyonu bulunur.
 
@@ -2756,7 +2311,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Veri minimizasyonu uygulandı.
 - [ ] Şema dokümanı güncellendi.
 
-### TASK-026: Tam RLS matrisi ve testlerini uygula
+### TASK-014: Tam RLS matrisi ve testlerini uygula
 
 **Amaç:** Bütün tenant verisini izole etmek.
 
@@ -2764,7 +2319,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Anonim `proposals SELECT`.
 
-**Bağımlılıklar:** TASK-023–TASK-025, TASK-009.
+**Bağımlılıklar:** TASK-011–TASK-013.
 
 **Teknik Notlar:** Child ownership parent proposal üzerinden kontrol edilir.
 
@@ -2792,7 +2347,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Service sınırı uygulandı.
 - [ ] RLS matrisi güncellendi.
 
-### TASK-027: Minimum müşteri oluşturma/seçme işlemlerini geliştir
+### TASK-015: Minimum müşteri oluşturma/seçme işlemlerini geliştir
 
 **Amaç:** Teklif girişini kolaylaştırmak.
 
@@ -2800,7 +2355,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** CRM listesi, pipeline ve lead.
 
-**Bağımlılıklar:** TASK-023, TASK-026.
+**Bağımlılıklar:** TASK-011, TASK-014.
 
 **Teknik Notlar:** Server Zod ve owner scope kullanılır.
 
@@ -2828,7 +2383,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Yetki/minimizasyon uygulandı.
 - [ ] API dokümanı güncellendi.
 
-### TASK-028: Teklif taslak CRUD işlemlerini geliştir
+### TASK-016: Teklif taslak CRUD işlemlerini geliştir
 
 **Amaç:** Proposal, section ve item verisini atomik yönetmek.
 
@@ -2836,7 +2391,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Yayın, public erişim ve AI.
 
-**Bağımlılıklar:** TASK-024, TASK-026, TASK-027.
+**Bağımlılıklar:** TASK-012, TASK-014, TASK-015.
 
 **Teknik Notlar:** Kısmi yazım transaction ile önlenir.
 
@@ -2864,7 +2419,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Yetki kontrolleri uygulandı.
 - [ ] API dokümanı güncellendi.
 
-### TASK-029: Teklif durum makinesini uygula
+### TASK-017: Teklif durum makinesini uygula
 
 **Amaç:** UI, API ve DB durum çelişkisini önlemek.
 
@@ -2872,7 +2427,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Kararsız gönderildi semantiği.
 
-**Bağımlılıklar:** TASK-028 ve ilgili açık kararlar.
+**Bağımlılıklar:** TASK-016 ve ilgili açık kararlar.
 
 **Teknik Notlar:** Kalıcı lifecycle ve türetilmiş display status ayrıdır.
 
@@ -2900,7 +2455,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Durum güvenliği uygulandı.
 - [ ] Durum dokümanı güncellendi.
 
-### TASK-030: Tüm alanlı teklif formunu geliştir
+### TASK-018: Tüm alanlı teklif formunu geliştir
 
 **Amaç:** Zorunlu teklif verisinin tamamını toplamak.
 
@@ -2908,7 +2463,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** AI üretimi.
 
-**Bağımlılıklar:** TASK-014, TASK-027–TASK-029.
+**Bağımlılıklar:** TASK-002, TASK-015–TASK-017.
 
 **Teknik Notlar:** Client ve server şemaları ortak kurallardan türetilir.
 
@@ -2936,7 +2491,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Validation güvenliği uygulandı.
 - [ ] Form dokümanı güncellendi.
 
-### TASK-031: Hizmet kalemi ve fiyat özetini geliştir
+### TASK-019: Hizmet kalemi ve fiyat özetini geliştir
 
 **Amaç:** Güvenli toplam ve vergi etiketini göstermek.
 
@@ -2944,7 +2499,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Resmi vergi hesaplama ve fatura.
 
-**Bağımlılıklar:** TASK-030.
+**Bağımlılıklar:** TASK-018.
 
 **Teknik Notlar:** Decimal string ve belgeli yuvarlama kullanılır.
 
@@ -2972,7 +2527,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Mali sınır uygulandı.
 - [ ] Fiyat dokümanı güncellendi.
 
-### TASK-032: Taslak kaydetme ve düzenlemeyi tamamla
+### TASK-020: Taslak kaydetme ve düzenlemeyi tamamla
 
 **Amaç:** Manuel teklif akışını güvenilir kılmak.
 
@@ -2980,7 +2535,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Karar verilmemiş otomatik kaydetme.
 
-**Bağımlılıklar:** TASK-028, TASK-030, TASK-031.
+**Bağımlılıklar:** TASK-016, TASK-018, TASK-019.
 
 **Teknik Notlar:** `lock_version` optimistic concurrency.
 
@@ -3008,7 +2563,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Sahiplik uygulandı.
 - [ ] Düzenleme dokümanı güncellendi.
 
-### TASK-033: Teklif çoğaltmayı geliştir
+### TASK-021: Teklif çoğaltmayı geliştir
 
 **Amaç:** Tekrar yazmayı azaltmak.
 
@@ -3016,7 +2571,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Token, view, response, AI log ve durum geçmişi.
 
-**Bağımlılıklar:** TASK-028, TASK-029.
+**Bağımlılıklar:** TASK-016, TASK-017.
 
 **Teknik Notlar:** Tek transaction ve Pro entitlement hook’u.
 
@@ -3044,7 +2599,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Sahiplik/entitlement uygulandı.
 - [ ] Çoğaltma dokümanı güncellendi.
 
-### TASK-034: Teklif önizlemesini geliştir
+### TASK-022: Teklif önizlemesini geliştir
 
 **Amaç:** Yayın öncesi müşteri görünümünü doğrulamak.
 
@@ -3052,7 +2607,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Public token ve PDF.
 
-**Bağımlılıklar:** TASK-031, TASK-032.
+**Bağımlılıklar:** TASK-019, TASK-020.
 
 **Teknik Notlar:** Public renderer ile görsel yapı paylaşılabilir, veri DTO’su paylaşılmaz.
 
@@ -3080,7 +2635,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Owner güvenliği uygulandı.
 - [ ] Preview dokümanı güncellendi.
 
-### TASK-035: AI sağlayıcı adaptörü ve promptları geliştir
+### TASK-023: AI sağlayıcı adaptörü ve promptları geliştir
 
 **Amaç:** Sağlayıcıdan bağımsız sınırlı AI katmanı.
 
@@ -3088,7 +2643,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Browser AI ve kesin fiyat.
 
-**Bağımlılıklar:** TASK-011, TASK-015.
+**Bağımlılıklar:** TASK-003.
 
 **Teknik Notlar:** Promptlar fixture’larla version control’dedir.
 
@@ -3116,7 +2671,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] AI key/veri sınırı uygulandı.
 - [ ] Prompt dokümanı güncellendi.
 
-### TASK-036: AI endpoint, Zod ve limitleri geliştir
+### TASK-024: AI endpoint, Zod ve limitleri geliştir
 
 **Amaç:** Yetkili ve doğrulanmış AI çağrısı.
 
@@ -3124,7 +2679,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Otomatik apply/save.
 
-**Bağımlılıklar:** TASK-035.
+**Bağımlılıklar:** TASK-023.
 
 **Teknik Notlar:** Runtime seçimi belgelenir.
 
@@ -3152,7 +2707,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] AI güvenliği uygulandı.
 - [ ] Endpoint dokümanı güncellendi.
 
-### TASK-037: Düzenlenebilir AI paneli ve güvenli merge geliştir
+### TASK-025: Düzenlenebilir AI paneli ve güvenli merge geliştir
 
 **Amaç:** AI çıktısı üzerinde kullanıcı kontrolünü korumak.
 
@@ -3160,7 +2715,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Onaysız overwrite ve fiyat değişimi.
 
-**Bağımlılıklar:** TASK-030, TASK-036.
+**Bağımlılıklar:** TASK-018, TASK-024.
 
 **Teknik Notlar:** Dolu alan varsayılan overwrite edilmez.
 
@@ -3188,7 +2743,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Kullanıcı kontrolü uygulandı.
 - [ ] AI UX dokümanı güncellendi.
 
-### TASK-038: AI kota, maliyet, log ve fallback geliştir
+### TASK-026: AI kota, maliyet, log ve fallback geliştir
 
 **Amaç:** Abuse ve maliyet kontrolü sağlamak.
 
@@ -3196,7 +2751,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** İstemci kaynaklı entitlement.
 
-**Bağımlılıklar:** TASK-025, TASK-036 ve kota kararı.
+**Bağımlılıklar:** TASK-013, TASK-024 ve kota kararı.
 
 **Teknik Notlar:** Sistem hatasında rezervasyon iade kuralı uygulanır.
 
@@ -3224,7 +2779,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Maliyet/veri güvenliği uygulandı.
 - [ ] Kota dokümanı güncellendi.
 
-### TASK-039: Yayınlama, token, iptal ve expiry işlemlerini geliştir
+### TASK-027: Yayınlama, token, iptal ve expiry işlemlerini geliştir
 
 **Amaç:** Güvenli paylaşım yaşam döngüsü.
 
@@ -3232,7 +2787,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Otomatik e-posta/WhatsApp.
 
-**Bağımlılıklar:** TASK-008, TASK-029, TASK-032.
+**Bağımlılıklar:** TASK-017, TASK-020.
 
 **Teknik Notlar:** Normal re-copy tokenı değiştirmez; rotate açık aksiyondur.
 
@@ -3260,7 +2815,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Token güvenliği uygulandı.
 - [ ] Lifecycle dokümanı güncellendi.
 
-### TASK-040: Public teklif resolver’ı geliştir
+### TASK-028: Public teklif resolver’ı geliştir
 
 **Amaç:** Anonim kullanıcıya yalnız gerekli veriyi vermek.
 
@@ -3268,7 +2823,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Anonim DB sorgusu.
 
-**Bağımlılıklar:** TASK-026, TASK-039.
+**Bağımlılıklar:** TASK-014, TASK-027.
 
 **Teknik Notlar:** Internal ID, owner ve audit alanları DTO’ya girmez.
 
@@ -3296,7 +2851,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Public sınır uygulandı.
 - [ ] API dokümanı güncellendi.
 
-### TASK-041: Responsive public teklif sayfasını geliştir
+### TASK-029: Responsive public teklif sayfasını geliştir
 
 **Amaç:** Hızlı ve profesyonel müşteri görünümü.
 
@@ -3304,7 +2859,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Müşteri hesabı ve PDF.
 
-**Bağımlılıklar:** TASK-034, TASK-040.
+**Bağımlılıklar:** TASK-022, TASK-028.
 
 **Teknik Notlar:** Server-first ve minimum JavaScript.
 
@@ -3332,7 +2887,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Public veri güvenliği uygulandı.
 - [ ] Sayfa dokümanı güncellendi.
 
-### TASK-042: Kabul ve ret işlemlerini geliştir
+### TASK-030: Kabul ve ret işlemlerini geliştir
 
 **Amaç:** Tutarlı ve abuse-resistant anonim karar almak.
 
@@ -3340,7 +2895,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Elektronik imza veya müşteri hesabı.
 
-**Bağımlılıklar:** TASK-025, TASK-029, TASK-040 ve yanıt kararı.
+**Bağımlılıklar:** TASK-013, TASK-017, TASK-028 ve yanıt kararı.
 
 **Teknik Notlar:** Row lock ve partial unique constraint.
 
@@ -3368,7 +2923,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Yanıt güvenliği uygulandı.
 - [ ] Karar dokümanı güncellendi.
 
-### TASK-043: Public müşteri mesajını geliştir
+### TASK-031: Public müşteri mesajını geliştir
 
 **Amaç:** Hesapsız ve bağlamsal mesaj bırakmayı sağlamak.
 
@@ -3376,7 +2931,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Chat, dosya veya e-posta.
 
-**Bağımlılıklar:** TASK-025, TASK-040.
+**Bağımlılıklar:** TASK-013, TASK-028.
 
 **Teknik Notlar:** Render escape edilir.
 
@@ -3404,7 +2959,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Mesaj güvenliği uygulandı.
 - [ ] Retention dokümanı güncellendi.
 
-### TASK-044: Görüntülenme event kaydını geliştir
+### TASK-032: Görüntülenme event kaydını geliştir
 
 **Amaç:** Public performansı bozmayan yaklaşık sinyal üretmek.
 
@@ -3412,7 +2967,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Kesin benzersiz kişi/fingerprint.
 
-**Bağımlılıklar:** TASK-010, TASK-025, TASK-041 ve IP kararı.
+**Bağımlılıklar:** TASK-013, TASK-029 ve IP kararı.
 
 **Teknik Notlar:** Best-effort ve non-blocking.
 
@@ -3440,7 +2995,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Privacy kontrolleri uygulandı.
 - [ ] Tracking dokümanı güncellendi.
 
-### TASK-045: Görüntülenme özeti, geçmişi ve uyarıyı geliştir
+### TASK-033: Görüntülenme özeti, geçmişi ve uyarıyı geliştir
 
 **Amaç:** Yararlı fakat kesinlik iddiası taşımayan view bilgisi sunmak.
 
@@ -3448,7 +3003,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Davranış tahmini.
 
-**Bağımlılıklar:** TASK-044.
+**Bağımlılıklar:** TASK-032.
 
 **Teknik Notlar:** Aggregate kolonları kullanılır.
 
@@ -3476,7 +3031,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Veri minimizasyonu uygulandı.
 - [ ] View dokümanı güncellendi.
 
-### TASK-046: Teklif listesi, filtre ve sayfalamayı geliştir
+### TASK-034: Teklif listesi, filtre ve sayfalamayı geliştir
 
 **Amaç:** CRM olmadan teklif yönetimini sağlamak.
 
@@ -3484,7 +3039,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Kanban, pipeline ve lead.
 
-**Bağımlılıklar:** TASK-029, TASK-045.
+**Bağımlılıklar:** TASK-017, TASK-033.
 
 **Teknik Notlar:** Server filtreleme ve kararlı sıra.
 
@@ -3512,7 +3067,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Owner izolasyonu uygulandı.
 - [ ] Liste dokümanı güncellendi.
 
-### TASK-047: Teklif detayını ve sahip aksiyonlarını geliştir
+### TASK-035: Teklif detayını ve sahip aksiyonlarını geliştir
 
 **Amaç:** Durum, view, response, mesaj ve işlemleri tek yerde sunmak.
 
@@ -3520,7 +3075,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** CRM aktivite akışı.
 
-**Bağımlılıklar:** TASK-033, TASK-039, TASK-042–TASK-046.
+**Bağımlılıklar:** TASK-021, TASK-027, TASK-030–TASK-034.
 
 **Teknik Notlar:** Her aksiyon sunucuda tekrar doğrulanır.
 
@@ -3548,7 +3103,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Sahiplik/token güvenliği uygulandı.
 - [ ] Detay dokümanı güncellendi.
 
-### TASK-048: AI takip mesajı backend’ini geliştir
+### TASK-036: AI takip mesajı backend’ini geliştir
 
 **Amaç:** Duruma bağlı güvenli mesaj taslağı üretmek.
 
@@ -3556,7 +3111,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Otomatik gönderim ve entegrasyon.
 
-**Bağımlılıklar:** TASK-035, TASK-038, TASK-047.
+**Bağımlılıklar:** TASK-023, TASK-026, TASK-035.
 
 **Teknik Notlar:** Modele minimum durum/teklif özeti gider.
 
@@ -3584,7 +3139,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] AI/veri güvenliği uygulandı.
 - [ ] Takip prompt dokümanı güncellendi.
 
-### TASK-049: Takip mesajı düzenleme ve kopyalama UI’sini geliştir
+### TASK-037: Takip mesajı düzenleme ve kopyalama UI’sini geliştir
 
 **Amaç:** Mesajı kullanıcı kontrolünde kendi kanalına taşımak.
 
@@ -3592,7 +3147,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Send endpoint’i.
 
-**Bağımlılıklar:** TASK-048.
+**Bağımlılıklar:** TASK-036.
 
 **Teknik Notlar:** Event yalnız clipboard başarıda üretilir.
 
@@ -3620,7 +3175,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Kullanıcı kontrolü uygulandı.
 - [ ] UI dokümanı güncellendi.
 
-### TASK-050: Entitlement ve kota servisini geliştir
+### TASK-038: Entitlement ve kota servisini geliştir
 
 **Amaç:** Free/Pro hakları için tek server kaynağı oluşturmak.
 
@@ -3628,7 +3183,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Client-side yetki.
 
-**Bağımlılıklar:** TASK-025, TASK-038 ve aktif/kota kararları.
+**Bağımlılıklar:** TASK-013, TASK-026 ve aktif/kota kararları.
 
 **Teknik Notlar:** “Sınırsız” için teknik abuse tavanı bulunur.
 
@@ -3656,7 +3211,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Kota güvenliği uygulandı.
 - [ ] Entitlement dokümanı güncellendi.
 
-### TASK-051: Dürüst fiyatlandırma ve plan UI’sini geliştir
+### TASK-039: Dürüst fiyatlandırma ve plan UI’sini geliştir
 
 **Amaç:** Yalnız çalışan özellikleri satmak.
 
@@ -3664,7 +3219,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** PDF ve özel şablonu aktif göstermek.
 
-**Bağımlılıklar:** TASK-050 ve ödeme kapsamı kararı.
+**Bağımlılıklar:** TASK-038 ve ödeme kapsamı kararı.
 
 **Teknik Notlar:** Fiyat kataloğu entitlement kaynağıyla eşleşir.
 
@@ -3692,7 +3247,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Ticari şeffaflık uygulandı.
 - [ ] Plan dokümanı güncellendi.
 
-### TASK-052: Ödeme adaptörü ve hosted checkout geliştir
+### TASK-040: Ödeme adaptörü ve hosted checkout geliştir
 
 **Amaç:** Kart verisi tutmadan ödeme almak.
 
@@ -3700,7 +3255,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Uygulama içinde kart formu.
 
-**Bağımlılıklar:** TASK-051 ve provider kararı.
+**Bağımlılıklar:** TASK-039 ve provider kararı.
 
 **Teknik Notlar:** İstemciden tutar veya price ID güvenilir kabul edilmez.
 
@@ -3728,7 +3283,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Ödeme güvenliği uygulandı.
 - [ ] Provider dokümanı güncellendi.
 
-### TASK-053: İmzalı ve idempotent ödeme webhook’unu geliştir
+### TASK-041: İmzalı ve idempotent ödeme webhook’unu geliştir
 
 **Amaç:** Provider ile subscription durumunu güvenilir eşitlemek.
 
@@ -3736,7 +3291,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Success page’i ödeme kanıtı yapmak.
 
-**Bağımlılıklar:** TASK-052.
+**Bağımlılıklar:** TASK-040.
 
 **Teknik Notlar:** Provider timestamp/version ile out-of-order korunur.
 
@@ -3764,7 +3319,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Webhook güvenliği uygulandı.
 - [ ] Runbook güncellendi.
 
-### TASK-054: Abonelik yaşam döngüsü ve downgrade geliştir
+### TASK-042: Abonelik yaşam döngüsü ve downgrade geliştir
 
 **Amaç:** Ödeme başarısızlığı, iptal ve süre sonunu deterministik yönetmek.
 
@@ -3772,7 +3327,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Sessiz veri silme veya link kapatma.
 
-**Bağımlılıklar:** TASK-050, TASK-053 ve plan kararları.
+**Bağımlılıklar:** TASK-038, TASK-041 ve plan kararları.
 
 **Teknik Notlar:** Entitlement provider state ve period end’den hesaplanır.
 
@@ -3800,7 +3355,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Ödeme/veri sınırı uygulandı.
 - [ ] Lifecycle dokümanı güncellendi.
 
-### TASK-055: Hukuki sayfaları ve takip/fatura bildirimlerini hazırla
+### TASK-043: Hukuki sayfaları ve takip/fatura bildirimlerini hazırla
 
 **Amaç:** Veri ve mali sınırları şeffaflaştırmak.
 
@@ -3808,7 +3363,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Hukuki garanti.
 
-**Bağımlılıklar:** Veri, IP, cookie ve provider kararları; TASK-041.
+**Bağımlılıklar:** Veri, IP, cookie ve provider kararları; TASK-029.
 
 **Teknik Notlar:** Metinler version ve effective date taşır.
 
@@ -3836,7 +3391,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Profesyonel inceleme tamamlandı.
 - [ ] Hukuk dokümanları sürümlendi.
 
-### TASK-056: Analitik pipeline ve event sözlüğünü geliştir
+### TASK-044: Analitik pipeline ve event sözlüğünü geliştir
 
 **Amaç:** Bölüm 20–21 metriklerini PII’siz ölçmek.
 
@@ -3844,7 +3399,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Teklif, müşteri veya AI içeriği.
 
-**Bağımlılıklar:** İlgili özellik görevleri, TASK-017 ve consent/provider kararı.
+**Bağımlılıklar:** İlgili özellik görevleri, TASK-005 ve consent/provider kararı.
 
 **Teknik Notlar:** İş sonuçları server-canonical olur.
 
@@ -3872,7 +3427,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Analitik gizliliği uygulandı.
 - [ ] Event sözlüğü güncellendi.
 
-### TASK-057: Hesap ve veri silmeyi geliştir
+### TASK-045: Hesap ve veri silmeyi geliştir
 
 **Amaç:** Kapsamdaki kullanıcı verisini güvenli ve izlenebilir silmek.
 
@@ -3880,7 +3435,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Belirsiz veya süresiz retention.
 
-**Bağımlılıklar:** TASK-022–TASK-026, TASK-053–TASK-056 ve retention kararı.
+**Bağımlılıklar:** TASK-010–TASK-014, TASK-041–TASK-044 ve retention kararı.
 
 **Teknik Notlar:** Retry-safe deletion saga.
 
@@ -3908,7 +3463,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Silme güvenliği uygulandı.
 - [ ] Silme kanıtı/dokümanı güncellendi.
 
-### TASK-058: Rate limit ve güvenlik sertleştirmesini tamamla
+### TASK-046: Rate limit ve güvenlik sertleştirmesini tamamla
 
 **Amaç:** Public, auth, AI, dosya ve ödeme abuse’unu azaltmak.
 
@@ -3916,7 +3471,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Yalnız istemciye dayalı limit.
 
-**Bağımlılıklar:** TASK-022, TASK-036, TASK-040–TASK-044, TASK-052.
+**Bağımlılıklar:** TASK-010, TASK-024, TASK-028–TASK-032, TASK-040.
 
 **Teknik Notlar:** Dağıtık store seçimi yük testine göre.
 
@@ -3944,7 +3499,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Güvenlik kontrolleri uygulandı.
 - [ ] Security runbook güncellendi.
 
-### TASK-059: Hata sağlayıcısı, health, metric ve alarmları kur
+### TASK-047: Hata sağlayıcısı, health, metric ve alarmları kur
 
 **Amaç:** Arızaları hassas veri toplamadan görmek.
 
@@ -3952,7 +3507,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Raw request payload.
 
-**Bağımlılıklar:** TASK-017 ve bütün server işlemleri.
+**Bağımlılıklar:** TASK-005 ve bütün server işlemleri.
 
 **Teknik Notlar:** Alarm eşikleri pilot baseline sonrası ayarlanır.
 
@@ -3980,7 +3535,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Log erişim güvenliği uygulandı.
 - [ ] Operasyon runbook’u güncellendi.
 
-### TASK-060: Performans ve erişilebilirliği tamamla
+### TASK-048: Performans ve erişilebilirliği tamamla
 
 **Amaç:** Hızlı ve herkesçe kullanılabilir ana akış sağlamak.
 
@@ -4016,7 +3571,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Perf/a11y düzeltmeleri uygulandı.
 - [ ] Rapor güncellendi.
 
-### TASK-061: Tam regression, RLS, güvenlik ve yük testini çalıştır
+### TASK-049: Tam regression, RLS, güvenlik ve yük testini çalıştır
 
 **Amaç:** Production riskini bütünsel doğrulamak.
 
@@ -4024,7 +3579,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Faz 2 özellikleri.
 
-**Bağımlılıklar:** TASK-018–TASK-060.
+**Bağımlılıklar:** TASK-006–TASK-048.
 
 **Teknik Notlar:** Staging ve sentetik veri kullanılır.
 
@@ -4052,7 +3607,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Güvenlik release kapısı geçti.
 - [ ] Bilinen hata listesi güncellendi.
 
-### TASK-062: Production deployment ve runbook’u tamamla
+### TASK-050: Production deployment ve runbook’u tamamla
 
 **Amaç:** Kontrollü ve geri alınabilir yayın yapmak.
 
@@ -4060,7 +3615,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Faz 2 rollout.
 
-**Bağımlılıklar:** TASK-055–TASK-061 ve release onayı.
+**Bağımlılıklar:** TASK-043–TASK-049 ve release onayı.
 
 **Teknik Notlar:** Expand-contract ve forward-fix yaklaşımı.
 
@@ -4088,7 +3643,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Operasyon güvenliği uygulandı.
 - [ ] Runbook güncellendi.
 
-### TASK-063: Faz 2 kanıt kapısını değerlendir
+### TASK-051: Faz 2 kanıt kapısını değerlendir
 
 **Amaç:** Retention ve ödeme kanıtı olmadan Faz 2 kodlamamak.
 
@@ -4096,7 +3651,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kapsam Dışı:** Faz 2 özelliği geliştirmek.
 
-**Bağımlılıklar:** TASK-062 ve yeterli kohort süresi.
+**Bağımlılıklar:** TASK-050 ve yeterli kohort süresi.
 
 **Teknik Notlar:** Payda ve veri kalitesi açıkça yazılır.
 
@@ -4128,26 +3683,25 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 | Faz | Tamamlanacak görevler/testler | Ölçülecek ürün metriği | Bilinen açıklar ve release blocker | Geçiş kararı |
 |---|---|---|---|---|
-| 0 | TASK-001–012; bütün spike negatifleri | Problem sıklığı, landing/fiyat, süre ve gerçek gönderim | Geçersiz veri veya public/RLS/AI riskinin çözülememesi blocker | Devam, pivot veya durdur |
-| 1A | TASK-013–017; CI/env/redaction | Landing dönüşümü sürdürülür | CI bypass, prod bağlantısı veya secret blocker | Teknik temel onayı |
-| 1B | TASK-018–022; auth/profile/storage | Signup ve profile completion | Auth, tenant veya dosya sızıntısı blocker | 1C |
-| 1C | TASK-023–029; migration/RLS/CRUD/state | Draft başlatma | Her RLS ve veri tutarlılığı hatası blocker | Şema freeze → 1D |
-| 1D | TASK-030–034; form/fiyat/save/duplicate/preview | İlk teklif ve oluşturma süresi | Veri kaybı, yanlış tutar, kritik mobil/a11y blocker | Manuel akış → 1E |
-| 1E | TASK-035–038; AI güvenlik/kota/fallback | AI kullanım, düzenleme ve süre | Key leak, overwrite, kontrolsüz maliyet blocker | Güvenli AI → 1F |
-| 1F | TASK-039–043; token/public/yanıt | Publish, link copy, response ve mesaj | Public/token sızıntısı ve karar race blocker | Paylaşım akışı → 1G |
-| 1G | TASK-044–045; bot/dedupe/aggregate | View oranı ve veri kalitesi | View write sayfayı blokluyorsa veya raw IP sızıyorsa blocker | Şeffaf takip → 1H |
-| 1H | TASK-046–047; liste/detay | Durum ekranına dönüş | Cross-user veya yanlış status blocker | Yönetim akışı → 1I |
-| 1I | TASK-048–049; senaryo/ton/kopya | Takip üretme/kopyalama | Auto-send, içerik sızıntısı veya kota bypass blocker | Güvenli taslak → 1J |
-| 1J | TASK-050–054; entitlement/ödeme/webhook | Upgrade, checkout ve gerçek ödeme | Yanlış charge, fake webhook, kart veya plan tutarsızlığı blocker | Çalışan ücretli paket |
-| 1K | TASK-055–062; hukuk, silme, analitik, security, a11y, deployment | Aktivasyon ve retention kohortu | Sev-1/2, privacy, ödeme, veri kaybı ve kritik a11y blocker | Sınırlı production rollout |
-| 2 | TASK-063 ve onaylı ayrı Faz 2 planı | %30 ikinci, %20 üçüncü, %5 ve 10 ödeme, ikinci ay | Kanıt yoksa Faz 2 başlamaz | Kanıta göre ayrı görev planı |
+| 1A | TASK-001–005; CI/env/redaction | Uygulanmaz; teknik temel fazı | CI bypass, prod bağlantısı veya secret blocker | Teknik temel onayı |
+| 1B | TASK-006–010; auth/profile/storage | Signup ve profile completion | Auth, tenant veya dosya sızıntısı blocker | 1C |
+| 1C | TASK-011–017; migration/RLS/CRUD/state | Draft başlatma | Her RLS ve veri tutarlılığı hatası blocker | Şema freeze → 1D |
+| 1D | TASK-018–022; form/fiyat/save/duplicate/preview | İlk teklif ve oluşturma süresi | Veri kaybı, yanlış tutar, kritik mobil/a11y blocker | Manuel akış → 1E |
+| 1E | TASK-023–026; AI güvenlik/kota/fallback | AI kullanım, düzenleme ve süre | Key leak, overwrite, kontrolsüz maliyet blocker | Güvenli AI → 1F |
+| 1F | TASK-027–031; token/public/yanıt | Publish, link copy, response ve mesaj | Public/token sızıntısı ve karar race blocker | Paylaşım akışı → 1G |
+| 1G | TASK-032–033; bot/dedupe/aggregate | View oranı ve veri kalitesi | View write sayfayı blokluyorsa veya raw IP sızıyorsa blocker | Şeffaf takip → 1H |
+| 1H | TASK-034–035; liste/detay | Durum ekranına dönüş | Cross-user veya yanlış status blocker | Yönetim akışı → 1I |
+| 1I | TASK-036–037; senaryo/ton/kopya | Takip üretme/kopyalama | Auto-send, içerik sızıntısı veya kota bypass blocker | Güvenli taslak → 1J |
+| 1J | TASK-038–042; entitlement/ödeme/webhook | Upgrade, checkout ve gerçek ödeme | Yanlış charge, fake webhook, kart veya plan tutarsızlığı blocker | Çalışan ücretli paket |
+| 1K | TASK-043–050; hukuk, silme, analitik, security, a11y, deployment | Aktivasyon ve retention kohortu | Sev-1/2, privacy, ödeme, veri kaybı ve kritik a11y blocker | Sınırlı production rollout |
+| 2 | TASK-051 ve onaylı ayrı Faz 2 planı | %30 ikinci, %20 üçüncü, %5 ve 10 ödeme, ikinci ay | Kanıt yoksa Faz 2 başlamaz | Kanıta göre ayrı görev planı |
 | 3/4 | Ayrı discovery ve mimari plan | Yönlendirmesiz yoğun talep ve PMF | Scope leakage blocker | Ayrı onaylı ürün kararı |
 
 Her faz için düşük önemde kalan hatalar sahibi, etkisi ve hedef tarihiyle kaydedilir.
 
 ## 31. Devam, Pivot veya Durdurma Kriterleri
 
-Kaynakta sayı verilmeyen aşağıdaki eşikler “başlangıç deney hipotezi”dir ve Faz 0’da veriye bakılmadan önce onaylanmalıdır.
+Kaynakta sayı verilmeyen aşağıdaki eşikler “başlangıç deney hipotezi”dir ve ilk production kohort verisi görülmeden önce onaylanmalıdır.
 
 ### Devam
 
@@ -4177,10 +3731,10 @@ Kaynakta eşik verilmeyen rakamlar önerilen başlangıç deney eşiğidir; kan�
 
 | Hipotez | Deney | Ölçüm | Başarı eşiği | Başarısızlık sinyali | Sonraki karar |
 |---|---|---|---|---|---|
-| 1. Yazılım ve tasarım freelancerları teklif hazırlamayı zaman kaybı görüyor | 20 görüşme ve son teklif süre günlüğü | Sorun sıklığı ve aktif süre | Başlangıç: en az 12/20 tekrarlayan sorun | Seyrek veya çok kısa süreç | Segment daralt, pivot veya durdur |
-| 2. Teklifin görüntülenip görüntülenmediğini bilmek değerlidir | Prototip ve gerçek tracking | Detay açma, takip davranışı ve görüşme | Başlangıç: en az %30 davranış etkisi | <%15 etki | Tracking’i ikincil yap veya çıkar |
+| 1. Yazılım ve tasarım freelancerları teklif hazırlamayı zaman kaybı görüyor | Gerçek kullanım telemetrisi, teklif süre günlüğü ve isteğe bağlı kullanım sonrası görüşme | Sorun sıklığı ve aktif süre | Başlangıç: aktif kullanıcıların en az %40’ında tekrarlayan sorun veya ölçülebilir süre kazanımı | Sorun seyrek veya aktif süre çok kısa | Segment daralt, pivot veya durdur |
+| 2. Teklifin görüntülenip görüntülenmediğini bilmek değerlidir | Çalışan ürün ve gerçek tracking | Detay açma, takip davranışı ve kullanım sonrası geri bildirim | Başlangıç: en az %30 davranış etkisi | <%15 etki | Tracking’i ikincil yap veya çıkar |
 | 3. AI teklif metni süreci hızlandırır | Benzer işte manuel/AI karşılaştırması | Medyan süre, kalite ve düzenleme | En az %30 süre azalması; kalite düşmez | Süre değişmez veya ağır düzeltme | Prompt/UI düzelt; yine olmazsa azalt |
-| 4. Kullanıcılar teklifleri gerçek müşterilere gönderir | Concierge doğrulama ve human-view | Doğrulanmış gönderim | En az 20 kullanıcıda gerçek gönderim | Demo/sahte veya çok düşük görüntüleme | Güven/sürtünme deneyi; gerekirse dur |
+| 4. Kullanıcılar teklifleri gerçek müşterilere gönderir | Gerçek publish, human-view ve isteğe bağlı kullanım sonrası doğrulama | Doğrulanmış gönderim | En az 20 kullanıcıda gerçek gönderim | Demo/sahte veya çok düşük görüntüleme | Güven/sürtünme deneyi; gerekirse dur |
 | 5. Kullanıcılar ikinci ve üçüncü teklif için döner | 30/60 günlük müdahalesiz kohort | İkinci ve üçüncü teklif oranı | %30 ikinci, %20 üçüncü | İkinci <%15 veya yalnız reminder | Retention kök nedeni |
 | 6. Kullanıcılar profesyonel teklif akışı için ödeme yapar | 149/249, yıllık/kurucu ve çalışan checkout | Dönüşüm, gerçek ödeme, ikinci ay | %5, 10 ödeme ve ikinci ay devam | <%2, fake click veya yüksek churn | Fiyat/segment/paket yeniden |
 | 7. TL ve yerel metinler Türkiye’de avantaj sağlar | Yerel ve nötr değer önerisi testi | Aktivasyon ve nitel tercih | Başlangıç: ≥%15 göreli artış veya güçlü tercih | Anlamlı fark yok | Yerellik iddiasını/pazarı yeniden değerlendir |
@@ -4190,27 +3744,27 @@ Kaynakta eşik verilmeyen rakamlar önerilen başlangıç deney eşiğidir; kan�
 
 | Risk | Olasılık | Etki | Erken sinyal | Önleyici aksiyon | Gerçekleşirse aksiyon | Sorumlu faz |
 |---|---|---|---|---|---|---|
-| Problem seyrek | Orta | Kritik | Düşük teklif sıklığı | Son davranış görüşmeleri | Segment daralt/pivot/dur | 0 |
-| Tek kullanımlık ücretsiz ürün | Yüksek | Kritik | İkinci teklif düşük | Retention ve concierge | Temel akış/segment yeniden | 0–1K |
-| Gerçek paylaşım yok | Orta | Kritik | Copy/view zinciri düşük | Gerçek gönderim doğrulaması | Güven/sürtünme düzelt; tez yoksa pivot | 0–1F |
+| Problem seyrek | Orta | Kritik | Düşük teklif sıklığı | Ürün içi kullanım ve kullanım sonrası geri bildirim | Segment daralt/pivot/dur | 1K–2 |
+| Tek kullanımlık ücretsiz ürün | Yüksek | Kritik | İkinci teklif düşük | Retention kohortu ve kullanım sonrası geri bildirim | Temel akış/segment yeniden | 1K–2 |
+| Gerçek paylaşım yok | Orta | Kritik | Copy/view zinciri düşük | Gerçek gönderim doğrulaması | Güven/sürtünme düzelt; tez yoksa pivot | 1F–1K |
 | CRM scope creep | Yüksek | Yüksek | Pipeline/kanban isteklerinin task’a girmesi | Scope guard ve faz kapısı | İstekleri Faz 3 discovery’ye taşı | Tüm fazlar |
-| Bot view şişirmesi | Yüksek | Orta | Şüpheli UA ve hızlı event | Bot flag, dedupe ve uyarı | Raporu düzelt, kesinlik iddiasını kaldır | 0–1G |
-| Token tahmini/sızıntısı | Düşük | Kritik | Invalid deneme artışı | HMAC, no-log, rate limit | Rotate/revoke ve incident | 0–1F |
-| RLS açığı | Orta | Kritik | Cross-user test hatası | Tam RLS matrisi CI | Erişimi kes, policy düzelt, ihlal analizi | 0–1C |
+| Bot view şişirmesi | Yüksek | Orta | Şüpheli UA ve hızlı event | Bot flag, dedupe ve uyarı | Raporu düzelt, kesinlik iddiasını kaldır | 1G |
+| Token tahmini/sızıntısı | Düşük | Kritik | Invalid deneme artışı | HMAC, no-log, rate limit | Rotate/revoke ve incident | 1F |
+| RLS açığı | Orta | Kritik | Cross-user test hatası | Tam RLS matrisi CI | Erişimi kes, policy düzelt, ihlal analizi | 1C–1K |
 | Kabul/ret yarışı | Orta | Yüksek | Çakışan kararlar | Transaction, unique, idempotency | Reconcile ve kullanıcı bildirimi | 1F |
 | XSS/spam/public abuse | Yüksek | Yüksek | Payload/429 artışı | Escape, validate, rate limit | Geçici limit, temizleme, inceleme | 1F–1K |
-| Prompt injection | Yüksek | Yüksek | Schema dışı çıktı | Strict schema, no tools, onay | AI degrade/manual | 0–1E |
-| AI maliyet artışı | Orta | Yüksek | Cost/user sıçraması | Kota, kısa çıktı, alarm | Kota/model ayarla, abuse kes | 0–1E |
+| Prompt injection | Yüksek | Yüksek | Schema dışı çıktı | Strict schema, no tools, onay | AI degrade/manual | 1E |
+| AI maliyet artışı | Orta | Yüksek | Cost/user sıçraması | Kota, kısa çıktı, alarm | Kota/model ayarla, abuse kes | 1E |
 | AI kesin fiyat üretmesi | Orta | Yüksek | Definitive fiyat dili | Fiyat schema dışında | Reject, prompt düzelt, incele | 1E |
 | Payment/webhook uyumsuzluğu | Orta | Kritik | Charge var, hak yok | İmza, idempotency, reconcile | Manuel uzlaştır, hak/iade | 1J |
-| Çalışmayan Pro özelliği satışı | Orta | Yüksek | Destek/iade talebi | Katalog=entitlement testi | Satışı durdur, bildir, iade | 0–1J |
+| Çalışmayan Pro özelliği satışı | Orta | Yüksek | Destek/iade talebi | Katalog=entitlement testi | Satışı durdur, bildir, iade | 1J–1K |
 | Kart verisinin sisteme gelmesi | Düşük | Kritik | Kart alanı/log payload | Hosted checkout | Veriyi sil, erişimi kes, olay incele | 1J |
-| KVKK sürecinin yetersizliği | Orta | Kritik | Şikâyet veya uzman bulgusu | Minimizasyon ve profesyonel review | İşlemeyi durdur, düzelt | 0–1K |
+| KVKK sürecinin yetersizliği | Orta | Kritik | Şikâyet veya uzman bulgusu | Minimizasyon ve profesyonel review | İşlemeyi durdur, düzelt | 1K |
 | Logda PII/IP | Orta | Yüksek | Log scan bulgusu | Allowlist/redaction testleri | Erişimi kısıtla, sil, incident | 1A–1K |
 | Silmede artık veri | Orta | Yüksek | Reconciliation farkı | Veri envanteri ve idempotent saga | Retry ve kullanıcı bildirimi | 1K |
 | Deploy/migration kesintisi | Orta | Yüksek | Preview-prod drift | Staging, backup, expand-contract | Rollback/forward-fix | 1A–1K |
 | Third-party kesintisi | Orta | Yüksek | Error spike | Timeout, retry, degrade | AI manuel; ödeme pending | 1E/1J |
-| İlk 100 edinim hedefinin tutmaması | Orta | Yüksek | Kanal hedeflerinin gerisi | Haftalık kanal/mesaj testi | Mesaj/kanal/segment değiştir | 0–1K |
+| İlk 100 edinim hedefinin tutmaması | Orta | Yüksek | Kanal hedeflerinin gerisi | Haftalık kanal/mesaj testi | Mesaj/kanal/segment değiştir | 1K–2 |
 | Tek geliştirici scope yükü | Yüksek | Yüksek | Task sürüklenmesi | Küçük görev ve no-scope | Rollout ve provider sayısını azalt | Tüm fazlar |
 | Performans/a11y gecikmesi | Orta | Orta | LCP veya a11y fail | Bütçe ve CI | Release’i blokla, düzelt | 1F–1K |
 
@@ -4220,13 +3774,13 @@ Aşağıdaki “öneri”ler başlangıç önerisidir, kesin ürün kararı değ
 
 | Konu | Seçenekler | Avantajlar | Riskler | Önerilen başlangıç kararı | Yeniden değerlendirme |
 |---|---|---|---|---|---|
-| Ürün adı ve domain | Türkçe, global veya geçici ad | Yerel güven ya da global genişleme | Domain/marka çakışması | Faz 0 marka/domain araştırması; geçici teknik ad | Landing ve production öncesi |
-| AI sağlayıcısı | Structured output destekleyen sağlayıcılar | Kalite, maliyet ve veri seçenekleri | Lock-in, retention ve kesinti | Anonim corpus ile en az iki sağlayıcı benchmark; tek adapter seç | TASK-011 ve üç aylık maliyet/kalite |
+| Ürün adı ve domain | Türkçe, global veya geçici ad | Yerel güven ya da global genişleme | Domain/marka çakışması | Production yayını öncesi marka/domain araştırması; geçici teknik ad | Landing ve production öncesi |
+| AI sağlayıcısı | Structured output destekleyen sağlayıcılar | Kalite, maliyet ve veri seçenekleri | Lock-in, retention ve kesinti | Anonim corpus ile en az iki sağlayıcı benchmark; tek adapter seç | TASK-023 ve üç aylık maliyet/kalite |
 | Ödeme sağlayıcısı | Yerel veya global sağlayıcı | Türkiye kartları, recurring ve operasyon uyumu | Şirket/vergi, webhook ve DPA farkları | Hukuk/muhasebe ve sandbox spike; hosted checkout şart | Gerçek checkout öncesi |
 | E-posta sağlayıcısı | Supabase Auth mail veya özel transactional provider | Hızlı başlangıç ya da teslimat kontrolü | Deliverability ve ek veri işleyen | MVP’de yalnız signup/reset; teklif/takip maili yok | Deliverability sorunu veya Faz 2 |
 | “Gönderildi” durumu | Manuel işaret, publish alias’ı veya otomatik | Manuel daha doğru; otomatik daha az sürtünme | Kopya gerçek gönderim değildir | Açık manuel aksiyon adayı; karar prototiple doğrulanmalı | İlk 20 gerçek gönderim |
 | Link kopyalama gönderim sayılır mı? | Evet, hayır veya proxy | Kolay event | Yanlış aktivasyon sinyali | Hayır; yalnız niyet eventi | İlk kullanıcı kohortu |
-| IP işleme | Hiç yok, minimize/HMAC veya kısa raw | Abuse/dedupe doğruluğu | KVKK ve profiling riski | Ham IP saklama yok; ihtiyaçta profesyonel incelemeli HMAC | Tracking spike ve hukuk review |
+| IP işleme | Hiç yok, minimize/HMAC veya kısa raw | Abuse/dedupe doğruluğu | KVKK ve profiling riski | Ham IP saklama yok; ihtiyaçta profesyonel incelemeli HMAC | Tracking implementasyonu ve hukuk review |
 | Yaklaşık benzersiz görüntüleme | Session ID, IP+UA HMAC, time bucket veya hiç | Dedupe değeri | Yanlış kişi iddiası | Ayrı unique göstermeme; yalnız dedupe edilmiş toplam | Production veri kalitesi |
 | Müşteri kabul/ret kimlik doğrulaması | Token, e-posta OTP veya PIN | Daha güçlü kimlik kanıtı | Müşteri sürtünmesi ve e-posta kapsamı | Hesap yok; token+nonce+onay adayı | Public prototype ve gerçek yanıtlar |
 | Yanıt değiştirilebilir mi? | İlk terminal, değişebilir veya owner reset | Esneklik | Çelişki ve hukuki belirsizlik | İlk terminal ve idempotent adayı | İlk gerçek yanıtlar |
@@ -4234,22 +3788,22 @@ Aşağıdaki “öneri”ler başlangıç önerisidir, kesin ürün kararı değ
 | Müşteriye hangi sürüm gösterilir? | Latest, snapshot veya yeni token | Latest basit; snapshot güvenilir | Sessiz içerik değişimi | Yayın kilidi seçilirse ilk yayın içeriği | Publish politikası kararı |
 | Hazır Pro özellikleri | Sınırsız teklif, çoğaltma, history, branding vb. | Gelir testi | Çalışmayan özelliği satma | Yalnız release checklist’i geçen entitlement | Her release |
 | Ücretsiz “aktif teklif” tanımı | Tüm açık, yalnız yayınlanan veya aylık yayın sayısı | Farklı gelir/UX dengeleri | Kullanıcı şaşkınlığı ve kota abuse | Yayınlanmış, süresi geçmemiş, iptal/terminal olmayan aday | Fiyat testi ve support |
-| AI kota birimi | Başarılı üretim, token, karakter veya kredi | Kullanıcı anlaşılabilirliği/maliyet doğruluğu | Karmaşıklık | UI’da üretim kredisi; içeride token/maliyet tavanı | AI spike ve aylık maliyet |
+| AI kota birimi | Başarılı üretim, token, karakter veya kredi | Kullanıcı anlaşılabilirliği/maliyet doğruluğu | Karmaşıklık | UI’da üretim kredisi; içeride token/maliyet tavanı | AI implementasyonu ve aylık maliyet |
 | Hesap silme sonrası saklama | Hemen aktif silme + backup TTL veya hukuki minimum | Veri minimizasyonu | Provider backup sınırı | Aktif sistemden hemen; en kısa belgeli backup TTL | Production ve provider değişimi |
 | İlk pazar yalnız Türkiye mi? | Türkiye, TR-first-global veya global | Odak ya da pazar büyüklüğü | Fazla dar/geniş kapsam | Türkiye öncelikli iki persona; global vaat yok | İlk 100 kullanıcı |
 | İngilizce teklif desteği MVP’de mi? | Yalnız Türkçe, çift dil veya serbest içerik | Daha geniş kullanım | Prompt/UI/test kapsamı | Karar bekliyor; kanıt yoksa Türkçe UI, manuel serbest metin | Görüşme ve prototip |
-| PDF MVP mi Faz 2 mi? | MVP veya Faz 2 | Bazı müşteriler için kolaylık | Public link tezini geciktirir | Faz 2; aktif Pro özelliği değil | TASK-063 sonrası |
-| Özel şablonlar MVP mi Faz 2 mi? | MVP veya Faz 2 | Kişiselleştirme | Şablon sistemi karmaşıklığı | Faz 2; MVP tek sabit temel şablon | TASK-063 sonrası |
+| PDF MVP mi Faz 2 mi? | MVP veya Faz 2 | Bazı müşteriler için kolaylık | Public link tezini geciktirir | Faz 2; aktif Pro özelliği değil | TASK-051 sonrası |
+| Özel şablonlar MVP mi Faz 2 mi? | MVP veya Faz 2 | Kişiselleştirme | Şablon sistemi karmaşıklığı | Faz 2; MVP tek sabit temel şablon | TASK-051 sonrası |
 | Free logo ve Pro marka ayrımı | Free temel logo, Pro logo veya gelişmiş brand-removal | Onboarding değeri ve gelir ayrımı | Çelişkili fiyatlandırma | Profil alanı herkeste olabilir; public logo/white-label satılmadan önce netleşir | Pricing öncesi |
 | Free sınırlı tracking | Yalnız özet, son N event veya kısa pencere | Basit entitlement | Veri/UX karmaşıklığı | Free ilk/son/toplam; Pro detay adayı | Paket kilidi |
 | Müşteri mesajında kimlik | Sadece mesaj, opsiyonel ad/e-posta veya zorunlu | Bağlam | Ek kişisel veri ve sürtünme | Sadece mesaj; gerekirse opsiyonel ad | Görüşme/support |
 | Yıllık/kurucu/erken erişim şartları | İndirim, sabit fiyat, ön sipariş | Erken gelir | Yanıltıcı kapsam ve yenileme sorunu | Kapsam, tarih ve iade net değilse ödeme yok | İlk ödeme öncesi |
-| Payment failure grace/downgrade | Hemen, grace veya period-end | Kullanıcı deneyimi | Gelir ve abuse riski | Provider ve kullanıcı beklentisiyle karar; veri silme yok | TASK-054 öncesi |
+| Payment failure grace/downgrade | Hemen, grace veya period-end | Kullanıcı deneyimi | Gelir ve abuse riski | Provider ve kullanıcı beklentisiyle karar; veri silme yok | TASK-042 öncesi |
 | Veri dışa aktarma | Self-service, güvenli manuel veya Faz 2 | İlgili kişi talebi | Başka kişilerin verisini sızdırma | Hukuk incelemesi; gerekiyorsa önce manuel güvenli süreç | Production legal review |
-| Analytics/error sağlayıcısı | Self-hosted, managed veya minimum DB | Operasyon görünürlüğü | Yurt dışı aktarım ve PII | Redaksiyon, minimum event ve uygun veri koşulu | TASK-056/TASK-059 |
+| Analytics/error sağlayıcısı | Self-hosted, managed veya minimum DB | Operasyon görünürlüğü | Yurt dışı aktarım ve PII | Redaksiyon, minimum event ve uygun veri koşulu | TASK-044/TASK-047 |
 | Cookie/analytics consent | Consent, cookieless veya server-only | Ölçüm | KVKK ve terk | Karar yokken gereksiz client tracker yok | Landing ve production öncesi |
-| Logo boyut ve signed URL TTL | Farklı limit/TTL seçenekleri | Performans ve silme dengesi | Büyük dosya veya uzun erişim | 2 MiB ve kısa TTL başlangıç varsayımı | Logo spike ve production |
-| “Düzenli freelancer” tanımı | Self-report, geçmiş veya aylık teklif sayısı | Metrik paydası | Yanlış segment | Faz 0’da önceden tanımla; ayda en az iki teklif adayı | Metrik başlamadan |
+| Logo boyut ve signed URL TTL | Farklı limit/TTL seçenekleri | Performans ve silme dengesi | Büyük dosya veya uzun erişim | 2 MiB ve kısa TTL başlangıç varsayımı | Logo implementasyonu ve production |
+| “Düzenli freelancer” tanımı | Self-report, geçmiş veya aylık teklif sayısı | Metrik paydası | Yanlış segment | Metrik başlamadan önce tanımla; ayda en az iki teklif adayı | Metrik başlamadan |
 
 ## 35. Nihai MVP Tanımı
 
@@ -4302,7 +3856,7 @@ MVP; freelance yazılım geliştirici ve freelance UI/UX veya web tasarımcısı
 
 ### MVP’nin tamamlanmış sayılma koşulları
 
-- TASK-001–TASK-062 tamamlanmış olmalıdır.
+- TASK-001–TASK-050 tamamlanmış olmalıdır.
 - Kritik E2E, RLS, public, AI, ödeme, silme, güvenlik, load, mobil ve a11y testleri geçmelidir.
 - Sev-1/2, privacy, ödeme, veri kaybı veya kritik erişilebilirlik hatası kalmamalıdır.
 - Migration, backup, rollback, alarm, secret rotation ve incident runbook’ları prova edilmelidir.

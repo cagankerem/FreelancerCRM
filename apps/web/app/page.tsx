@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { LandingPage } from "./landing-page";
+import { LandingPage } from "@/components/marketing/landing-page";
 
 export const metadata: Metadata = {
   title: "Hızlı teklif bağlantısı ve tek pencere yönetimi",

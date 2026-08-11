@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "cd v0.1.0 && npm run dev",
-    "install-all": "cd v0.1.0 && npm install",
-    "build": "cd v0.1.0 && npm run build",
-    "start": "cd v0.1.0 && npm run start"
+    "dev": "cd apps/web && npm run dev",
+    "install-all": "cd apps/web && npm install",
+    "build": "cd apps/web && npm run build",
+    "start": "cd apps/web && npm run start"
   }
 }

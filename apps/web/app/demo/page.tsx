@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { DemoApp } from "../demo-app";
+import { DemoApp } from "@/components/demo/demo-app";
 
 export const metadata: Metadata = {
   title: "Ürün demosu",

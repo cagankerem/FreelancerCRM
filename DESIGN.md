@@ -463,15 +463,15 @@ Future production behavior is documented in `plan.md`; it is a goal and roadmap,
 
 Use this precedence when information conflicts:
 
-1. `v0.1.0/app/landing-page.tsx` and `v0.1.0/app/landing-page.css` — alpha landing copy, conversion flow, layout, and responsive behavior.
-2. `v0.1.0/app/demo-app.tsx` and `v0.1.0/app/prototype-app.tsx` — guided demo entry plus shared product copy, synthetic data, workflows, states, and interactions.
-3. `v0.1.0/app/globals.css` — implemented prototype layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
+1. `apps/web/components/marketing/landing-page.tsx` and `apps/web/components/marketing/landing-page.css` — alpha landing copy, conversion flow, layout, and responsive behavior.
+2. `apps/web/components/demo/demo-app.tsx` and `apps/web/components/demo/prototype-app.tsx` — guided demo entry plus shared product copy, synthetic data, workflows, states, and interactions.
+3. `apps/web/app/globals.css` — implemented prototype layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
 4. `README.md` — current landing/prototype purpose, leading feature order, scope, and limitations.
-5. `v0.1.0/app/page.tsx`, `v0.1.0/app/demo/page.tsx`, and `v0.1.0/app/layout.tsx` — route-specific metadata, Turkish language, and prototype noindex behavior.
-6. `v0.1.0/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
+5. `apps/web/app/page.tsx`, `apps/web/app/demo/page.tsx`, and `apps/web/app/layout.tsx` — route-specific metadata, Turkish language, and prototype noindex behavior.
+6. `apps/web/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
 7. `plan.md` — future product thesis, production architecture, and roadmap only.
 
-`v0.1.0/db/schema.ts` is intentionally empty. `v0.1.0/examples/d1` is a generic framework example, not Kapsam content. The framework-default `v0.1.0/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
+`apps/web/db/schema.ts` is intentionally empty. `apps/web/examples/d1` is a generic framework example, not Kapsam content. The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
 
 **Color precedence exception:** the `## Colors` section and YAML color tokens in this file are the new source of truth. Do not reintroduce the current CSS palette's forest green, coral, mint, or sand values when generating a design. Continue to inherit the existing layout, spacing, typography, shape, and interaction patterns.
 

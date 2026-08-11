@@ -32,9 +32,9 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-import { cn } from "@/lib/utils";
+import { DemoApp } from "@/components/demo/demo-app";
+import { cn } from "@/lib/shared/utils";
 
-import { DemoApp } from "./demo-app";
 import "./landing-page.css";
 
 type FormStatus =

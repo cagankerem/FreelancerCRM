@@ -15,7 +15,7 @@ kalıcı tarayıcı verisine yazmaz.
 
 ## Landing sayfası
 
-Ana rota (`/`), Faz 0 / TASK-004 için alpha değer önerisini, 149/249 TL fiyat
+Ana rota (`/`), alpha değer önerisini, 149/249 TL fiyat
 varyantını ve tarayıcıda çalışan bekleme listesi durumlarını gösterir. E-posta,
 isteğe bağlı persona ve açık iletişim izni dışında veri istenmez. Mevcut
 yönlendirilmiş ürün tanıtımı `/demo` rotasındadır. Landing formu production
@@ -64,6 +64,7 @@ npm run lint
 npx tsc --noEmit
 ~~~
 
-Uygulama kodu `v0.1.0/` klasöründedir. Landing yüzeyi
-`app/landing-page.tsx` ve `app/landing-page.css`; demo girişi `app/demo-app.tsx`,
-paylaşılan ürün arayüzü ise `app/prototype-app.tsx` ve `app/globals.css` dosyalarındadır.
+Uygulama kodu `apps/web/` klasöründedir. Landing yüzeyi
+`components/marketing/landing-page.tsx` ve `components/marketing/landing-page.css`;
+demo girişi `components/demo/demo-app.tsx`, paylaşılan sentetik ürün arayüzü ise
+`components/demo/prototype-app.tsx` ve `app/globals.css` dosyalarındadır.

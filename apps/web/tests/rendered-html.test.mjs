@@ -69,10 +69,10 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   const [page, demoPage, demoApp, landing, layout, prototype, css, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/demo/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/demo-app.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/landing-page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/demo/demo-app.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/marketing/landing-page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/prototype-app.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/demo/prototype-app.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
