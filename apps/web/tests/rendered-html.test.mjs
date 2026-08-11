@@ -1,26 +1,91 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
 import { access, readFile } from "node:fs/promises";
-import test from "node:test";
+import { createServer } from "node:net";
+import { after, before, test } from "node:test";
+import { setTimeout as delay } from "node:timers/promises";
+import { fileURLToPath } from "node:url";
 
-async function render(pathname = "/") {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", String(process.pid) + "-" + String(Date.now()));
-  const { default: worker } = await import(workerUrl.href);
+const HOST = "127.0.0.1";
+const appDirectory = fileURLToPath(new URL("..", import.meta.url));
+const nextCli = fileURLToPath(
+  new URL("../node_modules/next/dist/bin/next", import.meta.url),
+);
 
-  return worker.fetch(
-    new Request(`http://localhost${pathname}`, {
-      headers: { accept: "text/html" },
-    }),
+let nextServer;
+let serverLog = "";
+let serverPort;
+
+before(async () => {
+  serverPort = await findAvailablePort();
+  nextServer = spawn(
+    process.execPath,
+    [nextCli, "start", "--hostname", HOST, "--port", String(serverPort)],
     {
-      ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
+      cwd: appDirectory,
+      env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
+      stdio: ["ignore", "pipe", "pipe"],
     },
   );
+
+  nextServer.stdout.on("data", appendServerLog);
+  nextServer.stderr.on("data", appendServerLog);
+  await waitForServer();
+}, { timeout: 30_000 });
+
+after(async () => {
+  if (!nextServer || nextServer.exitCode !== null) return;
+
+  nextServer.kill("SIGTERM");
+  await Promise.race([once(nextServer, "exit"), delay(5_000)]);
+  if (nextServer.exitCode === null) nextServer.kill("SIGKILL");
+});
+
+async function render(pathname = "/") {
+  return fetch(`http://${HOST}:${serverPort}${pathname}`, {
+    headers: { accept: "text/html" },
+  });
+}
+
+function appendServerLog(chunk) {
+  serverLog = (serverLog + chunk.toString()).slice(-20_000);
+}
+
+async function findAvailablePort() {
+  const server = createServer();
+  server.unref();
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, HOST, resolve);
+  });
+
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  const { port } = address;
+  await new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
+  return port;
+}
+
+async function waitForServer() {
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    if (nextServer.exitCode !== null) {
+      throw new Error(`Next.js server exited early.\n${serverLog}`);
+    }
+
+    try {
+      const response = await render();
+      if (response.ok) return;
+    } catch {
+      // The server may still be binding its port.
+    }
+
+    await delay(100);
+  }
+
+  throw new Error(`Next.js server did not become ready.\n${serverLog}`);
 }
 
 test("server-renders the Kapsam landing experience", async () => {
@@ -130,6 +195,7 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(css, /max-height:\s*calc\(100dvh - 32px\)/);
   assert.match(css, /@media \(max-width:\s*560px\)/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
+  assert.doesNotMatch(packageJson, /vinext/i);
 
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
 });
