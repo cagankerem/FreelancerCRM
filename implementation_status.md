@@ -19,6 +19,8 @@ Son güncelleme: 2026-08-20
   - 2026-08-17: Server/client/shared import kuralları dokümante edilip otomatik import-grafiği ve negatif Next.js build testiyle zorunlu kılındı; dev/production build, root smoke, lint ve strict typecheck geçti.
   - 2026-08-20: Next.js ve eslint-config-next 16.3.1’e yükseltildi; lint, typecheck, production build, 8 test ve production/tam bağımlılık auditleri geçti.
   - 2026-08-20: Tek normatif `apps/web/package-lock.json`, kökten temiz `npm ci`, standart Next.js tipleri ve gerekçeli type-boundary politikası otomatik foundation testleriyle doğrulandı; tarayıcı/DOM sınırlarındaki doğrulanmamış type assertion’lar runtime daraltmayla kaldırıldı.
+  - 2026-08-20: TASK-001 için temiz kurulum, lint, strict typecheck, tekrarlı production build, tam test seti, browser bundle sızıntı kontrolü ve `/` ile `/demo` development/production smoke kontrollerini birleştiren tek komutluk kabul seti eklendi.
+  - 2026-08-20: Kök mimari belgesi; dizin yapısı, Server/Client Component ve secret sınırları, sentetik `/demo` ile ayrı geliştirilecek production `/app` ayrımı, çalışma komutları ve TASK-003 Supabase yerleşimiyle tamamlandı.
 - [ ] TASK-002: Tailwind, shadcn ve form temelini kur — Kısmi
   - 2026-08-06: Tailwind ve temel UI bileşenleri mevcut; React Hook Form, Zod ve ortak form altyapısı eksik.
   - 2026-08-20: shadcn 4.18.0 tam sürümle devDependency olarak sabitlendi ve tema CSS’inin production build’de çözüldüğü doğrulandı; form altyapısı hâlâ eksik.

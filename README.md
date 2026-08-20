@@ -56,6 +56,13 @@ npm run install-all
 npm run dev
 ~~~
 
+Production çalıştırması:
+
+~~~bash
+npm run build
+npm run start
+~~~
+
 Kalite kontrolleri:
 
 ~~~bash
@@ -63,6 +70,17 @@ npm test
 npm run lint
 npm run typecheck
 ~~~
+
+TASK-001 temelinin temiz kurulumdan development ve production smoke testlerine
+kadar tam kabul kontrolü:
+
+~~~bash
+npm run validate:task-001
+~~~
+
+Bu komut `npm ci`, lint, strict type-check, iki production build, tüm testler,
+tarayıcı bundle'ında server/secret sızıntısı kontrolü ve hem `/` hem `/demo` için
+development/production HTTP 200 smoke kontrollerini sırasıyla çalıştırır.
 
 Kök `install-all` komutu, `apps/web/package-lock.json` dosyasını normatif kabul
 ederek temiz ve tekrar üretilebilir `npm ci` kurulumu yapar. Repoda ikinci bir
@@ -72,3 +90,9 @@ Uygulama kodu `apps/web/` klasöründedir. Landing yüzeyi
 `components/marketing/landing-page.tsx` ve `components/marketing/landing-page.css`;
 demo girişi `components/demo/demo-app.tsx`, paylaşılan sentetik ürün arayüzü ise
 `components/demo/prototype-app.tsx` ve `app/globals.css` dosyalarındadır.
+
+## Mimari
+
+Uygulama dizinleri, Server/Client Component sınırı, secret import kuralları,
+`/demo` ile gelecekteki gerçek `/app` ayrımı ve TASK-003 Supabase yerleşimi
+[ARCHITECTURE.md](./ARCHITECTURE.md) içinde tanımlanır.

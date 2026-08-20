@@ -9,6 +9,7 @@
     "start": "cd apps/web && npm run start",
     "test": "cd apps/web && npm test",
     "lint": "cd apps/web && npm run lint",
-    "typecheck": "cd apps/web && npm run typecheck"
+    "typecheck": "cd apps/web && npm run typecheck",
+    "validate:task-001": "node scripts/validate-task-001.mjs"
   }
 }
