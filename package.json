@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cd apps/web && npm run dev",
-    "install-all": "cd apps/web && npm install",
+    "install-all": "npm ci --prefix apps/web",
     "build": "cd apps/web && npm run build",
     "start": "cd apps/web && npm run start",
     "test": "cd apps/web && npm test",

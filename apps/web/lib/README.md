@@ -12,4 +12,6 @@ Server Components are the default. Add `"use client"` only to interactive leaf c
 
 Import server modules directly from their source files. Do not create barrel files that re-export server code into client or shared entry points.
 
+Parse untrusted browser, network, and environment values at their entry point. Prefer runtime narrowing over `as T`. If an assertion or non-null assertion is unavoidable at a verified boundary, document its reason on the same or preceding line with `type-boundary:`.
+
 These rules are enforced by `tests/server-boundary.test.mjs`. Supabase clients and their runtime placement belong to TASK-003.

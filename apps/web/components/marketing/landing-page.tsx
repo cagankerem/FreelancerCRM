@@ -44,6 +44,7 @@ type FormStatus =
   | "invalid-email"
   | "storage-error";
 type PriceVariant = 149 | 249;
+type WaitlistEntry = string | { email: string };
 
 const subscribeToHydration = () => () => undefined;
 const getHydratedSnapshot = () => true;
@@ -130,6 +131,21 @@ function getLandingSource() {
   }
 }
 
+function isWaitlistEntry(value: unknown): value is WaitlistEntry {
+  return (
+    typeof value === "string" ||
+    (typeof value === "object" &&
+      value !== null &&
+      "email" in value &&
+      typeof value.email === "string")
+  );
+}
+
+function readWaitlistEntries(value: string | null): WaitlistEntry[] {
+  const parsed: unknown = JSON.parse(value ?? "[]");
+  return Array.isArray(parsed) ? parsed.filter(isWaitlistEntry) : [];
+}
+
 function trackLandingEvent(name: string, detail: Record<string, string | number> = {}) {
   if (typeof window === "undefined") return;
 
@@ -148,7 +164,9 @@ function trackLandingEvent(name: string, detail: Record<string, string | number>
   };
 
   try {
-    const current = JSON.parse(window.localStorage.getItem("kapsam-alpha-events-v1") ?? "[]") as unknown[];
+    const current: unknown = JSON.parse(
+      window.localStorage.getItem("kapsam-alpha-events-v1") ?? "[]",
+    );
     const eventLog = Array.isArray(current) ? current : [];
     window.localStorage.setItem("kapsam-alpha-events-v1", JSON.stringify([...eventLog.slice(-99), payload]));
   } catch {
@@ -237,7 +255,8 @@ export function LandingPage() {
     if (typeof window === "undefined") return 149;
     try {
       const stored = window.localStorage.getItem("kapsam-alpha-price-v1");
-      if (stored === "149" || stored === "249") return Number(stored) as PriceVariant;
+      if (stored === "149") return 149;
+      if (stored === "249") return 249;
       const next: PriceVariant = window.crypto.getRandomValues(new Uint8Array(1))[0] % 2 === 0 ? 149 : 249;
       window.localStorage.setItem("kapsam-alpha-price-v1", String(next));
       return next;
@@ -289,9 +308,9 @@ export function LandingPage() {
     }
 
     try {
-      const current = JSON.parse(window.localStorage.getItem("kapsam-alpha-waitlist-v1") ?? "[]") as Array<
-        string | { email: string }
-      >;
+      const current = readWaitlistEntries(
+        window.localStorage.getItem("kapsam-alpha-waitlist-v1"),
+      );
       const isAlreadyRegistered = current.some((entry) =>
         typeof entry === "string" ? entry === email : entry.email === email,
       );

@@ -319,10 +319,77 @@ function cloneDraft(draft: DraftSnapshot): DraftSnapshot {
   return { ...draft, items: draft.items.map((item) => ({ ...item })) };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isCurrency(value: unknown): value is Currency {
+  return value === "TRY" || value === "USD" || value === "EUR";
+}
+
+function isTaxInfo(value: unknown): value is TaxInfo {
+  return value === "excluded" || value === "included" || value === "none";
+}
+
+function isItem(value: unknown): value is Item {
+  return (
+    isRecord(value) &&
+    typeof value.id === "number" &&
+    typeof value.description === "string" &&
+    typeof value.quantity === "number" &&
+    typeof value.unitPrice === "number"
+  );
+}
+
+function isProfileSnapshot(value: unknown): value is ProfileSnapshot {
+  return (
+    isRecord(value) &&
+    typeof value.name === "string" &&
+    typeof value.profession === "string" &&
+    typeof value.brand === "string" &&
+    typeof value.email === "string" &&
+    isCurrency(value.currency)
+  );
+}
+
+function isDraftSnapshot(value: unknown): value is DraftSnapshot {
+  return (
+    isRecord(value) &&
+    typeof value.projectName === "string" &&
+    typeof value.clientName === "string" &&
+    typeof value.company === "string" &&
+    typeof value.summary === "string" &&
+    typeof value.scope === "string" &&
+    typeof value.deliverables === "string" &&
+    typeof value.excluded === "string" &&
+    typeof value.duration === "string" &&
+    typeof value.startDate === "string" &&
+    typeof value.validUntil === "string" &&
+    typeof value.revision === "string" &&
+    isCurrency(value.currency) &&
+    isTaxInfo(value.taxInfo) &&
+    typeof value.paymentPlan === "string" &&
+    typeof value.additionalTerms === "string" &&
+    Array.isArray(value.items) &&
+    value.items.every(isItem) &&
+    typeof value.total === "number"
+  );
+}
+
+function readStoredPrototypeState(value: string) {
+  const parsed: unknown = JSON.parse(value);
+  if (!isRecord(parsed)) return {};
+
+  return {
+    ...(isProfileSnapshot(parsed.profile) ? { profile: parsed.profile } : {}),
+    ...(isDraftSnapshot(parsed.draft) ? { draft: parsed.draft } : {}),
+  };
+}
+
 function useStringFields<T extends object>(initialValue: T | (() => T)) {
   const [fields, setFields] = useState<T>(initialValue);
   const bind = <K extends StringKey<T>>(key: K) => ({
-    value: fields[key] as string,
+    value: String(fields[key]),
     onChange: (event: FieldEvent) =>
       setFields((current) => ({ ...current, [key]: event.target.value })),
   });
@@ -462,7 +529,10 @@ function Modal({
   }, [onClose]);
 
   useEffect(() => {
-    returnFocusRef.current = document.activeElement as HTMLElement;
+    returnFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     confirmRef.current?.focus();
@@ -2072,10 +2142,7 @@ export function PrototypeApp({
       try {
         const saved = window.localStorage.getItem("kapsam-prototype-state-v1");
         if (saved) {
-          const parsed = JSON.parse(saved) as {
-            profile?: ProfileSnapshot;
-            draft?: DraftSnapshot;
-          };
+          const parsed = readStoredPrototypeState(saved);
           if (parsed.profile) setProfile({ ...defaultProfile, ...parsed.profile });
           if (parsed.draft) {
             setDraftSnapshot({

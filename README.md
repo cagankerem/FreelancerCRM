@@ -52,7 +52,7 @@ amacıyla simüle edilir; production güvenlik kontrolü sayılmaz.
 Node.js 22.13.0 veya üzeri ile:
 
 ~~~bash
-npm install
+npm run install-all
 npm run dev
 ~~~
 
@@ -61,8 +61,12 @@ Kalite kontrolleri:
 ~~~bash
 npm test
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 ~~~
+
+Kök `install-all` komutu, `apps/web/package-lock.json` dosyasını normatif kabul
+ederek temiz ve tekrar üretilebilir `npm ci` kurulumu yapar. Repoda ikinci bir
+paket yöneticisi lockfile'ı tutulmaz.
 
 Uygulama kodu `apps/web/` klasöründedir. Landing yüzeyi
 `components/marketing/landing-page.tsx` ve `components/marketing/landing-page.css`;
