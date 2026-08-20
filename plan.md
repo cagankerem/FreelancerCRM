@@ -1961,7 +1961,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Bağımlılıklar:** TASK-001–TASK-003.
 
-**Teknik Notlar:** Sentetik deterministik test verisi kullanılır.
+**Teknik Notlar:** Sentetik deterministik test verisi kullanılır. CI, production bağımlılıklarını `npm audit --omit=dev --audit-level=high` ile merge engelleyici olarak tarar; tüm bağımlılık ağacı ayrıca `npm audit` ile raporlanır. Otomatik `npm audit fix --force` kullanılmaz.
 
 **Güvenlik ve Veri Notları:** CI production verisine veya secret’ına erişmez.
 
@@ -1971,6 +1971,8 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Hata merge’i engelliyor.
 - [ ] Test/prod izolasyonu var.
 - [ ] Fail senaryosu doğrulandı.
+- [ ] Production bağımlılıklarındaki high veya critical bulgular merge’i engelliyor.
+- [ ] Tüm bağımlılık ağacının audit sonucu ayrıca raporlanıyor.
 
 **Testler:**
 

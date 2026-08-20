@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-08-11
+Son güncelleme: 2026-08-20
 
 ## Takip Sistemi
 
@@ -13,14 +13,18 @@ Son güncelleme: 2026-08-11
 
 ## Faz 1A: Proje Temeli
 
-- [ ] TASK-001: Next.js ve strict TypeScript temelini kur — Kısmi
+- [x] TASK-001: Next.js ve strict TypeScript temelini kur
   - 2026-08-06: Next.js, React ve strict TypeScript mevcut; production runtime ve server/client sınırları kesinleşmedi.
   - 2026-08-11: Native Next.js dev/production runtime, kök komutları ve rota smoke testleri tamamlandı; Vinext/Cloudflare/Sites/Vite/Wrangler ile boş D1/SQLite-Drizzle iskeleti kaldırıldı, server-only guard ve bundle sınırı testi eksik.
+  - 2026-08-17: Server/client/shared import kuralları dokümante edilip otomatik import-grafiği ve negatif Next.js build testiyle zorunlu kılındı; dev/production build, root smoke, lint ve strict typecheck geçti.
+  - 2026-08-20: Next.js ve eslint-config-next 16.3.1’e yükseltildi; lint, typecheck, production build, 8 test ve production/tam bağımlılık auditleri geçti.
 - [ ] TASK-002: Tailwind, shadcn ve form temelini kur — Kısmi
   - 2026-08-06: Tailwind ve temel UI bileşenleri mevcut; React Hook Form, Zod ve ortak form altyapısı eksik.
+  - 2026-08-20: shadcn 4.18.0 tam sürümle devDependency olarak sabitlendi ve tema CSS’inin production build’de çözüldüğü doğrulandı; form altyapısı hâlâ eksik.
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
+  - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.
 - [ ] TASK-005: Correlation ID ve güvenli logger kur
 
 ## Faz 1B: Auth ve Profil
