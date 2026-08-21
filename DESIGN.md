@@ -3,120 +3,255 @@ version: alpha
 name: Kapsam
 description: "Kapsam's cool-spectrum editorial product system, using purple for versatility, blue for trust, cyan for clarity, and orange for high-attention actions."
 colors:
-  canvas: "#F6F8FC"
-  surface: "#FFFFFF"
-  surface-subtle: "#F1F5F9"
-  on-surface: "#101828"
-  on-surface-soft: "#344054"
-  muted: "#475467"
-  outline: "#CBD5E1"
-  outline-soft: "#E2E8F0"
-  control-outline: "#7B8794"
-  sidebar: "#12142A"
-  sidebar-raised: "#1B2140"
-  sidebar-text: "#E2E8F0"
-  sidebar-muted: "#A7B2C5"
-  primary: "#6D28D9"
-  primary-hover: "#5B21B6"
-  primary-container: "#F5F3FF"
-  primary-container-strong: "#EDE9FE"
-  on-primary-container: "#5B21B6"
-  secondary: "#1D4ED8"
-  secondary-hover: "#1E40AF"
-  secondary-container: "#EFF6FF"
-  secondary-container-strong: "#DBEAFE"
-  on-secondary-container: "#1D4ED8"
-  tertiary: "#0E7490"
-  tertiary-signal: "#06B6D4"
-  tertiary-hover: "#155E75"
-  tertiary-container: "#ECFEFF"
-  tertiary-container-strong: "#CFFAFE"
-  on-tertiary-container: "#155E75"
-  accent: "#C2410C"
-  accent-hover: "#9A3412"
-  accent-signal: "#F97316"
-  accent-container: "#FFF7ED"
-  accent-container-strong: "#FFEDD5"
-  on-accent-container: "#9A3412"
-  on-accent: "#FFFFFF"
-  on-primary: "#FFFFFF"
-  danger: "#B42318"
-  danger-container: "#FEF3F2"
-  neutral: "#475467"
-  neutral-container: "#F2F4F7"
-  focus: "#2563EB"
-  selection: "#DBEAFE"
+  canvas:
+    light: "#F6F8FC"
+    dark: "#0B1020"
+  surface:
+    light: "#FFFFFF"
+    dark: "#111827"
+  surface-subtle:
+    light: "#F1F5F9"
+    dark: "#182033"
+  on-surface:
+    light: "#101828"
+    dark: "#F8FAFC"
+  on-surface-soft:
+    light: "#344054"
+    dark: "#CBD5E1"
+  muted:
+    light: "#475467"
+    dark: "#94A3B8"
+  outline:
+    light: "#CBD5E1"
+    dark: "#475569"
+  outline-soft:
+    light: "#E2E8F0"
+    dark: "#273449"
+  control-outline:
+    light: "#7B8794"
+    dark: "#64748B"
+  sidebar:
+    light: "#12142A"
+    dark: "#080C18"
+  sidebar-raised:
+    light: "#1B2140"
+    dark: "#151C31"
+  sidebar-text:
+    light: "#E2E8F0"
+    dark: "#F1F5F9"
+  sidebar-muted:
+    light: "#A7B2C5"
+    dark: "#A8B3C7"
+  primary:
+    light: "#6D28D9"
+    dark: "#7C3AED"
+  primary-hover:
+    light: "#5B21B6"
+    dark: "#6D28D9"
+  primary-container:
+    light: "#F5F3FF"
+    dark: "#2E1065"
+  primary-container-strong:
+    light: "#EDE9FE"
+    dark: "#4C1D95"
+  on-primary-container:
+    light: "#5B21B6"
+    dark: "#EDE9FE"
+  on-primary:
+    light: "#FFFFFF"
+    dark: "#FFFFFF"
+  secondary:
+    light: "#1D4ED8"
+    dark: "#1D4ED8"
+  secondary-hover:
+    light: "#1E40AF"
+    dark: "#1E40AF"
+  secondary-container:
+    light: "#EFF6FF"
+    dark: "#172554"
+  secondary-container-strong:
+    light: "#DBEAFE"
+    dark: "#1E3A8A"
+  on-secondary-container:
+    light: "#1D4ED8"
+    dark: "#DBEAFE"
+  on-secondary:
+    light: "#FFFFFF"
+    dark: "#FFFFFF"
+  tertiary:
+    light: "#0E7490"
+    dark: "#0E7490"
+  tertiary-signal:
+    light: "#06B6D4"
+    dark: "#22D3EE"
+  tertiary-hover:
+    light: "#155E75"
+    dark: "#155E75"
+  tertiary-container:
+    light: "#ECFEFF"
+    dark: "#083344"
+  tertiary-container-strong:
+    light: "#CFFAFE"
+    dark: "#164E63"
+  on-tertiary-container:
+    light: "#155E75"
+    dark: "#CFFAFE"
+  on-tertiary:
+    light: "#FFFFFF"
+    dark: "#FFFFFF"
+  action-primary:
+    light: "#C2410C"
+    dark: "#C2410C"
+  action-primary-hover:
+    light: "#9A3412"
+    dark: "#9A3412"
+  action-primary-signal:
+    light: "#F97316"
+    dark: "#FB923C"
+  on-action-primary:
+    light: "#FFFFFF"
+    dark: "#FFFFFF"
+  status-attention:
+    light: "#9A3412"
+    dark: "#FDBA74"
+  status-attention-signal:
+    light: "#F97316"
+    dark: "#FB923C"
+  status-attention-container:
+    light: "#FFF7ED"
+    dark: "#431407"
+  status-attention-container-strong:
+    light: "#FFEDD5"
+    dark: "#7C2D12"
+  on-status-attention-container:
+    light: "#9A3412"
+    dark: "#FFEDD5"
+  danger:
+    light: "#B42318"
+    dark: "#FCA5A5"
+  danger-action:
+    light: "#B42318"
+    dark: "#B42318"
+  danger-action-hover:
+    light: "#912018"
+    dark: "#912018"
+  on-danger:
+    light: "#FFFFFF"
+    dark: "#FFFFFF"
+  danger-container:
+    light: "#FEF3F2"
+    dark: "#450A0A"
+  on-danger-container:
+    light: "#912018"
+    dark: "#FECACA"
+  neutral:
+    light: "#475467"
+    dark: "#CBD5E1"
+  neutral-container:
+    light: "#F2F4F7"
+    dark: "#1E293B"
+  disabled:
+    light: "#5A6578"
+    dark: "#94A3B8"
+  disabled-container:
+    light: "#E2E8F0"
+    dark: "#273449"
+  backdrop:
+    light: "rgb(11 16 32 / 55%)"
+    dark: "rgb(0 0 0 / 72%)"
+  toast-surface:
+    light: "#12142A"
+    dark: "#1E293B"
+  on-toast-surface:
+    light: "#F8FAFC"
+    dark: "#F8FAFC"
+  focus:
+    light: "#2563EB"
+    dark: "#2563EB"
+  selection:
+    light: "#DBEAFE"
+    dark: "#1E3A8A"
 typography:
+  display-marketing:
+    fontFamily: Sora
+    fontSize: 72px
+    fontWeight: 600
+    lineHeight: 0.98
+    letterSpacing: -0.055em
   display-proposal:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 75px
     fontWeight: 520
     lineHeight: 0.98
     letterSpacing: -0.063em
   display-onboarding:
-    fontFamily: Geist
+    fontFamily: Sora
     fontSize: 57px
     fontWeight: 590
     lineHeight: 0.99
     letterSpacing: -0.055em
   display-product:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 44px
     fontWeight: 560
     lineHeight: 1.04
     letterSpacing: -0.055em
   headline-page:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 38px
     fontWeight: 580
     lineHeight: 1
     letterSpacing: -0.05em
   headline-section:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 27px
     fontWeight: 610
     lineHeight: 1.05
     letterSpacing: -0.04em
   title-card:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 16px
     fontWeight: 680
     lineHeight: 1.3
     letterSpacing: -0.03em
   body-large:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.7
     letterSpacing: 0em
-    fontFeature: '"ss01" 1, "cv11" 1'
   body-default:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: 0em
-    fontFeature: '"ss01" 1, "cv11" 1'
   body-small:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.55
     letterSpacing: 0em
   label-ui:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 13px
     fontWeight: 650
     lineHeight: 1.2
     letterSpacing: 0em
   eyebrow:
-    fontFamily: Geist
+    fontFamily: Manrope
     fontSize: 10px
     fontWeight: 780
     lineHeight: 1.2
     letterSpacing: 0.14em
+  brand-wordmark:
+    fontFamily: Sora
+    fontSize: 21px
+    fontWeight: 700
+    lineHeight: 1
+    letterSpacing: -0.045em
   metadata-mono:
-    fontFamily: Geist Mono
+    fontFamily: ui-monospace
     fontSize: 9px
     fontWeight: 650
     lineHeight: 1.4
@@ -124,10 +259,10 @@ typography:
 rounded:
   document: 3px
   brand-glyph: 9px
-  sm: 10px
-  control: 11px
-  compact-card: 13px
-  card: 16px
+  sm: 12px
+  control: 14px
+  compact-card: 16px
+  card: 18px
   modal: 20px
   lg: 24px
   xl: 32px
@@ -143,6 +278,44 @@ spacing:
   "3xl": 48px
   "4xl": 64px
   "5xl": 84px
+iconography:
+  library: lucide-react
+  strokeWidth: 1.75
+  size-sm: 16px
+  size-md: 18px
+  size-lg: 20px
+motion:
+  functional: 160ms
+  overlay: 200ms
+  expressive-entry: 480ms
+  expressive-scroll: 600ms
+  reduced: 0ms
+gradients:
+  brand-spectrum:
+    light: "linear-gradient(120deg, #6D28D9 0%, #1D4ED8 52%, #0E7490 100%)"
+    dark: "linear-gradient(120deg, #7C3AED 0%, #1D4ED8 52%, #0E7490 100%)"
+  deep-spectrum:
+    light: "linear-gradient(135deg, #5B21B6 0%, #1E40AF 52%, #155E75 100%)"
+    dark: "linear-gradient(135deg, #4C1D95 0%, #172554 52%, #083344 100%)"
+  ambient-spectrum:
+    light: "linear-gradient(135deg, #F5F3FF 0%, #EFF6FF 52%, #ECFEFF 100%)"
+    dark: "linear-gradient(135deg, #2E1065 0%, #172554 52%, #083344 100%)"
+  action-primary:
+    light: "linear-gradient(135deg, #C2410C 0%, #9A3412 100%)"
+    dark: "linear-gradient(135deg, #C2410C 0%, #9A3412 100%)"
+elevation:
+  small:
+    light: "0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%)"
+    dark: "0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 22%)"
+  medium:
+    light: "0 18px 48px rgb(16 24 40 / 12%)"
+    dark: "0 18px 48px rgb(0 0 0 / 34%)"
+  large:
+    light: "0 32px 80px rgb(16 24 40 / 20%)"
+    dark: "0 32px 80px rgb(0 0 0 / 46%)"
+  document:
+    light: "0 20px 70px rgb(16 24 40 / 10%)"
+    dark: "0 20px 70px rgb(0 0 0 / 38%)"
 components:
   app-canvas:
     backgroundColor: "{colors.canvas}"
@@ -159,15 +332,15 @@ components:
     rounded: "{rounded.card}"
     padding: 20px
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.on-accent}"
+    backgroundColor: "{colors.action-primary}"
+    textColor: "{colors.on-action-primary}"
     typography: "{typography.label-ui}"
     rounded: "{rounded.control}"
     height: 42px
     padding: 17px
   button-primary-hover:
-    backgroundColor: "{colors.accent-hover}"
-    textColor: "{colors.on-accent}"
+    backgroundColor: "{colors.action-primary-hover}"
+    textColor: "{colors.on-action-primary}"
     typography: "{typography.label-ui}"
     rounded: "{rounded.control}"
     height: 42px
@@ -186,25 +359,25 @@ components:
     height: 42px
   button-trust:
     backgroundColor: "{colors.secondary}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.on-secondary}"
     typography: "{typography.label-ui}"
     rounded: "{rounded.control}"
     height: 42px
   button-trust-hover:
     backgroundColor: "{colors.secondary-hover}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.on-secondary}"
     typography: "{typography.label-ui}"
     rounded: "{rounded.control}"
     height: 42px
   button-clarity:
     backgroundColor: "{colors.tertiary}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.on-tertiary}"
     typography: "{typography.label-ui}"
     rounded: "{rounded.control}"
     height: 42px
   button-clarity-hover:
     backgroundColor: "{colors.tertiary-hover}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.on-tertiary}"
     typography: "{typography.label-ui}"
     rounded: "{rounded.control}"
     height: 42px
@@ -215,6 +388,19 @@ components:
     rounded: "{rounded.control}"
     height: 42px
     padding: 17px
+  button-danger:
+    backgroundColor: "{colors.danger-action}"
+    textColor: "{colors.on-danger}"
+    typography: "{typography.label-ui}"
+    rounded: "{rounded.control}"
+    height: 42px
+    padding: 17px
+  button-danger-hover:
+    backgroundColor: "{colors.danger-action-hover}"
+    textColor: "{colors.on-danger}"
+    typography: "{typography.label-ui}"
+    rounded: "{rounded.control}"
+    height: 42px
   field:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
@@ -298,23 +484,23 @@ components:
     backgroundColor: "{colors.tertiary-signal}"
     rounded: "{rounded.full}"
     size: 5px
-  status-warning:
-    backgroundColor: "{colors.accent-container}"
-    textColor: "{colors.on-accent-container}"
+  status-attention:
+    backgroundColor: "{colors.status-attention-container}"
+    textColor: "{colors.on-status-attention-container}"
     rounded: "{rounded.full}"
     height: 26px
-  status-warning-dot:
-    backgroundColor: "{colors.accent-signal}"
+  status-attention-dot:
+    backgroundColor: "{colors.status-attention-signal}"
     rounded: "{rounded.full}"
     size: 5px
   attention-card:
-    backgroundColor: "{colors.accent-container-strong}"
-    textColor: "{colors.on-accent-container}"
+    backgroundColor: "{colors.status-attention-container-strong}"
+    textColor: "{colors.on-status-attention-container}"
     rounded: "{rounded.compact-card}"
     padding: 16px
   status-danger:
     backgroundColor: "{colors.danger-container}"
-    textColor: "{colors.danger}"
+    textColor: "{colors.on-danger-container}"
     rounded: "{rounded.full}"
     height: 26px
   status-info:
@@ -331,6 +517,14 @@ components:
     backgroundColor: "{colors.neutral}"
     rounded: "{rounded.full}"
     size: 5px
+  disabled-control:
+    backgroundColor: "{colors.disabled-container}"
+    textColor: "{colors.disabled}"
+    rounded: "{rounded.control}"
+  toast:
+    backgroundColor: "{colors.toast-surface}"
+    textColor: "{colors.on-toast-surface}"
+    rounded: "{rounded.control}"
   focus-indicator:
     backgroundColor: "{colors.focus}"
     textColor: "{colors.on-primary}"
@@ -459,21 +653,19 @@ This repository currently implements an alpha landing page plus a guided, synthe
 
 Future production behavior is documented in `plan.md`; it is a goal and roadmap, not proof of implementation.
 
-### Source-of-truth files
+### Source-of-truth hierarchy
 
-Use this precedence when information conflicts:
+This `DESIGN.md` file is the primary and normative source for every visual and interaction decision: theme tokens, color semantics, typography, spacing, geometry, iconography, component hierarchy, motion, responsive behavior, and accessibility presentation. CSS, React components, prototypes, screenshots, and future implementations must conform to this document; their current values never override it.
 
-1. `apps/web/components/marketing/landing-page.tsx` and `apps/web/components/marketing/landing-page.css` — alpha landing copy, conversion flow, layout, and responsive behavior.
-2. `apps/web/components/demo/demo-app.tsx` and `apps/web/components/demo/prototype-app.tsx` — guided demo entry plus shared product copy, synthetic data, workflows, states, and interactions.
-3. `apps/web/app/globals.css` — implemented prototype layout, responsive behavior, component geometry, typography, and motion; its legacy forest/coral color values are superseded by this file.
-4. `README.md` — current landing/prototype purpose, leading feature order, scope, and limitations.
-5. `apps/web/app/page.tsx`, `apps/web/app/demo/page.tsx`, and `apps/web/app/layout.tsx` — route-specific metadata, Turkish language, and prototype noindex behavior.
-6. `apps/web/tests/rendered-html.test.mjs` — non-negotiable rendered content, safety, and accessibility contracts.
-7. `plan.md` — future product thesis, production architecture, and roadmap only.
+Use the following domain-specific precedence when information conflicts:
+
+1. `DESIGN.md` — all visual and interaction rules.
+2. `plan.md` — product scope, behavior, routes, data, security, and implementation roadmap; it does not override this file's visual rules.
+3. `apps/web/components/marketing/landing-page.tsx`, `apps/web/components/marketing/landing-page.css`, `apps/web/components/demo/demo-app.tsx`, and `apps/web/components/demo/prototype-app.tsx` — current copy, synthetic data, workflows, states, and interaction references that must be migrated toward this design system.
+4. `apps/web/app/globals.css` — current prototype implementation only. Its legacy forest, coral, mint, sand, typography, radius, and motion values are non-normative where they conflict with this file.
+5. `README.md`, route metadata, and `apps/web/tests/rendered-html.test.mjs` — current product purpose, limitations, metadata, safety, and rendered-content contracts.
 
 The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
-
-**Color precedence exception:** the `## Colors` section and YAML color tokens in this file are the new source of truth. Do not reintroduce the current CSS palette's forest green, coral, mint, or sand values when generating a design. Continue to inherit the existing layout, spacing, typography, shape, and interaction patterns.
 
 ### Design goals
 
@@ -483,47 +675,59 @@ The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, 
 - Make approximate tracking and irreversible or terminal actions explicit without alarmist styling.
 - Present AI as a bounded assistant: field-selective, editable, approval-based, and visually subordinate to the freelancer's judgment.
 - Express comfort and versatility through purple, trust through blue, productivity and clarity through cyan, and excitement through deliberately scarce orange actions and highlights.
+- Provide complete light and dark themes through the same semantic token names; changing theme must never change meaning or hierarchy.
+- Use Manrope for the durable product interface and Sora only for selected expressive brand moments.
 - Preserve a professional Turkish-market context through Turkish copy, TL display, clear payment terms, and honest legal limits.
 - Remain usable from a 320px viewport upward and preserve keyboard, focus, reduced-motion, and screen-reader behavior.
 
 ## Colors
 
-The visual world is cool-spectrum editorial SaaS: purple for comfort and versatility, blue for trust, cyan for productivity and clarity, and orange for excitement and high-attention actions. White proposal paper sits on a very light blue-lavender canvas. The result should feel confident, dynamic, and clear without becoming neon, playful, or rainbow-like.
+The visual world is cool-spectrum editorial SaaS: purple for comfort and versatility, blue for trust, cyan for productivity and clarity, and orange for excitement and high-attention actions. The light theme uses white document surfaces on a very light blue-lavender canvas; the dark theme uses deep navy canvases and clearly raised dark document surfaces. Both must feel confident, dynamic, and clear without becoming neon, playful, rainbow-like, or visually tiring.
+
+### Theme system
+
+Every color token in the YAML front matter has a complete `light` and `dark` value. Components consume the semantic token name—such as `surface`, `on-surface`, `action-primary`, `status-attention`, or `danger`—and never select a raw light/dark value themselves.
+
+- Support `light` and `dark` explicitly from the first production release. Respect the system preference until the user makes a choice, then persist that explicit preference.
+- Set the document color scheme to the active theme so native controls render consistently, and prevent an incorrect-theme flash during initial rendering.
+- Theme switching changes surface and contrast values, not the semantic meaning of purple, blue, cyan, orange, or red.
+- Test normal, hover, active, focus, disabled, selected, loading, validation, and destructive states independently in both themes against WCAG 2.2 AA.
+- Do not hard-code theme-dependent colors inside product components. Raw palette values belong only in the token declaration and deliberately fixed brand artwork.
 
 ### Color psychology and semantic roles
 
 - **Purple — comfort and versatility:** brand identity, onboarding, editable or selected states, flexible AI assistance, and brand-led secondary actions. Core values are `#6D28D9`, darker `#5B21B6`, and the soft containers `#F5F3FF` / `#EDE9FE`.
 - **Blue — trust:** navigation, security and share-link surfaces, publication state, trusted customer-facing controls, and structural information. Core values are `#1D4ED8`, darker `#1E40AF`, and the containers `#EFF6FF` / `#DBEAFE`.
 - **Cyan — productivity and clarity:** live preview, progress, tracking, completed states, AI clarity, and data marks. Use accessible `#0E7490` or `#155E75` for text and controls; reserve brighter `#06B6D4` for non-text signals. Containers are `#ECFEFF` / `#CFFAFE`.
-- **Orange — excitement and attention:** the most important CTA, deadlines, “needs attention” signals, document indexes, eyebrows, and limited text highlights. Use accessible `#C2410C` for white-label buttons or text on white, `#9A3412` for hover/darker text, and bright `#F97316` only for dots, glows, or non-text graphics. Containers are `#FFF7ED` / `#FFEDD5`.
+- **Orange — excitement and attention:** the color family supports two separate meanings. `action-primary` is the highest-priority CTA and uses a solid, high-weight orange fill. `status-attention` communicates deadlines, “needs attention,” and pending states through pale containers, colored text, and a small signal dot. These tokens may share an orange family but must never be used interchangeably. Bright orange is limited to dots, glows, or non-text graphics.
 
 Orange is an accent layer, not part of the cool brand gradient. Its separation from the adjacent purple–blue–cyan family is what creates visual priority.
 
 ### Neutral and safety colors
 
-- **Canvas (`#F6F8FC`)**: default application background with a subtle cool tint.
-- **Surface (`#FFFFFF`)** and **subtle surface (`#F1F5F9`)**: cards, forms, modals, and proposal paper.
-- **Ink (`#101828`)** and **soft ink (`#344054`)**: primary and secondary text. Brand colors do not replace readable body copy.
-- **Muted (`#475467`)**: supporting copy and metadata; do not use it for primary decisions.
-- **Outline (`#CBD5E1`)** and **soft outline (`#E2E8F0`)**: decorative structure. Use the stronger control outline `#7B8794` where a field boundary must remain visible.
-- **Danger (`#B42318`) / danger container (`#FEF3F2`)**: rejection, revoked access, validation, and destructive confirmation. Red is the only non-brand exception and must remain reserved for safety semantics.
-- **Neutral (`#475467`) / neutral container (`#F2F4F7`)**: draft and inactive states.
+- **Light theme:** canvas `#F6F8FC`, surface `#FFFFFF`, subtle surface `#F1F5F9`, ink `#101828`, soft ink `#344054`, and muted text `#475467`.
+- **Dark theme:** canvas `#0B1020`, surface `#111827`, subtle surface `#182033`, ink `#F8FAFC`, soft ink `#CBD5E1`, and muted text `#94A3B8`.
+- **Outlines:** resolve through `outline`, `outline-soft`, and the stronger `control-outline`; field boundaries must remain visible in both themes.
+- **Danger:** `danger`, `danger-action`, and `danger-container` are red-only semantics for rejection, revoked access, validation, destructive confirmation, and destructive buttons. Orange never substitutes for danger.
+- **Neutral:** `neutral` and `neutral-container` represent draft, inactive, and non-urgent states.
 
 ### Gradient system
 
 Use gradients to show movement between related meanings, not as decoration on every surface:
 
-- **Brand spectrum:** `linear-gradient(120deg, #6D28D9 0%, #1D4ED8 52%, #0E7490 100%)`. Use on the `kapsam.` glyph, major lifecycle progress, and selected brand moments. White normal-size text remains accessible at every endpoint.
-- **Deep spectrum:** `linear-gradient(135deg, #5B21B6 0%, #1E40AF 52%, #155E75 100%)`. Use for the onboarding visual, dashboard hero, and public proposal investment block.
-- **Soft ambient spectrum:** `linear-gradient(135deg, #F5F3FF 0%, #EFF6FF 52%, #ECFEFF 100%)`. Use for AI panels, gentle page atmosphere, and large low-contrast background fields.
-- **Orange action gradient:** `linear-gradient(135deg, #C2410C 0%, #9A3412 100%)`. Use only for the highest-priority CTA when a gradient is needed; solid `#C2410C` remains the default fallback.
-- **Orange attention glow:** use `#F97316` at `12–18%` opacity fading to transparent around an attention card or notification dot.
+- **Brand spectrum:** use the theme-resolved `brand-spectrum` token on the `kapsam.` glyph, major lifecycle progress, and selected brand moments.
+- **Deep spectrum:** use the theme-resolved `deep-spectrum` token for the onboarding visual, dashboard hero, and public proposal investment block.
+- **Ambient spectrum:** use the theme-resolved `ambient-spectrum` token for AI panels, gentle page atmosphere, and large low-contrast background fields.
+- **Primary action gradient:** use the `action-primary` gradient only for the highest-priority CTA when a gradient is necessary; the accessible solid `action-primary` color remains the default.
+- **Attention glow:** use `action-primary-signal` or `status-attention-signal` at `12–18%` opacity, matching the component's semantic role.
 
-Keep most cards white. A single composition should normally contain one dominant cool gradient and one small orange priority signal. Do not place long body copy over a gradient. Dark spectrum surfaces are fixed compositional sections, not a global dark theme.
+Keep most cards on the active `surface` token. A single composition should normally contain one dominant cool gradient and one small orange priority signal. Do not place long body copy over a gradient. Deep-spectrum surfaces are compositional accents inside both complete themes; they are not a substitute for the dark theme token set.
 
 ## Typography
 
-Use **Geist** for all interface and document typography, with **Inter**, `ui-sans-serif`, `system-ui`, and `sans-serif` only as fallbacks. Enable the existing `ss01` and `cv11` OpenType features. Use **Geist Mono** only for step numbers, proposal IDs, counters, compact dates, metadata, and document section indexes.
+Use **Manrope** as the primary family for the application shell, forms, tables, cards, public proposal document, long-form copy, and all durable product UI. Use **Sora** only where controlled expressiveness adds brand movement: the marketing hero, onboarding presentation hero, and `kapsam.` wordmark. Sora must not leak into dense controls, table content, form values, legal text, or routine application headings. Use the system monospace stack only for step numbers, proposal IDs, counters, compact dates, metadata, and document section indexes.
+
+Fallbacks are `ui-sans-serif`, `system-ui`, and `sans-serif` for Manrope/Sora. The utility mono role uses `ui-monospace`, `SFMono-Regular`, and `monospace` without introducing a third downloaded font. Keep exactly one primary sans, one expressive sans, and one utility system-mono role; never select fonts ad hoc inside a component.
 
 The core contrast is between restrained UI typography and an editorial proposal document:
 
@@ -557,7 +761,7 @@ Do not make every section equally spacious. The app shell is compact and operati
 
 ### Application shell
 
-- Desktop: sticky `248px` deep navy sidebar (`#12142A`) with a restrained purple/blue radial glow, plus fluid content.
+- Desktop: sticky `248px` sidebar using the active `sidebar` token with a restrained purple/blue radial glow, plus fluid content.
 - The sidebar holds the brand, **Çalışma alanı** navigation, account links, free-plan quota, and the **Deniz Kaya / Kaya Studio** profile chip.
 - Main content starts with a narrow **ETKİLEŞİMLİ PROTOTİP** disclosure bar, then a page header.
 - At `760px` and below, remove the desktop sidebar and use the existing fixed, blurred, three-item bottom navigation.
@@ -569,7 +773,7 @@ Do not make every section equally spacious. The app shell is compact and operati
 - **Proposal list:** compact panel, filter tabs and search toolbar, then a structured table. On narrow screens, stack toolbar controls and hide lower-priority columns before compromising legibility.
 - **Proposal editor:** sticky translucent top bar; editorial heading and bounded AI entry point; four-step horizontal stepper; form and sticky live-preview split at approximately `1.25fr / 0.75fr`. Stack the preview below the form under `980px`.
 - **Proposal detail:** title/actions, share-link banner, three view-summary cards, transparency notice, then activity timeline and AI follow-up assistant. Actionable state and history outrank decoration.
-- **Public proposal:** narrow blue trust/security or owner-preview strip, brand/contact header, centered `1020px` white document, oversized hero, numbered sections, deep spectrum investment block, terms, and customer response actions. The document itself uses a restrained `3px` radius so it reads like paper rather than a dashboard card.
+- **Public proposal:** narrow blue trust/security or owner-preview strip, brand/contact header, centered `1020px` document surface, oversized hero, numbered sections, deep spectrum investment block, terms, and customer response actions. The document uses the active `surface` token and a restrained `3px` radius so it reads like paper rather than a dashboard card in either theme.
 
 ### Responsive breakpoints
 
@@ -577,13 +781,13 @@ Use the implemented breakpoints: `1180px`, `980px`, `760px`, and `560px`. Respec
 
 ## Elevation & Depth
 
-Depth is quiet and functional. Prefer thin borders, tonal surface changes, and only then a soft shadow.
+Depth is quiet and functional. Prefer tonal surface changes and a soft shadow, adding a thin border wherever hierarchy or control recognition needs it. Resolve every shadow through the theme-paired `elevation` tokens rather than copying raw shadow values.
 
-- Small: `0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%)` for normal cards and controls.
-- Medium: `0 18px 48px rgb(16 24 40 / 12%)` for stronger floating surfaces.
-- Large: `0 32px 80px rgb(16 24 40 / 20%)` for modals and prominent overlays.
-- Public proposal paper: `0 20px 70px rgb(16 24 40 / 10%)`.
-- Sticky bars may use translucent white with `backdrop-filter: blur(15px)`.
+- Small elevation is for normal cards and controls.
+- Medium elevation is for stronger floating surfaces.
+- Large elevation is for modals and prominent overlays.
+- Document elevation is reserved for the public proposal paper.
+- Sticky bars may use a translucent version of the active `surface` token with `backdrop-filter: blur(15px)`.
 
 Use large shadows only where the layer actually floats. Tables, status pills, timelines, and form groups should rely on borders or tonal backgrounds instead.
 
@@ -593,9 +797,9 @@ Decorative depth comes from subtle purple, blue, and cyan radial gradients plus 
 
 Kapsam is softly geometric:
 
-- Form controls and buttons: about `11px` radius.
-- Compact cards and choice rows: about `13px` radius.
-- Standard panels and metric cards: `16px` radius.
+- Form controls and buttons: `14px` radius.
+- Compact cards and choice rows: `16px` radius.
+- Standard panels and metric cards: `18px` radius.
 - Modals: `20px` radius.
 - Major hero/editor containers: `24px` radius.
 - Onboarding presentation panel: `32px` radius.
@@ -610,29 +814,33 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 
 ### Brand mark and iconography
 
-- Render an asymmetric tile containing a white lowercase **`k`**, followed by **`kapsam.`**. Use the purple→blue→cyan brand spectrum gradient; solid `#6D28D9` is the fallback.
-- Standard glyph size is `29px`; the wordmark is `21px`, weight about `770`, tracking `-0.045em`.
-- No icon library is installed. The implemented language uses restrained text glyphs such as `✦`, `◇`, `↗`, `⌕`, `◌`, `×`, `✓`, arrows, and numerals.
-- Keep icon strokes visually light and labels explicit. Never rely on a symbol alone for a destructive or legal action.
+- Render an asymmetric tile containing a white lowercase **`k`**, followed by **`kapsam.`**. Use the theme-resolved purple→blue→cyan brand spectrum gradient; the active `primary` token is the solid fallback.
+- Standard glyph size is `29px`; the Sora wordmark is `21px`, weight about `700`, tracking `-0.045em`.
+- **Lucide (`lucide-react`) is the official and only general-purpose product icon library.** Use the nearest semantic Lucide icon rather than Unicode symbols, emoji, handmade SVGs, or a second icon library.
+- Default icon sizes are `16px`, `18px`, and `20px` with a `1.75` stroke width. Change size only when hierarchy or touch-target context requires it; keep stroke weight consistent.
+- Keep labels explicit. Never rely on an icon alone for a destructive, legal, unfamiliar, or status-changing action. Icon-only buttons require an accessible name and at least a `44px` touch target.
+- The asymmetric `k` brand glyph and typographic document indexes are identity elements, not replacements for interface icons.
 
 ### Buttons
 
 - Default button height: `42px`; large onboarding button: `52px`.
-- Primary attention action: orange `#C2410C` fill, white label, `11px` radius, `14px`/`650` text, and a subtle orange shadow. Hover uses `#9A3412`; the optional action gradient runs only between those two accessible tones.
-- Brand action: purple `#6D28D9` or the cool brand spectrum gradient. Use for onboarding, versatile/creative choices, and brand-led secondary actions—not for the page's most urgent CTA.
-- Trust action: blue `#1D4ED8`. Use for publishing, sharing, security, and customer-facing trust actions when orange would imply urgency.
-- Clarity action: cyan `#0E7490`. Use sparingly for live preview, progress, and productivity actions.
-- Ghost: white fill, outline border, soft-ink label.
+- `action-primary`: orange `#C2410C` fill, white label, `14px` radius, `14px`/`650` text, and a subtle orange shadow. Hover resolves through `action-primary-hover`; the optional action gradient uses only the theme-resolved primary-action tones.
+- Brand action: the active purple `primary` token or cool brand spectrum gradient. Use for onboarding, versatile/creative choices, and brand-led secondary actions—not for the page's most urgent CTA.
+- Trust action: the active blue `secondary` token. Use for publishing, sharing, security, and customer-facing trust actions when orange would imply urgency.
+- Clarity action: the active cyan `tertiary` token. Use sparingly for live preview, progress, and productivity actions.
+- Ghost: active `surface` fill, outline border, soft-ink label.
 - Soft: pale lavender, blue, or cyan container fill chosen by semantic role, with a dark accessible label.
-- Dark: deep purple→blue→cyan spectrum with white label; reserve for strong compositional actions within light surfaces.
-- Danger: danger fill and white label; use only after the destructive context is clear.
+- Spectrum: deep purple→blue→cyan spectrum with white label; reserve for strong compositional actions where contrast is verified in both themes.
+- `danger`: red `danger-action` fill and white label; use only after the destructive context is clear and never substitute orange.
+- Do not impose a fixed limit on the number of available actions, but allow only one highest-weight `action-primary` in each action group. Brand, trust, clarity, ghost, soft, and danger variants establish the remaining hierarchy.
+- `status-attention` is not a button treatment. It uses an attention container, readable orange text, and a small dot so it is visibly lighter than `action-primary`.
 - Pressed state moves down `1px`. Solid hover transitions are about `160ms`; gradient state crossfades take `180–240ms`.
 - Public accept, reject, and message actions must remain three semantically distinct buttons.
 
 ### Forms and multi-step editing
 
 - Labels sit above fields in soft ink at `13px`/`660`.
-- Inputs and selects are at least `48px` high, white, `11px` radius, with a quiet outline.
+- Inputs and selects are at least `48px` high, use the active `surface` token, have a `14px` radius, and retain a quiet but visible `control-outline` boundary.
 - Focus uses a blue border plus a visible ring. Global keyboard focus remains a `3px #2563EB` outline with `3px` offset; orange remains reserved for action priority rather than navigation focus.
 - Helper text follows the field in muted `11px` copy.
 - Validation stays adjacent to the field and also appears in the publish checklist. Use the exact summary heading **Yayınlamadan önce tamamla**.
@@ -641,7 +849,7 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 
 ### AI assistant
 
-- Use the `✦` spark with a cyan-led clarity treatment. AI panels may use the soft purple→blue→cyan ambient gradient, with solid cyan as fallback; orange is not an AI color.
+- Use Lucide's `Sparkles` icon with a cyan-led clarity treatment. AI panels may use the theme-resolved ambient gradient, with solid cyan as fallback; orange is not an AI color.
 - AI entry points are bounded cards or side panels, never a full-screen replacement for the proposal form.
 - Suggestions are field-specific checkbox cards. The user chooses which suggestions apply.
 - Show loading as a gentle spark pulse and three small dots.
@@ -650,11 +858,11 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 
 ### Cards, tables, and status
 
-- Standard panels use white surface, soft outline, `16px` radius, and the small shadow.
+- Standard panels use the active `surface` token, soft outline, `18px` radius, and the theme-resolved small shadow.
 - Metric cards have one dominant value, one label, and a restrained bar, progress line, avatar stack, or supporting note. Do not add decorative charts with invented data.
 - Proposal rows use client/project content first, then amount and status. Hover is a barely cooler lavender-blue surface.
 - Status pills always combine color with a dot and text label.
-- Status mapping: **Yayınlandı** uses blue; **Görüntülendi** uses cyan; **Kabul edildi** uses the stronger cyan container with a check and explicit label; **Yanıt bekleniyor** or **Süresi doldu** uses orange; **Reddedildi** or **Erişim iptal edildi** uses danger red; **Taslak** uses neutral. Color never replaces the dot, icon, and text label.
+- Status mapping: **Yayınlandı** uses blue; **Görüntülendi** uses cyan; **Kabul edildi** uses the stronger cyan container with a check and explicit label; **Yanıt bekleniyor** or **Süresi doldu** uses `status-attention`; **Reddedildi** or **Erişim iptal edildi** uses `danger`; **Taslak** uses neutral. Color never replaces the dot, icon, and text label.
 - Timeline items use circular nodes, a `1px` connecting rule, a concrete event title, honest explanation, and timestamp.
 
 ### Public proposal document
@@ -670,17 +878,18 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 
 - Empty search uses **Eşleşen teklif bulunamadı** and offers **Filtreleri temizle**.
 - Revoked or expired public access uses **Bu teklif artık erişilebilir değil.** without leaking proposal content.
-- Modals are white, `20px` radius, maximum `470px` wide, with a meaning-specific icon tile and explicit cancel/confirm buttons.
-- Toasts use a deep navy surface. Their icon tile follows meaning: cyan for success/clarity, blue for information, orange for attention/action, and red for danger. Position bottom-right on desktop and above the mobile nav on small screens.
+- Modals use the active `surface` token, `20px` radius, maximum `470px` width, a meaning-specific Lucide icon tile, and explicit cancel/confirm buttons.
+- Toasts use `toast-surface` and `on-toast-surface`. Their Lucide icon tile follows meaning: cyan for success/clarity, blue for information, `status-attention` orange for attention, `action-primary` orange only for an action-oriented CTA, and red for danger. Position bottom-right on desktop and above the mobile nav on small screens.
 - Critical errors must not be communicated only by toast.
 
 ### Motion and accessibility
 
-- Standard transitions: `140–160ms` for color, border, transform, and shadow.
-- Cool-spectrum gradient states crossfade over `180–240ms`; avoid constant animated gradients on operational screens.
-- Modal and toast entrances: `160–200ms` with a small fade/vertical movement.
-- AI pulse: `1.5s`; loading dots: `1s`.
-- Under `prefers-reduced-motion: reduce`, effectively disable animations, gradient movement, transitions, and smooth scrolling.
+- **Landing, onboarding, and presentation-led brand surfaces:** may use characterful scroll-linked movement, layered entrances, and controlled parallax. Keep timings primarily within `300–600ms`, bind motion to meaningful section progress, and never make scrolling or input feel delayed.
+- **Dashboard, tables, forms, settings, and other operational surfaces:** use only short functional transitions around `140–160ms` for color, border, transform, and shadow. Do not add scroll choreography, ambient loops, or constant gradient movement here.
+- **Public proposal:** use restrained one-time section entrances around `240–400ms`. Reading order, customer decisions, and document stability take priority over spectacle.
+- Cool-spectrum gradient state changes crossfade over `180–240ms`. Modal and toast entrances use `160–200ms` with a small fade/vertical movement. AI pulse remains `1.5s`; loading dots remain `1s`.
+- Under `prefers-reduced-motion: reduce`, resolve motion to the `reduced` token, remove parallax and scroll-linked transforms, disable gradient movement and smooth scrolling, and replace animated entrances with immediate state changes.
+- Animations must never hide essential content, block interaction, communicate status alone, or cause layout shifts.
 - Preserve visible focus, keyboard navigation, modal focus trap and focus return, ARIA states, live regions, and screen-reader-only labels.
 - Do not communicate status through color alone.
 
@@ -688,8 +897,10 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 
 ### Do
 
-- Read the source-of-truth files before generating or revising any screen.
-- Treat this file's purple–blue–cyan–orange palette as an intentional override of the current prototype CSS colors.
+- Treat this file as the primary source for all visual and interaction decisions before generating or revising any screen.
+- Consume the paired semantic tokens for every light/dark surface and state; keep raw theme values out of components.
+- Use Manrope throughout durable product UI, Sora only in the documented expressive regions, and the system monospace stack only for compact metadata.
+- Use Lucide consistently for interface icons and preserve explicit text labels for consequential actions.
 - Use the exact Turkish product name, labels, values, statuses, and synthetic proposal content already in the repository.
 - Organize screens around the proposal lifecycle and the user's next meaningful action.
 - Make proposal creation and customer preview visually dominant; keep aggregate metrics secondary.
@@ -698,6 +909,7 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 - Preserve explicit boundaries: approximate tracking, user-approved AI, no automatic sending, no electronic-signature claim, and no invoice claim.
 - Show loading, empty, error, disabled, validation, confirmation, success, rejected, and revoked states where the current flow calls for them.
 - Keep desktop and mobile compositions recognizably the same product.
+- Keep expressive motion in landing, onboarding, and presentation-led surfaces; keep operational motion short and functional.
 - Validate all normal text and interactive states against WCAG 2.2 AA. Use the accessible solid fallbacks for every gradient component and never place normal text on `#06B6D4` or `#F97316`.
 
 ### Don't
@@ -706,7 +918,11 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 - Do not use the framework-default favicon or the generic `file.svg`, `globe.svg`, or `window.svg` assets as brand direction.
 - Do not turn the palette into a rainbow, neon spectrum, monochrome corporate-blue interface, glass-heavy dashboard, or generic fintech style.
 - Do not mix orange into the purple→blue→cyan brand gradient; orange must remain a separate priority signal.
+- Do not interchange `action-primary`, `status-attention`, and `danger`, even when two roles use related warm hues.
 - Do not use bright cyan `#06B6D4` or bright orange `#F97316` for normal-size text or white-label buttons.
+- Do not introduce another icon library, Unicode interface symbols, emoji icons, or one-off handmade SVG controls alongside Lucide.
+- Do not use Sora for tables, forms, legal text, routine application headings, or dense operational content.
+- Do not add scroll-linked choreography, ambient loops, or constant animated gradients to dashboards, forms, tables, or settings.
 - Do not turn Kapsam into a CRM, Kanban board, lead pipeline, project manager, calendar, finance app, invoice tool, or autonomous communication platform.
 - Do not add real-auth, payment, email, WhatsApp, PDF, cross-device sync, or database success states to the current prototype unless a separate prompt explicitly asks for a future production design.
 - Do not let AI write or imply a final price, silently replace user text, or apply all suggestions without selection.

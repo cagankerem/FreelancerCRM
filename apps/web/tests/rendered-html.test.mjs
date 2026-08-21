@@ -194,9 +194,29 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /max-height:\s*calc\(100dvh - 32px\)/);
   assert.match(css, /@media \(max-width:\s*560px\)/);
-  assert.doesNotMatch(packageJson, /react-loading-skeleton/);
-  assert.doesNotMatch(packageJson, /vinext/i);
-  assert.doesNotMatch(packageJson, /cloudflare|drizzle|vite|wrangler/i);
+
+  const packageManifest = JSON.parse(packageJson);
+  const directPackageNames = new Set([
+    ...Object.keys(packageManifest.dependencies ?? {}),
+    ...Object.keys(packageManifest.devDependencies ?? {}),
+  ]);
+  const removedPrototypePackages = [
+    "@cloudflare/vite-plugin",
+    "drizzle-kit",
+    "drizzle-orm",
+    "react-loading-skeleton",
+    "vinext",
+    "vite",
+    "wrangler",
+  ];
+
+  for (const packageName of removedPrototypePackages) {
+    assert.equal(
+      directPackageNames.has(packageName),
+      false,
+      `${packageName} must not return as a direct dependency.`,
+    );
+  }
 
   const removedPrototypePaths = [
     "../.openai/hosting.json",
