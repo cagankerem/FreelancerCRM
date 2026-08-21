@@ -9,42 +9,21 @@ import {
   Eye,
   FileText,
   ListChecks,
-  Mail,
   MessageCircle,
   PenLine,
   Send,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import { type FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
 import { DemoApp } from "@/components/demo/demo-app";
+import { WaitlistForm } from "@/components/marketing/waitlist-form";
 import { cn } from "@/lib/shared/utils";
 
 import "./landing-page.css";
 
-type FormStatus =
-  | "idle"
-  | "success"
-  | "duplicate"
-  | "invalid-email"
-  | "storage-error";
 type PriceVariant = 149 | 249;
-type WaitlistEntry = string | { email: string };
 
 const subscribeToHydration = () => () => undefined;
 const getHydratedSnapshot = () => true;
@@ -129,21 +108,6 @@ function getLandingSource() {
   } catch {
     return "direct";
   }
-}
-
-function isWaitlistEntry(value: unknown): value is WaitlistEntry {
-  return (
-    typeof value === "string" ||
-    (typeof value === "object" &&
-      value !== null &&
-      "email" in value &&
-      typeof value.email === "string")
-  );
-}
-
-function readWaitlistEntries(value: string | null): WaitlistEntry[] {
-  const parsed: unknown = JSON.parse(value ?? "[]");
-  return Array.isArray(parsed) ? parsed.filter(isWaitlistEntry) : [];
 }
 
 function trackLandingEvent(name: string, detail: Record<string, string | number> = {}) {
@@ -264,7 +228,6 @@ export function LandingPage() {
       return 149;
     }
   });
-  const [status, setStatus] = useState<FormStatus>("idle");
   const pricingSectionRef = useRef<HTMLElement>(null);
   const hasTrackedLandingView = useRef(false);
   const hasTrackedPricingView = useRef(false);
@@ -292,63 +255,6 @@ export function LandingPage() {
     observer.observe(pricingSection);
     return () => observer.disconnect();
   }, [price]);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const email = String(form.get("email") ?? "").trim().toLowerCase();
-    const persona = String(form.get("persona") ?? "").trim();
-    const marketingConsent = form.get("consent") === "granted";
-
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setStatus("invalid-email");
-      document.getElementById("waitlist-email")?.focus();
-      trackLandingEvent("waitlist_submit_failed", { reason: "invalid_email" });
-      return;
-    }
-
-    try {
-      const current = readWaitlistEntries(
-        window.localStorage.getItem("kapsam-alpha-waitlist-v1"),
-      );
-      const isAlreadyRegistered = current.some((entry) =>
-        typeof entry === "string" ? entry === email : entry.email === email,
-      );
-
-      if (isAlreadyRegistered) {
-        setStatus("duplicate");
-        trackLandingEvent("waitlist_submit_duplicate", { price });
-        return;
-      }
-      window.localStorage.setItem(
-        "kapsam-alpha-waitlist-v1",
-        JSON.stringify([
-          ...current,
-          {
-            email,
-            ...(persona ? { persona } : {}),
-            marketingConsent,
-          },
-        ]),
-      );
-      setStatus("success");
-      trackLandingEvent("waitlist_submit_succeeded", { price, persona: persona || "belirtilmedi" });
-      event.currentTarget.reset();
-    } catch {
-      setStatus("storage-error");
-      trackLandingEvent("waitlist_submit_failed", { reason: "storage_unavailable" });
-    }
-  };
-
-  const clearLocalRegistration = () => {
-    try {
-      window.localStorage.removeItem("kapsam-alpha-waitlist-v1");
-      setStatus("idle");
-      trackLandingEvent("waitlist_local_registration_cleared");
-    } catch {
-      setStatus("storage-error");
-    }
-  };
 
   return (
     <div className="lp-page" id="top">
@@ -465,84 +371,9 @@ export function LandingPage() {
 
           <div className="lp-waitlist" id="waitlist">
             <span className="lp-eyebrow">ERKEN ERİŞİM</span>
-            <h2>Alpha sürümüne katıl</h2>
+            <h2 id="waitlist-heading">Alpha sürümüne katıl</h2>
             <p>Bu v0.1.0 önizlemesinde form kaydı yalnız bu tarayıcıda tutulur; gerçek bekleme listesi bağlantısı henüz aktif değildir.</p>
-            <form onSubmit={handleSubmit} noValidate>
-              <FieldGroup className="lp-form-group">
-                <div className="lp-form-row">
-                  <Field className="lp-field" data-invalid={status === "invalid-email"}>
-                    <FieldLabel htmlFor="waitlist-email">
-                      E-posta adresin <b aria-hidden="true">*</b>
-                    </FieldLabel>
-                    <span className="lp-input-wrap">
-                      <Mail aria-hidden="true" />
-                      <Input
-                        id="waitlist-email"
-                        required
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="ornek@eposta.com"
-                        aria-invalid={status === "invalid-email"}
-                        aria-describedby={status === "invalid-email" ? "waitlist-email-error" : undefined}
-                        onChange={() => status !== "idle" && setStatus("idle")}
-                      />
-                    </span>
-                    {status === "invalid-email" ? (
-                      <FieldError id="waitlist-email-error">Geçerli bir e-posta adresi gir.</FieldError>
-                    ) : null}
-                  </Field>
-
-                  <Field className="lp-field">
-                    <FieldLabel htmlFor="waitlist-persona">
-                      Sen kimsin? <small>(isteğe bağlı)</small>
-                    </FieldLabel>
-                    <NativeSelect id="waitlist-persona" name="persona" defaultValue="" className="lp-native-select">
-                      <NativeSelectOption value="">Seçiniz</NativeSelectOption>
-                      <NativeSelectOption value="developer">Freelance yazılımcı</NativeSelectOption>
-                      <NativeSelectOption value="designer">UI/UX tasarımcısı</NativeSelectOption>
-                    </NativeSelect>
-                  </Field>
-                </div>
-
-                <div className="lp-disclosure" id="aydinlatma" role="note" aria-labelledby="aydinlatma-baslik">
-                  <strong id="aydinlatma-baslik">Aydınlatma ve gizlilik özeti</strong>
-                  <p>
-                    E-posta adresi, isteğe bağlı persona ve iletişim tercihi yalnızca bu cihazda saklanır;
-                    sunucuya gönderilmez. Kalıcı bekleme listesi devreye alınmadan önce veri sorumlusu,
-                    saklama süresi ve iletişim kanalı ayrıca açıklanacaktır.
-                  </p>
-                </div>
-
-                <Field orientation="horizontal" className="lp-consent-field">
-                  <Checkbox
-                    id="waitlist-consent"
-                    name="consent"
-                    value="granted"
-                  />
-                  <FieldContent>
-                    <FieldLabel className="lp-consent" htmlFor="waitlist-consent">
-                      İsteğe bağlı: Alpha süreci dışındaki ürün duyurularını da almak istiyorum.
-                    </FieldLabel>
-                  </FieldContent>
-                </Field>
-              </FieldGroup>
-
-              <Button className="lp-form-submit" size="lg" type="submit">
-                Alpha sürümüne katıl <ArrowRight data-icon="inline-end" />
-              </Button>
-              <div className="lp-form-message" aria-live="polite">
-                {status === "success" ? <span className="is-success"><CheckCircle2 />Demo kaydın bu cihazda saklandı. Bu, gerçek bir erken erişim başvurusu değildir.</span> : null}
-                {status === "duplicate" ? <span className="is-info"><Mail />Bu e-posta bu cihazdaki demo kayıtlarda zaten bulunuyor.</span> : null}
-                {status === "storage-error" ? <span className="is-error">Kayıt bu tarayıcıda saklanamadı. Lütfen daha sonra tekrar dene.</span> : null}
-                {status === "idle" ? <span><ShieldCheck />Kart bilgisi istenmez. Verilerin minimum düzeyde tutulur.</span> : null}
-              </div>
-              {status === "success" || status === "duplicate" ? (
-                <Button className="lp-clear-registration" variant="link" size="sm" type="button" onClick={clearLocalRegistration}>
-                  Bu cihazdaki demo kaydını sil
-                </Button>
-              ) : null}
-            </form>
+            <WaitlistForm price={price} onTrackEvent={trackLandingEvent} />
           </div>
         </div>
       </section>

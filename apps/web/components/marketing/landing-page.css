@@ -918,7 +918,10 @@
 .lp-form-submit {
   width: 100%;
   min-height: 48px;
+  color: var(--primary-foreground);
 }
+
+.lp-form-submit:hover { background: var(--lp-orange-dark); }
 
 .lp-form-message {
   min-height: 22px;

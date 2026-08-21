@@ -236,7 +236,7 @@ a {
 .button--light {
   border-color: rgb(255 255 255 / 28%);
   background: #fff;
-  color: var(--ink);
+  color: #211b28;
 }
 
 .button--light:hover {

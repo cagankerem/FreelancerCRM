@@ -107,7 +107,7 @@ test("server-renders the Kapsam landing experience", async () => {
   assert.match(html, /66\.000 TL/);
   assert.match(html, /name="email"/i);
   assert.match(html, /name="persona"/i);
-  assert.match(html, /name="consent"/i);
+  assert.match(html, /name="marketingConsent"/i);
   assert.match(html, /Aydınlatma ve gizlilik özeti/i);
   assert.match(html, /Kart bilgisi istenmez/i);
   assert.match(html, /CANLI ÜRÜN TURU/i);
@@ -131,11 +131,26 @@ test("keeps the guided product tour available at demo", async () => {
 });
 
 test("keeps the landing and clickable prototype contracts explicit", async () => {
-  const [page, demoPage, demoApp, landing, layout, prototype, css, packageJson] = await Promise.all([
+  const [
+    page,
+    demoPage,
+    demoApp,
+    landing,
+    waitlistForm,
+    waitlistStorage,
+    waitlistSchema,
+    layout,
+    prototype,
+    css,
+    packageJson,
+  ] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/demo/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/demo/demo-app.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/marketing/landing-page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/marketing/waitlist-form.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../lib/client/waitlist-storage.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/shared/schemas/waitlist.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/demo/prototype-app.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
@@ -148,11 +163,15 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(demoApp, /layout\?: "page" \| "embedded"/);
   assert.match(demoApp, /<PrototypeApp mode="demo" layout=\{layout\} \/>/);
   assert.match(landing, /kapsam-alpha-price-v1/);
-  assert.match(landing, /kapsam-alpha-waitlist-v1/);
   assert.match(landing, /kapsam-alpha-events-v1/);
-  assert.match(landing, /invalid-email/);
-  assert.match(landing, /storage-error/);
-  assert.match(landing, /waitlist_submit_duplicate/);
+  assert.match(landing, /<WaitlistForm price=\{price\} onTrackEvent=\{trackLandingEvent\} \/>/);
+  assert.match(waitlistStorage, /kapsam-alpha-waitlist-v1/);
+  assert.match(waitlistStorage, /safeParse/);
+  assert.match(waitlistForm, /storage-error/);
+  assert.match(waitlistForm, /waitlist_submit_duplicate/);
+  assert.match(waitlistForm, /zodResolver\(waitlistFormSchema\)/);
+  assert.match(waitlistSchema, /email:\s*waitlistEmailSchema/);
+  assert.match(waitlistSchema, /marketingConsent:\s*z\.boolean/);
   assert.match(landing, /pricing_view/);
   assert.match(landing, /useSyncExternalStore/);
   assert.match(landing, /<DemoApp layout="embedded" \/>/);
@@ -167,9 +186,9 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.doesNotMatch(navSource, />Güven</);
   assert.match(landing, /id="urun"/);
   assert.match(landing, /id="problem-cozumu"/);
-  assert.match(landing, /FieldGroup/);
-  assert.match(landing, /NativeSelect/);
-  assert.match(landing, /Checkbox/);
+  assert.match(waitlistForm, /FieldGroup/);
+  assert.match(waitlistForm, /NativeSelect/);
+  assert.match(waitlistForm, /Checkbox/);
   assert.match(landing, /Görüntülenme verileri yaklaşık sinyaldir/);
   assert.match(layout, /<html lang="tr">/);
   assert.match(prototype, /"onboarding"/);
