@@ -101,10 +101,6 @@ select {
   -webkit-tap-highlight-color: transparent;
 }
 
-button {
-  color: inherit;
-}
-
 button:not(:disabled) {
   cursor: pointer;
 }
@@ -112,10 +108,6 @@ button:not(:disabled) {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-}
-
-a {
-  color: inherit;
 }
 
 ::selection {
@@ -5853,6 +5845,10 @@ a {
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  button,
+  a {
+    color: inherit;
   }
   body {
     @apply bg-background text-foreground;

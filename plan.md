@@ -1859,10 +1859,10 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kabul Kriterleri:**
 
-- [ ] Dev ve production build çalışıyor.
-- [ ] Strict type-check geçiyor.
-- [ ] Server-only guard testli.
-- [ ] Root smoke geçiyor.
+- [x] Dev ve production build çalışıyor.
+- [x] Strict type-check geçiyor.
+- [x] Server-only guard testli.
+- [x] Root smoke geçiyor.
 
 **Testler:**
 
@@ -1873,11 +1873,11 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Tamamlanma Tanımı:**
 
-- [ ] Kod tamamlandı.
-- [ ] Testler geçti.
-- [ ] Lint/type-check geçti.
-- [ ] Secret sınırı uygulandı.
-- [ ] Mimari doküman güncellendi.
+- [x] Kod tamamlandı.
+- [x] Testler geçti.
+- [x] Lint/type-check geçti.
+- [x] Secret sınırı uygulandı.
+- [x] Mimari doküman güncellendi.
 
 ### TASK-002: Tailwind, shadcn ve form temelini kur
 

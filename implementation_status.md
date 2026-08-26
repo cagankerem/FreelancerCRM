@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-08-21
+Son güncelleme: 2026-08-25
 
 ## Takip Sistemi
 
@@ -26,6 +26,7 @@ Son güncelleme: 2026-08-21
   - 2026-08-20: shadcn 4.18.0 tam sürümle devDependency olarak sabitlendi ve tema CSS’inin production build’de çözüldüğü doğrulandı; form altyapısı hâlâ eksik.
   - 2026-08-21: Vitest/jsdom/Testing Library ve Playwright/axe bağımlılıkları exact devDependency olarak sabitlendi; ayrı unit, E2E ve a11y komutları ile smoke testleri eklendi, mevcut node:test seti korundu; a11y kapısı etiketsiz checkbox ve iki kontrast ihlalini açıkça yakalıyor.
   - 2026-08-21: Landing bekleme listesi RHF/Zod örnek entegrasyonuna dönüştürüldü; sürümlü localStorage adaptörü, güvenli hata sonuçları, ilk hatalı alana odak, ARIA hata bağlantıları ve erişilebilir checkbox tamamlandı; 15 unit/integration, 3 E2E ve axe WCAG A/AA testi geçti.
+  - 2026-08-25: Loading, empty ve güvenli error durum bileşenleri App Router sınırlarına bağlandı; retry, teknik hata gizliliği, gerçek 404/noindex ve 404 axe kapsamı eklendi, 24 unit/integration, 12 node:test ve 6 tarayıcı testi ile production build geçti.
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
