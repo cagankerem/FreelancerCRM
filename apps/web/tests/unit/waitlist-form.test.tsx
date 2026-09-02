@@ -42,6 +42,33 @@ describe("WaitlistForm", () => {
     expect(window.localStorage.getItem(WAITLIST_STORAGE_KEY)).toBeNull();
   });
 
+  it("clears email error semantics after the value becomes valid", async () => {
+    const user = userEvent.setup();
+    renderWaitlistForm();
+
+    const email = screen.getByRole("textbox", { name: /e-posta adresin/i });
+    await user.type(email, "gecersiz");
+    await user.click(
+      screen.getByRole("button", { name: "Alpha sürümüne katıl" }),
+    );
+
+    expect(
+      await screen.findByText("Geçerli bir e-posta adresi gir."),
+    ).toBeVisible();
+
+    await user.clear(email);
+    await user.type(email, "user@example.com");
+
+    await waitFor(() => {
+      expect(email).toHaveAttribute("aria-invalid", "false");
+      expect(email).not.toHaveAttribute("aria-describedby");
+      expect(email.closest('[data-slot="field"]')).toHaveAttribute(
+        "data-invalid",
+        "false",
+      );
+    });
+  });
+
   it("stores normalized values and resets every controlled field", async () => {
     const user = userEvent.setup();
     renderWaitlistForm();
@@ -59,9 +86,11 @@ describe("WaitlistForm", () => {
       screen.getByRole("button", { name: "Alpha sürümüne katıl" }),
     );
 
-    expect(
-      await screen.findByText(/demo kaydın bu cihazda saklandı/i),
-    ).toBeVisible();
+    const successMessage = await screen.findByText(
+      /demo kaydın bu cihazda saklandı/i,
+    );
+    expect(successMessage).toBeVisible();
+    expect(successMessage.closest('[aria-live="polite"]')).toBeInTheDocument();
     expect(JSON.parse(window.localStorage.getItem(WAITLIST_STORAGE_KEY) ?? "null")).toEqual([
       {
         email: "user@example.com",
@@ -91,11 +120,11 @@ describe("WaitlistForm", () => {
       screen.getByRole("button", { name: "Alpha sürümüne katıl" }),
     );
 
-    expect(
-      await screen.findByText(
-        "Kayıt bu tarayıcıda saklanamadı. Lütfen daha sonra tekrar dene.",
-      ),
-    ).toBeVisible();
+    const errorMessage = await screen.findByText(
+      "Kayıt bu tarayıcıda saklanamadı. Lütfen daha sonra tekrar dene.",
+    );
+    expect(errorMessage).toBeVisible();
+    expect(errorMessage.closest('[aria-live="polite"]')).toBeInTheDocument();
     expect(screen.queryByText(/secret quota/i)).not.toBeInTheDocument();
   });
 });

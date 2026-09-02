@@ -662,10 +662,24 @@ Use the following domain-specific precedence when information conflicts:
 1. `DESIGN.md` — all visual and interaction rules.
 2. `plan.md` — product scope, behavior, routes, data, security, and implementation roadmap; it does not override this file's visual rules.
 3. `apps/web/components/marketing/landing-page.tsx`, `apps/web/components/marketing/landing-page.css`, `apps/web/components/demo/demo-app.tsx`, and `apps/web/components/demo/prototype-app.tsx` — current copy, synthetic data, workflows, states, and interaction references that must be migrated toward this design system.
-4. `apps/web/app/globals.css` — current prototype implementation only. Its legacy forest, coral, mint, sand, typography, radius, and motion values are non-normative where they conflict with this file.
+4. `apps/web/app/globals.css` — the implemented semantic theme and typography foundation plus demo-only compatibility CSS. Semantic root and `.dark` tokens implement this document; legacy forest, coral, mint, and sand values are isolated from the production root and remain non-normative.
 5. `README.md`, route metadata, and `apps/web/tests/rendered-html.test.mjs` — current product purpose, limitations, metadata, safety, and rendered-content contracts.
 
 The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, `globe.svg`, and `window.svg` assets are not part of the Kapsam identity.
+
+### Implemented TASK-002 UI foundation
+
+As of 2026-09-02, the following foundation is implemented and must remain aligned with this document:
+
+- `apps/web/app/globals.css` maps shadcn semantic tokens to the complete light/dark Kapsam palette. `action-primary`, `status-attention`, and `danger-action` are separate tokens, and the global keyboard focus color resolves through the blue `ring` token.
+- `apps/web/components/theme-provider.tsx` applies `light`, `dark`, or the system preference through the root class, persists an explicit choice under `kapsam-theme`, sets the native color scheme, and prevents an incorrect-theme flash.
+- `apps/web/app/layout.tsx` loads Manrope for durable UI and Sora for the documented expressive regions. Compact metadata uses the system monospace stack; Geist is not part of the active typography system.
+- The shared Button, Input, and NativeSelect primitives consume semantic tokens. Default buttons are `42px`, large buttons are `52px`, fields are at least `48px`, controls use a `14px` radius, and icon-only button variants keep at least a `44px` target.
+- The landing waitlist is the reference RHF/Zod integration. It validates and normalizes through one schema, connects field errors with ARIA, focuses the first invalid field, sends only validated data to a versioned client storage adapter, and converts storage failures to safe copy.
+- LoadingState, EmptyState, and ErrorState are the reusable route-state primitives used by `app/loading.tsx`, `app/not-found.tsx`, and `app/error.tsx`. ErrorState never renders a raw Error object.
+- `npm run validate:task-002` is the acceptance gate for lint, strict types, unit/integration coverage, production build, existing node:test boundaries, keyboard/focus, responsive behavior, reduced motion, and axe checks.
+
+The old demo palette is scoped under `.demo-experience`; additional `.app-shell`, `.editor-app-shell`, public-proposal, and demo-tour selectors are compatibility styling for the synthetic `/demo` experience only. Do not copy their raw values into production components.
 
 ### Design goals
 
@@ -876,6 +890,8 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 
 ### Empty, error, modal, and toast states
 
+- Use the shared LoadingState, EmptyState, and ErrorState primitives for route or data states rather than one component with competing loading/empty/error Boolean props.
+- LoadingState exposes `role="status"`, `aria-busy`, and screen-reader text. EmptyState accepts an explicit Lucide icon and optional action. ErrorState uses safe copy and an optional retry action; it does not render technical exception details.
 - Empty search uses **Eşleşen teklif bulunamadı** and offers **Filtreleri temizle**.
 - Revoked or expired public access uses **Bu teklif artık erişilebilir değil.** without leaking proposal content.
 - Modals use the active `surface` token, `20px` radius, maximum `470px` width, a meaning-specific Lucide icon tile, and explicit cancel/confirm buttons.

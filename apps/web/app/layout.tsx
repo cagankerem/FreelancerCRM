@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Sora } from "next/font/google";
+import { Manrope, Sora } from "next/font/google";
 import { headers } from "next/headers";
+
+import { ThemeProvider } from "@/components/theme-provider";
+
 import "./globals.css";
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,8 +53,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
-      <body className={sora.variable + " " + geistMono.variable}>{children}</body>
+    <html lang="tr" suppressHydrationWarning>
+      <body className={`${manrope.variable} ${sora.variable}`}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

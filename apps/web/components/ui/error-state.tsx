@@ -45,7 +45,7 @@ function ErrorState({
         {description}
       </p>
       {onRetry ? (
-        <Button className="mt-6 h-[42px] px-5" size="lg" onClick={onRetry}>
+        <Button className="mt-6 px-5" onClick={onRetry}>
           {retryLabel}
         </Button>
       ) : null}

@@ -32,10 +32,24 @@ describe("waitlistFormSchema", () => {
   });
 
   it.each([
-    {
-      input: { email: "gecersiz", persona: "", marketingConsent: false },
-      path: "email",
-    },
+    ["", "E-posta adresini gir."],
+    ["gecersiz", "Geçerli bir e-posta adresi gir."],
+  ])("rejects %j with a stable email error", (email, message) => {
+    const result = waitlistFormSchema.safeParse({
+      email,
+      persona: "",
+      marketingConsent: false,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({ path: ["email"], message }),
+      );
+    }
+  });
+
+  it.each([
     {
       input: {
         email: "user@example.com",

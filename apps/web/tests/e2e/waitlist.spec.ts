@@ -30,6 +30,21 @@ test("submits every waitlist field with the keyboard", async ({ page }) => {
   const submit = form.getByRole("button", { name: "Alpha sürümüne katıl" });
 
   await email.focus();
+  await expect(email).toBeFocused();
+  expect(
+    await email.evaluate((element) => {
+      const style = window.getComputedStyle(element);
+      return {
+        isFocusVisible: element.matches(":focus-visible"),
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+      };
+    }),
+  ).toMatchObject({
+    isFocusVisible: true,
+    outlineStyle: "solid",
+    outlineWidth: 3,
+  });
   await page.keyboard.type("USER@Example.COM");
   await page.keyboard.press("Tab");
   await expect(persona).toBeFocused();
@@ -41,7 +56,9 @@ test("submits every waitlist field with the keyboard", async ({ page }) => {
   await expect(submit).toBeFocused();
   await page.keyboard.press("Enter");
 
-  await expect(form.getByText(/demo kaydın bu cihazda saklandı/i)).toBeVisible();
+  const feedback = form.locator(".lp-form-message");
+  await expect(feedback).toHaveAttribute("aria-live", "polite");
+  await expect(feedback.getByText(/demo kaydın bu cihazda saklandı/i)).toBeVisible();
   expect(
     await page.evaluate(() =>
       JSON.parse(window.localStorage.getItem("kapsam-alpha-waitlist-v1") ?? "null"),

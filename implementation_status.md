@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-08-25
+Son güncelleme: 2026-09-02
 
 ## Takip Sistemi
 
@@ -21,12 +21,14 @@ Son güncelleme: 2026-08-25
   - 2026-08-20: Tek normatif `apps/web/package-lock.json`, kökten temiz `npm ci`, standart Next.js tipleri ve gerekçeli type-boundary politikası otomatik foundation testleriyle doğrulandı; tarayıcı/DOM sınırlarındaki doğrulanmamış type assertion’lar runtime daraltmayla kaldırıldı.
   - 2026-08-20: TASK-001 için temiz kurulum, lint, strict typecheck, tekrarlı production build, tam test seti, browser bundle sızıntı kontrolü ve `/` ile `/demo` development/production smoke kontrollerini birleştiren tek komutluk kabul seti eklendi.
   - 2026-08-20: Kök mimari belgesi; dizin yapısı, Server/Client Component ve secret sınırları, sentetik `/demo` ile ayrı geliştirilecek production `/app` ayrımı, çalışma komutları ve TASK-003 Supabase yerleşimiyle tamamlandı.
-- [ ] TASK-002: Tailwind, shadcn ve form temelini kur — Kısmi
+- [x] TASK-002: Tailwind, shadcn ve form temelini kur
   - 2026-08-06: Tailwind ve temel UI bileşenleri mevcut; React Hook Form, Zod ve ortak form altyapısı eksik.
   - 2026-08-20: shadcn 4.18.0 tam sürümle devDependency olarak sabitlendi ve tema CSS’inin production build’de çözüldüğü doğrulandı; form altyapısı hâlâ eksik.
   - 2026-08-21: Vitest/jsdom/Testing Library ve Playwright/axe bağımlılıkları exact devDependency olarak sabitlendi; ayrı unit, E2E ve a11y komutları ile smoke testleri eklendi, mevcut node:test seti korundu; a11y kapısı etiketsiz checkbox ve iki kontrast ihlalini açıkça yakalıyor.
   - 2026-08-21: Landing bekleme listesi RHF/Zod örnek entegrasyonuna dönüştürüldü; sürümlü localStorage adaptörü, güvenli hata sonuçları, ilk hatalı alana odak, ARIA hata bağlantıları ve erişilebilir checkbox tamamlandı; 15 unit/integration, 3 E2E ve axe WCAG A/AA testi geçti.
   - 2026-08-25: Loading, empty ve güvenli error durum bileşenleri App Router sınırlarına bağlandı; retry, teknik hata gizliliği, gerçek 404/noindex ve 404 axe kapsamı eklendi, 24 unit/integration, 12 node:test ve 6 tarayıcı testi ile production build geçti.
+  - 2026-09-02: Form hata/live-region sözleşmeleri, 320/375/768/1440 px taşma ve mobil tek sütun kontrolleri, Tab/Space/Enter akışı, 3 px focus görünürlüğü, reduced-motion ve sticky menüden bağımsız form anchor’ı doğrulandı; mobil/masaüstü görsel kontrast incelemesiyle birlikte 26 unit/integration, 12 node:test ve 12 Playwright/axe testi, lint, strict typecheck ve production build geçti.
+  - 2026-09-02: Manrope/Sora rolleri, açık/koyu semantic tokenlar, kalıcı sistem-tema sağlayıcısı, izole demo paleti ve 42/52/48 px temel kontrol ölçüleri tamamlandı; `validate:task-002` ile 29 unit/integration, 12 node:test ve 15 Playwright/axe testi, lint, strict typecheck ve production build tek komutta geçti.
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.

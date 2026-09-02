@@ -13,9 +13,20 @@ describe("Button", () => {
 
     const button = screen.getByRole("button", { name: "Teklif oluştur" });
     expect(button).toBeInTheDocument();
+    expect(button).toHaveClass("h-[42px]");
+    expect(button).toHaveClass("rounded-[14px]");
+    expect(button).toHaveClass("bg-action-primary");
 
     await user.click(button);
 
     expect(handleClick).toHaveBeenCalledOnce();
+  });
+
+  it("uses the documented large-button height", () => {
+    render(<Button size="lg">Devam et</Button>);
+
+    expect(screen.getByRole("button", { name: "Devam et" })).toHaveClass(
+      "h-[52px]",
+    );
   });
 });

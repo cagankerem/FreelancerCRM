@@ -13,6 +13,7 @@
     "test:a11y": "cd apps/web && npm run test:a11y",
     "lint": "cd apps/web && npm run lint",
     "typecheck": "cd apps/web && npm run typecheck",
-    "validate:task-001": "node scripts/validate-task-001.mjs"
+    "validate:task-001": "node scripts/validate-task-001.mjs",
+    "validate:task-002": "node scripts/validate-task-002.mjs"
   }
 }

@@ -190,7 +190,9 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(waitlistForm, /NativeSelect/);
   assert.match(waitlistForm, /Checkbox/);
   assert.match(landing, /Görüntülenme verileri yaklaşık sinyaldir/);
-  assert.match(layout, /<html lang="tr">/);
+  assert.match(layout, /<html lang="tr" suppressHydrationWarning>/);
+  assert.match(layout, /import \{ Manrope, Sora \} from "next\/font\/google"/);
+  assert.match(layout, /<ThemeProvider>\{children\}<\/ThemeProvider>/);
   assert.match(prototype, /"onboarding"/);
   assert.match(prototype, /"dashboard"/);
   assert.match(prototype, /"editor"/);

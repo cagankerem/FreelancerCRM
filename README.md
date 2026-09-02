@@ -82,6 +82,24 @@ Bu komut `npm ci`, lint, strict type-check, iki production build, tüm testler,
 tarayıcı bundle'ında server/secret sızıntısı kontrolü ve hem `/` hem `/demo` için
 development/production HTTP 200 smoke kontrollerini sırasıyla çalıştırır.
 
+TASK-002 UI, form ve erişilebilirlik temelinin tek komutluk kabul kontrolü:
+
+~~~bash
+npm run validate:task-002
+~~~
+
+Bu komut üretilmiş Next.js çıktısını temizleyip sırasıyla lint, strict type-check,
+Vitest unit/integration testleri, Webpack production build, mevcut `node:test`
+sınır/render testleri ve tek Playwright koşusunda klavye, focus, responsive,
+reduced-motion ile axe WCAG A/AA kontrollerini çalıştırır. `npm test` mevcut
+`node:test` akışını bağımsız olarak çalıştırmaya devam eder; `test:unit`,
+`test:e2e` ve `test:a11y` komutları da ayrı kullanım için korunur.
+
+Tema altyapısı sistem tercihini varsayılan kabul eder ve kullanıcının açık
+`light`/`dark` seçimini `kapsam-theme` anahtarında saklar. Semantic tokenlar,
+tipografi rolleri ve temel kontrol ölçüleri için normatif kaynak
+[DESIGN.md](./DESIGN.md) dosyasıdır.
+
 Kök `install-all` komutu, `apps/web/package-lock.json` dosyasını normatif kabul
 ederek temiz ve tekrar üretilebilir `npm ci` kurulumu yapar. Repoda ikinci bir
 paket yöneticisi lockfile'ı tutulmaz.
