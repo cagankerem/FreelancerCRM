@@ -1,5 +1,7 @@
 # FreelancerCRM
 
+<!-- Harmless commit-screen test marker: no application behavior changes. -->
+
 ## v0.1.0
 
 ### Kapsam — alpha landing ve yönlendirilmiş ürün demosu
