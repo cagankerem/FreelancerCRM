@@ -18,7 +18,7 @@ colors:
   on-surface-soft:
     light: "#344054"
     dark: "#CBD5E1"
-  muted:
+  on-surface-muted:
     light: "#475467"
     dark: "#94A3B8"
   outline:
@@ -410,11 +410,11 @@ components:
     padding: 14px
   caption:
     backgroundColor: "{colors.surface}"
-    textColor: "{colors.muted}"
+    textColor: "{colors.on-surface-muted}"
     typography: "{typography.body-small}"
   disclaimer:
     backgroundColor: "{colors.surface}"
-    textColor: "{colors.muted}"
+    textColor: "{colors.on-surface-muted}"
     typography: "{typography.metadata-mono}"
   divider:
     backgroundColor: "{colors.outline}"
@@ -673,6 +673,7 @@ As of 2026-09-02, the following foundation is implemented and must remain aligne
 
 - `apps/web/app/globals.css` maps shadcn semantic tokens to the complete light/dark Kapsam palette. `action-primary`, `status-attention`, and `danger-action` are separate tokens, and the global keyboard focus color resolves through the blue `ring` token.
 - `apps/web/components/theme-provider.tsx` applies `light`, `dark`, or the system preference through the root class, persists an explicit choice under `kapsam-theme`, sets the native color scheme, and prevents an incorrect-theme flash.
+- `apps/web/components/marketing/landing-page.css` keeps its `--lp-*` compatibility names as aliases to the canonical palette, so the existing landing composition renders from the same semantic tokens in both light and dark themes.
 - `apps/web/app/layout.tsx` loads Manrope for durable UI and Sora for the documented expressive regions. Compact metadata uses the system monospace stack; Geist is not part of the active typography system.
 - The shared Button, Input, and NativeSelect primitives consume semantic tokens. Default buttons are `42px`, large buttons are `52px`, fields are at least `48px`, controls use a `14px` radius, and icon-only button variants keep at least a `44px` target.
 - The landing waitlist is the reference RHF/Zod integration. It validates and normalizes through one schema, connects field errors with ARIA, focuses the first invalid field, sends only validated data to a versioned client storage adapter, and converts storage failures to safe copy.
@@ -719,8 +720,8 @@ Orange is an accent layer, not part of the cool brand gradient. Its separation f
 
 ### Neutral and safety colors
 
-- **Light theme:** canvas `#F6F8FC`, surface `#FFFFFF`, subtle surface `#F1F5F9`, ink `#101828`, soft ink `#344054`, and muted text `#475467`.
-- **Dark theme:** canvas `#0B1020`, surface `#111827`, subtle surface `#182033`, ink `#F8FAFC`, soft ink `#CBD5E1`, and muted text `#94A3B8`.
+- **Light theme:** canvas `#F6F8FC`, surface `#FFFFFF`, subtle surface `#F1F5F9`, ink `#101828`, soft ink `#344054`, and `on-surface-muted` text `#475467`.
+- **Dark theme:** canvas `#0B1020`, surface `#111827`, subtle surface `#182033`, ink `#F8FAFC`, soft ink `#CBD5E1`, and `on-surface-muted` text `#94A3B8`.
 - **Outlines:** resolve through `outline`, `outline-soft`, and the stronger `control-outline`; field boundaries must remain visible in both themes.
 - **Danger:** `danger`, `danger-action`, and `danger-container` are red-only semantics for rejection, revoked access, validation, destructive confirmation, and destructive buttons. Orange never substitutes for danger.
 - **Neutral:** `neutral` and `neutral-container` represent draft, inactive, and non-urgent states.
@@ -856,7 +857,7 @@ Use circles mainly for status dots, timeline nodes, progress ornaments, and back
 - Labels sit above fields in soft ink at `13px`/`660`.
 - Inputs and selects are at least `48px` high, use the active `surface` token, have a `14px` radius, and retain a quiet but visible `control-outline` boundary.
 - Focus uses a blue border plus a visible ring. Global keyboard focus remains a `3px #2563EB` outline with `3px` offset; orange remains reserved for action priority rather than navigation focus.
-- Helper text follows the field in muted `11px` copy.
+- Helper text follows the field in `on-surface-muted` `11px` copy.
 - Validation stays adjacent to the field and also appears in the publish checklist. Use the exact summary heading **Yayınlamadan önce tamamla**.
 - The stepper uses numbered mono tiles; active is blue or the cool brand spectrum with white text, completed is cyan, and future is neutral.
 - Price rows show service description, quantity, unit price, and amount. Keep the running **Proje toplamı** visible.
