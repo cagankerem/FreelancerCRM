@@ -54,9 +54,9 @@ await runCommand("existing boundary and render tests", process.execPath, [
 
 const port = await findAvailablePort();
 await runCommand(
-  "keyboard, focus, responsive, reduced-motion, and axe browser tests",
+  "Chromium full matrix plus Firefox and WebKit critical smoke tests",
   npmCommand,
-  ["exec", "playwright", "test", "--", "tests/e2e", "tests/a11y"],
+  ["run", "test:browser"],
   {
     ...commandEnvironment,
     CI: "1",
@@ -66,7 +66,8 @@ await runCommand(
 
 console.log("\nTASK-002 validation passed.");
 console.log("Lint, strict types, unit/integration, production build, existing");
-console.log("node:test coverage, keyboard/focus, responsive, motion, and axe passed.");
+console.log("node:test coverage, Chromium full matrix, Firefox/WebKit smoke,");
+console.log("keyboard/focus, responsive, motion, and light/dark axe passed.");
 
 async function runCommand(label, executable, arguments_, environment = commandEnvironment) {
   console.log(`\n[TASK-002] ${label}: ${executable} ${arguments_.join(" ")}`);

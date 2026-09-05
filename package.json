@@ -11,9 +11,16 @@
     "test:unit": "cd apps/web && npm run test:unit",
     "test:e2e": "cd apps/web && npm run test:e2e",
     "test:a11y": "cd apps/web && npm run test:a11y",
+    "test:browser": "cd apps/web && npm run test:browser",
     "lint": "cd apps/web && npm run lint",
     "typecheck": "cd apps/web && npm run typecheck",
     "validate:task-001": "node scripts/validate-task-001.mjs",
-    "validate:task-002": "node scripts/validate-task-002.mjs"
+    "validate:task-002": "node scripts/validate-task-002.mjs",
+    "db:init": "npm exec --prefix apps/web -- supabase --workdir . init",
+    "db:start": "npm exec --prefix apps/web -- supabase --workdir . start",
+    "db:stop": "npm exec --prefix apps/web -- supabase --workdir . stop",
+    "db:reset": "npm exec --prefix apps/web -- supabase --workdir . db reset --local",
+    "db:status": "npm exec --prefix apps/web -- supabase --workdir . status",
+    "db:types": "npm exec --prefix apps/web -- supabase --workdir . gen types typescript --local --schema public"
   }
 }

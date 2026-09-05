@@ -104,6 +104,13 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
     onTrackEvent("waitlist_local_registration_cleared");
   };
 
+  const feedbackRole =
+    status === "storage-error"
+      ? "alert"
+      : status === "success" || status === "duplicate"
+        ? "status"
+        : undefined;
+
   return (
     <form
       aria-labelledby="waitlist-heading"
@@ -249,7 +256,11 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
       <Button className="lp-form-submit" size="lg" type="submit">
         Alpha sürümüne katıl <ArrowRight data-icon="inline-end" />
       </Button>
-      <div className="lp-form-message" aria-live="polite">
+      <div
+        className="lp-form-message"
+        role={feedbackRole}
+        aria-live={feedbackRole === "status" ? "polite" : undefined}
+      >
         {status === "success" ? (
           <span className="is-success">
             <CheckCircle2 />Demo kaydın bu cihazda saklandı. Bu, gerçek bir erken

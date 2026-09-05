@@ -29,4 +29,38 @@ describe("Button", () => {
       "h-[52px]",
     );
   });
+
+  it("uses the accessible primary-family text token for link actions", () => {
+    render(<Button variant="link">Kaydı temizle</Button>);
+
+    expect(screen.getByRole("button", { name: "Kaydı temizle" })).toHaveClass(
+      "text-on-primary-container",
+    );
+  });
+
+  it("keeps disabled actions inert and destructive actions on the danger family", async () => {
+    const user = userEvent.setup();
+    const handleClick = vi.fn();
+    render(
+      <>
+        <Button disabled onClick={handleClick}>
+          Devre dışı işlem
+        </Button>
+        <Button variant="destructive">Kaydı sil</Button>
+      </>,
+    );
+
+    const disabled = screen.getByRole("button", { name: "Devre dışı işlem" });
+    expect(disabled).toBeDisabled();
+    await user.click(disabled);
+    expect(handleClick).not.toHaveBeenCalled();
+
+    expect(screen.getByRole("button", { name: "Kaydı sil" })).toHaveClass(
+      "bg-danger-action",
+      "text-danger-action-foreground",
+    );
+    expect(screen.getByRole("button", { name: "Kaydı sil" })).not.toHaveClass(
+      "bg-action-primary",
+    );
+  });
 });

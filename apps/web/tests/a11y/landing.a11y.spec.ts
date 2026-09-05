@@ -1,23 +1,32 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-for (const colorScheme of ["light", "dark"] as const) {
-  test(`landing page has no automatically detectable WCAG A or AA violations in ${colorScheme} theme`, async ({
+import {
+  expectNoAxeViolations,
+  gotoWithTheme,
+  themes,
+} from "../helpers/accessibility";
+
+for (const theme of themes) {
+  test(`landing form is usable and has no detectable WCAG A or AA violations in its normal ${theme} state`, async ({
     page,
   }) => {
-    await page.emulateMedia({ colorScheme });
-    await page.goto("/");
+    await gotoWithTheme(page, theme);
 
-    const results = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      .analyze();
+    const form = page.getByRole("form", { name: "Alpha sürümüne katıl" });
+    await expect(form).toBeVisible();
+    await expect(
+      form.getByRole("textbox", { name: /e-posta adresin/i }),
+    ).toBeEnabled();
+    await expect(
+      form.getByRole("combobox", { name: /sen kimsin/i }),
+    ).toBeEnabled();
+    await expect(
+      form.getByRole("checkbox", { name: /ürün duyurularını/i }),
+    ).toBeEnabled();
+    await expect(
+      form.getByRole("button", { name: "Alpha sürümüne katıl" }),
+    ).toBeEnabled();
 
-    const violations = results.violations.map(({ id, impact, nodes }) => ({
-      id,
-      impact,
-      targets: nodes.map((node) => node.target.join(" ")),
-    }));
-
-    expect(violations).toEqual([]);
+    await expectNoAxeViolations(page);
   });
 }

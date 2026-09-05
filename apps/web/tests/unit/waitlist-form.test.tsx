@@ -90,7 +90,11 @@ describe("WaitlistForm", () => {
       /demo kaydın bu cihazda saklandı/i,
     );
     expect(successMessage).toBeVisible();
-    expect(successMessage.closest('[aria-live="polite"]')).toBeInTheDocument();
+    const successRegion = successMessage.closest('[role="status"]');
+    expect(successRegion).toHaveAttribute("aria-live", "polite");
+    expect(
+      successRegion?.querySelector('[role="status"], [role="alert"], [aria-live]'),
+    ).not.toBeInTheDocument();
     expect(JSON.parse(window.localStorage.getItem(WAITLIST_STORAGE_KEY) ?? "null")).toEqual([
       {
         email: "user@example.com",
@@ -124,7 +128,12 @@ describe("WaitlistForm", () => {
       "Kayıt bu tarayıcıda saklanamadı. Lütfen daha sonra tekrar dene.",
     );
     expect(errorMessage).toBeVisible();
-    expect(errorMessage.closest('[aria-live="polite"]')).toBeInTheDocument();
+    const errorRegion = errorMessage.closest('[role="alert"]');
+    expect(errorRegion).toBeInTheDocument();
+    expect(errorRegion).not.toHaveAttribute("aria-live");
+    expect(
+      errorRegion?.querySelector('[role="status"], [role="alert"], [aria-live]'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/secret quota/i)).not.toBeInTheDocument();
   });
 });

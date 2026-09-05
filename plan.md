@@ -1895,10 +1895,10 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Kabul Kriterleri:**
 
-- [ ] Örnek form ve hata akışı çalışıyor.
-- [ ] Loading/empty/error bileşenleri var.
-- [ ] Klavye/focus testi geçti.
-- [ ] Responsive temel doğrulandı.
+- [x] Örnek form ve hata akışı çalışıyor.
+- [x] Loading/empty/error bileşenleri var.
+- [x] Klavye/focus testi geçti.
+- [x] Responsive temel doğrulandı.
 
 **Testler:**
 
@@ -1909,11 +1909,11 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Tamamlanma Tanımı:**
 
-- [ ] Kod tamamlandı.
-- [ ] Testler geçti.
-- [ ] Lint/type-check geçti.
-- [ ] A11y kontrolleri uygulandı.
-- [ ] UI dokümanı güncellendi.
+- [x] Kod tamamlandı.
+- [x] Testler geçti.
+- [x] Lint/type-check geçti.
+- [x] A11y kontrolleri uygulandı.
+- [x] UI dokümanı güncellendi.
 
 ### TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
 

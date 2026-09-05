@@ -1,23 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const landingThemes = {
-  light: {
-    canvas: "#f6f8fc",
-    canvasRgb: "rgb(246, 248, 252)",
-    surface: "#fff",
-    surfaceRgb: "rgb(255, 255, 255)",
-    onSurface: "#101828",
-    onSurfaceRgb: "rgb(16, 24, 40)",
-  },
-  dark: {
-    canvas: "#0b1020",
-    canvasRgb: "rgb(11, 16, 32)",
-    surface: "#111827",
-    surfaceRgb: "rgb(17, 24, 39)",
-    onSurface: "#f8fafc",
-    onSurfaceRgb: "rgb(248, 250, 252)",
-  },
-} as const;
+import { gotoWithTheme, themes } from "../helpers/accessibility";
 
 test("resolves the dark semantic token set from the system preference", async ({
   page,
@@ -55,27 +38,40 @@ test("resolves the dark semantic token set from the system preference", async ({
   });
 });
 
-for (const colorScheme of ["light", "dark"] as const) {
-  test(`renders real landing surfaces in ${colorScheme} theme`, async ({
+for (const theme of themes) {
+  test(`renders real landing surfaces in ${theme} theme`, async ({
     page,
   }) => {
-    await page.emulateMedia({ colorScheme });
-    await page.goto("/");
-
-    await expect(page.locator("html")).toHaveClass(
-      new RegExp(`(^|\\s)${colorScheme}(\\s|$)`),
-    );
+    await gotoWithTheme(page, theme);
 
     const landingTheme = await page.locator(".lp-page").evaluate((element) => {
+      const root = getComputedStyle(document.documentElement);
       const styles = getComputedStyle(element);
       const conversionPanel = getComputedStyle(
         document.querySelector(".lp-conversion-panel")!,
       );
       const footer = getComputedStyle(document.querySelector(".lp-footer")!);
+      const resolveColor = (variable: string) => {
+        const probe = document.createElement("span");
+        probe.style.color = `var(${variable})`;
+        element.append(probe);
+        const color = getComputedStyle(probe).color;
+        probe.remove();
+        return color;
+      };
 
       return {
         backgroundColor: styles.backgroundColor,
+        canvasColor: resolveColor("--canvas"),
         color: styles.color,
+        onSurfaceColor: resolveColor("--on-surface"),
+        rootCanvas: root.getPropertyValue("--canvas").trim().toLowerCase(),
+        rootSurface: root.getPropertyValue("--surface").trim().toLowerCase(),
+        rootOnSurface: root
+          .getPropertyValue("--on-surface")
+          .trim()
+          .toLowerCase(),
+        rootPrimary: root.getPropertyValue("--primary").trim().toLowerCase(),
         lpCanvas: styles.getPropertyValue("--lp-canvas").trim().toLowerCase(),
         lpSurface: styles
           .getPropertyValue("--lp-surface")
@@ -85,27 +81,24 @@ for (const colorScheme of ["light", "dark"] as const) {
         primary: styles.getPropertyValue("--primary").trim().toLowerCase(),
         conversionSurface: conversionPanel.backgroundColor,
         footerSurface: footer.backgroundColor,
+        surfaceColor: resolveColor("--surface"),
       };
     });
 
-    const expected = landingThemes[colorScheme];
-    expect(landingTheme).toEqual({
-      backgroundColor: expected.canvasRgb,
-      color: expected.onSurfaceRgb,
-      lpCanvas: expected.canvas,
-      lpSurface: expected.surface,
-      lpInk: expected.onSurface,
-      primary: colorScheme === "light" ? "#6d28d9" : "#7c3aed",
-      conversionSurface: expected.surfaceRgb,
-      footerSurface: expected.surfaceRgb,
-    });
+    expect(landingTheme.lpCanvas).toBe(landingTheme.rootCanvas);
+    expect(landingTheme.lpSurface).toBe(landingTheme.rootSurface);
+    expect(landingTheme.lpInk).toBe(landingTheme.rootOnSurface);
+    expect(landingTheme.primary).toBe(landingTheme.rootPrimary);
+    expect(landingTheme.backgroundColor).toBe(landingTheme.canvasColor);
+    expect(landingTheme.color).toBe(landingTheme.onSurfaceColor);
+    expect(landingTheme.conversionSurface).toBe(landingTheme.surfaceColor);
+    expect(landingTheme.footerSurface).toBe(landingTheme.surfaceColor);
   });
 
-  test(`keeps the landing focus color canonical in ${colorScheme} theme`, async ({
+  test(`keeps the landing focus color canonical in ${theme} theme`, async ({
     page,
   }) => {
-    await page.emulateMedia({ colorScheme });
-    await page.goto("/");
+    await gotoWithTheme(page, theme);
 
     const email = page.getByRole("textbox", { name: /e-posta adresin/i });
     await email.focus();

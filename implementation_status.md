@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-02
+Son güncelleme: 2026-09-04
 
 ## Takip Sistemi
 
@@ -29,6 +29,9 @@ Son güncelleme: 2026-09-02
   - 2026-08-25: Loading, empty ve güvenli error durum bileşenleri App Router sınırlarına bağlandı; retry, teknik hata gizliliği, gerçek 404/noindex ve 404 axe kapsamı eklendi, 24 unit/integration, 12 node:test ve 6 tarayıcı testi ile production build geçti.
   - 2026-09-02: Form hata/live-region sözleşmeleri, 320/375/768/1440 px taşma ve mobil tek sütun kontrolleri, Tab/Space/Enter akışı, 3 px focus görünürlüğü, reduced-motion ve sticky menüden bağımsız form anchor’ı doğrulandı; mobil/masaüstü görsel kontrast incelemesiyle birlikte 26 unit/integration, 12 node:test ve 12 Playwright/axe testi, lint, strict typecheck ve production build geçti.
   - 2026-09-02: Manrope/Sora rolleri, açık/koyu semantic tokenlar, kalıcı sistem-tema sağlayıcısı, izole demo paleti ve 42/52/48 px temel kontrol ölçüleri tamamlandı; `validate:task-002` ile 29 unit/integration, 12 node:test ve 15 Playwright/axe testi, lint, strict typecheck ve production build tek komutta geçti.
+  - 2026-09-04: Light/dark form ve UI durum matrisi, 32 Chromium tam kapsam testi ile Firefox ve WebKit için dörder kritik smoke testi tamamlandı; 31 unit/integration, 18 node:test ve 40 Playwright/axe testi `validate:task-002` içinde geçti. Axe, ARIA, klavye, focus ve tarayıcı matrisi erişilebilirlik kabulünü tamamlıyor; VoiceOver bu görev için eksik veya bloke sayılmıyor, App Store/pazarlamada destek beyanına dayanak oluşturmuyor ve gelecekteki native yayın için ayrı kalite çalışması olarak ele alınacak.
+  - 2026-09-04: Manrope `200–800` ve Sora `100–800` variable font eksenleriyle yüklenerek landing’deki ara ağırlıkların en yakın statik yüze yuvarlanması kaldırıldı; kaynak sözleşme testi eklendi ve 20 node:test içeren `validate:task-002` kabul seti yeniden geçti.
+  - 2026-09-04: `shadcn@4.18.0` korunarak transitive `browserslist`, `fast-uri` ve `qs` güvenli sürümlere kilitlendi; production ve tam bağımlılık auditleri sıfır bulguyla geçti.
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.

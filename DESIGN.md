@@ -669,16 +669,18 @@ The framework-default `apps/web/public/favicon.svg` and the generic `file.svg`, 
 
 ### Implemented TASK-002 UI foundation
 
-As of 2026-09-02, the following foundation is implemented and must remain aligned with this document:
+As of 2026-09-04, the following foundation is implemented and must remain aligned with this document:
 
 - `apps/web/app/globals.css` maps shadcn semantic tokens to the complete light/dark Kapsam palette. `action-primary`, `status-attention`, and `danger-action` are separate tokens, and the global keyboard focus color resolves through the blue `ring` token.
 - `apps/web/components/theme-provider.tsx` applies `light`, `dark`, or the system preference through the root class, persists an explicit choice under `kapsam-theme`, sets the native color scheme, and prevents an incorrect-theme flash.
 - `apps/web/components/marketing/landing-page.css` keeps its `--lp-*` compatibility names as aliases to the canonical palette, so the existing landing composition renders from the same semantic tokens in both light and dark themes.
-- `apps/web/app/layout.tsx` loads Manrope for durable UI and Sora for the documented expressive regions. Compact metadata uses the system monospace stack; Geist is not part of the active typography system.
+- `apps/web/app/layout.tsx` loads variable Manrope (`200–800`) for durable UI and variable Sora (`100–800`) for the documented expressive regions. Intentional intermediate weights are rendered by the variable axes instead of being rounded to the nearest static face. Compact metadata uses the system monospace stack; Geist is not part of the active typography system.
 - The shared Button, Input, and NativeSelect primitives consume semantic tokens. Default buttons are `42px`, large buttons are `52px`, fields are at least `48px`, controls use a `14px` radius, and icon-only button variants keep at least a `44px` target.
 - The landing waitlist is the reference RHF/Zod integration. It validates and normalizes through one schema, connects field errors with ARIA, focuses the first invalid field, sends only validated data to a versioned client storage adapter, and converts storage failures to safe copy.
 - LoadingState, EmptyState, and ErrorState are the reusable route-state primitives used by `app/loading.tsx`, `app/not-found.tsx`, and `app/error.tsx`. ErrorState never renders a raw Error object.
-- `npm run validate:task-002` is the acceptance gate for lint, strict types, unit/integration coverage, production build, existing node:test boundaries, keyboard/focus, responsive behavior, reduced motion, and axe checks.
+- `npm run validate:task-002` runs the complete Chromium state matrix plus focused Firefox and WebKit smoke coverage. Normal, validation, selected, success, storage-error, loading, disabled, and destructive states are checked in both themes; hover, active, and focus-visible behavior is exercised without screenshot snapshots.
+- TASK-002 accessibility acceptance is formed by the automated axe WCAG A/AA, ARIA/live-region, keyboard, focus-visible, responsive, and Chromium/Firefox/WebKit checks. A manual VoiceOver session is optional quality work; it is not a missing, partial, or blocking TASK-002 requirement.
+- Passing this automated acceptance scope must not be described as “VoiceOver supported” in App Store or marketing content. If a native application is released, VoiceOver compatibility must be evaluated as a separate, platform-specific quality effort.
 
 The old demo palette is scoped under `.demo-experience`; additional `.app-shell`, `.editor-app-shell`, public-proposal, and demo-tour selectors are compatibility styling for the synthetic `/demo` experience only. Do not copy their raw values into production components.
 
@@ -743,6 +745,8 @@ Keep most cards on the active `surface` token. A single composition should norma
 Use **Manrope** as the primary family for the application shell, forms, tables, cards, public proposal document, long-form copy, and all durable product UI. Use **Sora** only where controlled expressiveness adds brand movement: the marketing hero, onboarding presentation hero, and `kapsam.` wordmark. Sora must not leak into dense controls, table content, form values, legal text, or routine application headings. Use the system monospace stack only for step numbers, proposal IDs, counters, compact dates, metadata, and document section indexes.
 
 Fallbacks are `ui-sans-serif`, `system-ui`, and `sans-serif` for Manrope/Sora. The utility mono role uses `ui-monospace`, `SFMono-Regular`, and `monospace` without introducing a third downloaded font. Keep exactly one primary sans, one expressive sans, and one utility system-mono role; never select fonts ad hoc inside a component.
+
+Load Manrope through its `200–800` variable weight axis and Sora through its `100–800` variable weight axis. Intermediate values in this typography contract, such as `570`, `650`, or `780`, are deliberate variable-font coordinates and must not be backed by a partial set of static faces.
 
 The core contrast is between restrained UI typography and an editorial proposal document:
 
