@@ -12,15 +12,16 @@
     "test:e2e": "cd apps/web && npm run test:e2e",
     "test:a11y": "cd apps/web && npm run test:a11y",
     "test:browser": "cd apps/web && npm run test:browser",
+    "test:local-db-tools": "node --test scripts/local-docker.test.mjs",
     "lint": "cd apps/web && npm run lint",
     "typecheck": "cd apps/web && npm run typecheck",
     "validate:task-001": "node scripts/validate-task-001.mjs",
     "validate:task-002": "node scripts/validate-task-002.mjs",
     "db:init": "npm exec --prefix apps/web -- supabase --workdir . init",
-    "db:start": "npm exec --prefix apps/web -- supabase --workdir . start",
+    "db:start": "node scripts/start-local-supabase.mjs",
     "db:stop": "npm exec --prefix apps/web -- supabase --workdir . stop",
-    "db:reset": "npm exec --prefix apps/web -- supabase --workdir . db reset --local",
+    "db:reset": "node scripts/run-local-supabase.mjs reset",
     "db:status": "npm exec --prefix apps/web -- supabase --workdir . status",
-    "db:types": "npm exec --prefix apps/web -- supabase --workdir . gen types typescript --local --schema public"
+    "db:types": "node scripts/run-local-supabase.mjs types"
   }
 }

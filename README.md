@@ -109,6 +109,34 @@ Uygulama kodu `apps/web/` klasöründedir. Landing yüzeyi
 demo girişi `components/demo/demo-app.tsx`, paylaşılan sentetik ürün arayüzü ise
 `components/demo/prototype-app.tsx` ve `app/globals.css` dosyalarındadır.
 
+## Yerel Supabase
+
+Docker Desktop arka planda açıkken proje kökünden:
+
+~~~bash
+npm run db:start
+npm run db:status
+npm run db:stop
+~~~
+
+`db:start`, projede sabitlenmiş CLI sürümünü ve `freelancercrm-local` Docker
+ağını kullanır. Bu makinedeki Docker Desktop, ağın localhost varsayılanını
+uygulamadığı için yalnız Supabase alt süreçlerine özel Docker adaptörü portları
+açıkça `127.0.0.1` adresine bağlar. Global Docker ayarları değişmez. Başlatma
+sonunda gerçek port bağları kontrol edilir; dış arayüz tespit edilirse servisler
+veriler korunarak durdurulur. Bu korumayı atlamamak için doğrudan `supabase start`
+yerine kök komutlarını kullanın.
+
+`db:reset` **yerel verileri silip veritabanını yeniden kurar**; `db:types` ise
+TypeScript veritabanı tiplerini standart çıktıya üretir. İkisi de aynı proje ağı
+ve adaptörünü kullanır; uzak veritabanı seçenekleri kabul edilmez. `seed.sql`
+henüz oluşturulmadığından seeding kapalıdır. `db:status` çıktısını paylaşırken
+anahtarları gizleyin.
+
+Adaptör testleri: `npm run test:local-db-tools`. Adaptör, CLI `2.116.0` komut
+biçimi için testlidir; CLI yükseltilirken testler ve gerçek port bağları tekrar
+kontrol edilmelidir. Desteklenmeyen Docker seçenekleri sessizce geçirilmez.
+
 ## Mimari
 
 Uygulama dizinleri, Server/Client Component sınırı, secret import kuralları,

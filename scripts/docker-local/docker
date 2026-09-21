@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+// Used only in Supabase child processes, never installed globally.
+import { spawn } from "node:child_process";
+import { isAbsolute } from "node:path";
+import { localhostPortArgs } from "../lib/local-docker.mjs";
+
+try {
+  const executable = process.env.FREELANCERCRM_DOCKER_BIN;
+  if (!executable || !isAbsolute(executable)) throw new Error("Missing real Docker executable.");
+  const child = spawn(executable, localhostPortArgs(process.argv.slice(2)), { stdio: "inherit" });
+  for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+    process.on(signal, () => child.kill(signal));
+  }
+  child.on("error", () => { console.error("Failed to launch Docker."); process.exitCode = 1; });
+  child.on("exit", (code, signal) => { process.exitCode = code ?? (signal ? 1 : 0); });
+} catch (error) {
+  console.error(error instanceof Error ? error.message : "Local Docker adapter failed.");
+  process.exitCode = 1;
+}

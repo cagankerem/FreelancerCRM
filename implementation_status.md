@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-04
+Son güncelleme: 2026-09-15
 
 ## Takip Sistemi
 
@@ -32,7 +32,9 @@ Son güncelleme: 2026-09-04
   - 2026-09-04: Light/dark form ve UI durum matrisi, 32 Chromium tam kapsam testi ile Firefox ve WebKit için dörder kritik smoke testi tamamlandı; 31 unit/integration, 18 node:test ve 40 Playwright/axe testi `validate:task-002` içinde geçti. Axe, ARIA, klavye, focus ve tarayıcı matrisi erişilebilirlik kabulünü tamamlıyor; VoiceOver bu görev için eksik veya bloke sayılmıyor, App Store/pazarlamada destek beyanına dayanak oluşturmuyor ve gelecekteki native yayın için ayrı kalite çalışması olarak ele alınacak.
   - 2026-09-04: Manrope `200–800` ve Sora `100–800` variable font eksenleriyle yüklenerek landing’deki ara ağırlıkların en yakın statik yüze yuvarlanması kaldırıldı; kaynak sözleşme testi eklendi ve 20 node:test içeren `validate:task-002` kabul seti yeniden geçti.
   - 2026-09-04: `shadcn@4.18.0` korunarak transitive `browserslist`, `fast-uri` ve `qs` güvenli sürümlere kilitlendi; production ve tam bağımlılık auditleri sıfır bulguyla geçti.
-- [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır
+- [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır — Kısmi
+  - 2026-09-15: Local config'te explicit Data API grant, HTTP Auth callback/reset allowlist, en az 8 karakter + harf/rakam politikası uygulandı; S3/vector/pgdelta ve seed oluşturulana kadar seeding kapatıldı. Parola negatif testleri ve onaylı local reset sonrası tablo izin testi geçti; localhost Docker ağına rağmen host port bağları tüm arayüzlerde kaldığından başlatma kontrolü servisleri verileri korunarak durdurdu. Ağ sorunu açık; seed.sql sonraki adım.
+  - 2026-09-15: Docker Desktop'ın ağ varsayılanını uygulamaması, yalnız projeye ait Supabase alt süreçlerinde açık 127.0.0.1 port bağı kullanan adaptörle çözüldü; başlatma, tekrar başlatma ve onaylı boş local reset sonrası beş yayınlanan port localhost olarak doğrulandı, otomatik tablo izinleri kapalı kaldı ve 5 adaptör testi geçti. Seed.sql henüz oluşturulmadı; sonraki adım.
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
   - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.
