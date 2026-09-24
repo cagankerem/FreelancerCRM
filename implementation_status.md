@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-15
+Son güncelleme: 2026-09-23
 
 ## Takip Sistemi
 
@@ -35,6 +35,7 @@ Son güncelleme: 2026-09-15
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır — Kısmi
   - 2026-09-15: Local config'te explicit Data API grant, HTTP Auth callback/reset allowlist, en az 8 karakter + harf/rakam politikası uygulandı; S3/vector/pgdelta ve seed oluşturulana kadar seeding kapatıldı. Parola negatif testleri ve onaylı local reset sonrası tablo izin testi geçti; localhost Docker ağına rağmen host port bağları tüm arayüzlerde kaldığından başlatma kontrolü servisleri verileri korunarak durdurdu. Ağ sorunu açık; seed.sql sonraki adım.
   - 2026-09-15: Docker Desktop'ın ağ varsayılanını uygulamaması, yalnız projeye ait Supabase alt süreçlerinde açık 127.0.0.1 port bağı kullanan adaptörle çözüldü; başlatma, tekrar başlatma ve onaylı boş local reset sonrası beş yayınlanan port localhost olarak doğrulandı, otomatik tablo izinleri kapalı kaldı ve 5 adaptör testi geçti. Seed.sql henüz oluşturulmadı; sonraki adım.
+  - 2026-09-23: Migration/seed öncesi ürün kararları plan.md'ye işlendi: Free eşzamanlı 3 aktif teklif ve AI kapalı; Pro yayın sonrası yetkiler; değişmez kabul/ret ve yanıtlanan içerik; alan bazlı metin sınırları ve önce kalem yuvarlama. Abonelik fiyatı ertelendi, teklif TRY/USD/EUR desteği korundu; bu adımda migration/seed veya veri silme yapılmadı.
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
   - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.

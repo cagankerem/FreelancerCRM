@@ -172,7 +172,8 @@ Kurallar:
 - Toplam istemcide önizlense de sunucuda yeniden hesaplanır.
 - Vergi dahil/hariç yalnız bilgilendirici etikettir; vergi motoru veya resmi hesaplama yapılmaz.
 - Tarih, tutar, para birimi ve zorunlu alanlar yayın öncesi sunucuda doğrulanır.
-- Kullanıcı metinleri her zaman düzenlenebilir.
+- Kullanıcı metinleri taslakta düzenlenebilir; yayın sonrası düzenleme Bölüm 5.5'teki plan ve karar durumu kurallarına bağlıdır.
+- Kullanıcının girdiği metinlerin sınırları Bölüm 11.6'da tanımlıdır; uzun içerik sessizce kesilmez.
 - Kaydetme hatasında form girdisi korunur.
 - Önizleme ve public belgede “Fatura yerine geçmez.” uyarısı bulunur.
 
@@ -201,7 +202,23 @@ Yayınlama:
 
 Teklif versiyonlama MVP’de yoktur.
 
-**Açık Karar:** Yayın sonrası düzenleme, müşteriye gösterilecek sürüm, iptal sonrası yeniden etkinleştirme ve token rotasyonu Bölüm 34’te kesinleşmeden uygulanmayacaktır.
+**Kesinleşen ürün kararı — 2026-09-23:**
+
+- Free: Taslak düzenlenebilir; ilk yayından sonra içerik kilitlidir. Canlı düzenleme ve aynı teklifin yeniden yayınlanması yoktur. Bağlantıyı iptal etme hakkı korunur; içerik kilidi bağlantı iptali değildir.
+- Pro: Yanıt bekleyen tekliflerde içerik kilidi, canlı düzenleme veya yeniden yayınlama seçilebilir. Kabul/ret verilmiş bir teklifin içeriği hiçbir planda değiştirilemez.
+- İlk geçerli kabul/ret kararı değişmez; sahibi veya müşteri kararı sıfırlayamaz. Yeni koşullar için yeni teklif gerekir. Pro çoğaltabilir; Free yeni bir taslağı manuel oluşturabilir.
+
+**Teknik tasarım — tablo ayrımı yapmadan uygulama:**
+
+- Free ve Pro için aynı `proposals`, `proposal_sections` ve `proposal_items` tabloları kullanılır. Alt tablolara plan veya kilit kolonları kopyalanmaz.
+- `proposals.publication_mode` alanı `locked|live` olur; güvenli başlangıç değeri `locked` seçilir. `live` yalnız güncel Pro yetkisiyle etkilidir; plan değişince satırdaki eski değer yetki kazandırmaz.
+- Canlı düzenleme, yayında/süresi geçmemiş/yanıt bekleyen teklifte son kaydedilmiş içeriği aynı bağlantıda gösterir. Public sayfa son içerik güncellemesini belirtir. Bu, geçmiş sürüm arşivi veya elektronik imza değildir.
+- Pro yeniden yayınlama, yanıt bekleyen aynı kayıt üzerinde içerik ve yayın kontrollerini tekrar çalıştırır; yeni paylaşım generation/selector ile eski bağlantı ve nonce'ları geçersiz kılar. İptal edilmiş veya süresi dolmuş kayıt bu işlemle tekrar yayına alınabilir. Normal link kopyalama bu işlemi yapmaz.
+- Yeniden yayınlama eski görüntülenme/mesaj geçmişini silmez; mevcut agregalar teklif ömrü toplamıdır, yeni yayına aitmiş gibi etiketlenmez. Ayrı sürüm raporlaması MVP kapsamına eklenmez.
+- Parent, sections ve items değişiklikleri aynı transaction'da parent satırını kilitler; sahiplik, güncel plan, yayın/karar durumu ve `lock_version` birlikte doğrulanır. İçerik değiştiğinde parent `lock_version` artırılır; salt görüntülenme sayacı bu içerik sürümünü değiştirmez.
+- Müşteri yanıtı, gösterilmiş içerik sürümüne bağlı nonce ile alınır. Müşteri eski sekmede açık teklife yanıt verirken içerik değişmişse `409` ile yeniden görüntüleme istenir; görmediği koşullar kabul edilmiş sayılmaz.
+- Kabul/ret de aynı parent kilidini kullanır: karar önce kaydolursa düzenleme reddedilir; düzenleme önce kaydolursa eski sürüme yanıt reddedilir.
+- Tarayıcıya yayınlanmış parent veya alt tablolarda doğrudan write yetkisi verilmez. Kontrollü server işlemi ve DB koruması birlikte kullanılır; yalnız buton gizlemek yeterli değildir. Ayrıntı Bölüm 12'dedir.
 
 ### 5.6 AI Destekli Teklif Metni
 
@@ -217,6 +234,7 @@ AI yalnız aşağıdaki alanlarda taslak üretir:
 
 Zorunlu kurallar:
 
+- AI teklif üretimi yalnız Pro planındadır. Free isteği sunucuda sağlayıcı çağrısı ve kota rezervasyonu yapılmadan reddedilir; manuel teklif akışı açıktır.
 - Akış `Kullanıcı → Next.js sunucusu veya Edge Function → AI sağlayıcısı → doğrulama → düzenlenebilir taslak` şeklindedir.
 - Tarayıcı AI sağlayıcısını doğrudan çağırmaz.
 - AI anahtarı frontend’e, source map’e veya loga girmez.
@@ -272,7 +290,9 @@ Kurallar:
 - Mesaj düz metindir; uzunluk, spam ve XSS kontrolleri uygulanır.
 - Link üzerinden verilen yanıt hukuki kimlik doğrulaması veya elektronik imza olarak sunulmaz.
 
-**Açık Karar:** Müşteri adı/e-postası, ek kimlik doğrulama ve terminal kararın sonradan değiştirilebilirliği Bölüm 34’tedir.
+**Kesinleşen karar:** İlk geçerli kabul/ret değişmez; yanıtlanan teklif içeriği de korunur (Bölüm 5.5).
+
+**Açık Karar:** Müşteri adı/e-postası ve ek kimlik doğrulama Bölüm 34’tedir.
 
 ### 5.9 Görüntülenme Takibi
 
@@ -403,16 +423,18 @@ Kurallar:
 - Mesaj “teklifi kesin okudunuz” gibi kesin takip iddiası içermez.
 - AI kullanıcı adına fiyat kararı vermez.
 - Teklif taslağıyla aynı kota, doğrulama, maliyet, log ve fallback kuralları uygulanır.
+- AI takip mesajı da yalnız Pro içindir; Free'de AI çağrısı veya AI deneme kotası yoktur.
 
 ### 5.13 Ücretsiz ve Pro Plan
 
 | Özellik | Ücretsiz | Pro MVP | Kapsam notu |
 |---|---|---|---|
-| Aktif teklif | Ayda 3; kesin tanım açık karar | Sınırsız veya açık adil kullanım | Enforcement yalnız sunucuda |
+| Aktif teklif | Eşzamanlı en fazla 3; aylık yayın kotası değildir | Sınır/adil kullanım tavanı henüz kararlaştırılmadı | Enforcement yalnız sunucuda |
 | Sunum | Tek sabit temel şablon | Aynı temel şablon + çalışan marka hakları | Seçilebilir/özel şablon Faz 2 |
 | Teklif bağlantısı | Var | Var | Her iki planda güvenli public erişim |
 | Görüntülenme | İlk/son/toplam | Çalışıyorsa gelişmiş olay geçmişi | Kesin benzersiz kişi iddiası yok |
-| AI | Sınırlı | Daha yüksek, açıklanmış kota | Gerçek “sınırsız” vaat edilmez; abuse tavanı vardır |
+| AI | Yok; teklif üretimi ve takip mesajı kapalı | Var; kota miktarı/birimi ayrıca kesinleştirilecek | Free sağlayıcı çağrısı yapamaz; Pro için abuse/maliyet tavanı gerekir |
+| Yayın sonrası içerik | Kilitli; düzenleme/yeniden yayınlama yok | Yanıt beklerken kilitleme, canlı düzenleme veya yeniden yayınlama | Kabul/ret sonrası her iki planda da içerik korunur |
 | Çoğaltma | Yok veya kilitli | Var | Yetenek MVP’de geliştirilir, Pro entitlement’ıdır |
 | Logo/marka | Profil alanı; public kullanım kararı açık | Özel logo/marka ve platform markasını kaldırma yalnız çalışıyorsa | Kişisel domain Faz 2 |
 | PDF | Yok | Yok | Faz 2; MVP’de satılmaz |
@@ -420,6 +442,9 @@ Kurallar:
 
 Çelişki çözümü:
 
+- Aktif teklif: `lifecycle_status = published`, `decision_status = pending`, iptal edilmemiş ve süresi dolmamış kayıt. Taslaklar, kabul/ret alanlar, iptal edilenler ve süresi dolanlar bu kotaya dahil değildir. `valid_until` boşsa mevcut modelde süre dolumu oluşmaz; otomatik geçerlilik süresi atanmaz.
+- Kabul/ret, iptal veya süre sonu aktif kontenjanı boşaltır. Aylık sıfırlama yoktur. Kota yayınlama/yeniden etkinleştirme transaction'ında aynı kullanıcı için seri hale getirilir; paralel istekler 3 sınırını aşamaz.
+- Pro'dan Free'ye düşüşte mevcut veriler silinmez; limit üstündeyken yeni aktivasyon engellenir, canlı düzenleme/yeniden yayınlama hakları kapanır. Mevcut bağlantıların kapanma/grace politikası Bölüm 34'te ayrıca kararlaştırılır.
 - PDF ve özel şablonlar Faz 2’dir; MVP ödeme ekranında aktif özellik veya satın alınmış vaat olarak gösterilmez.
 - Sahte kapı kullanılacaksa bunun ilgi testi olduğu açıkça yazılır ve ödeme alınmaz.
 - Ücretli ön siparişte hazır olmayan kapsam, teslim tarihi ve iade koşulları açıkça belirtilir.
@@ -493,7 +518,7 @@ Kurallar:
 ### 8.3 AI ile teklif taslağı
 
 1. Kullanıcı kısa proje açıklaması girer.
-2. Sunucu auth, sahiplik, kota, rate limit ve uzunluk kontrolü yapar.
+2. Sunucu auth, Pro yetkisi, sahiplik, kota, rate limit ve uzunluk kontrolü yapar; Free sağlayıcıya ulaşmaz.
 3. AI yapılandırılmış taslak üretir.
 4. Zod doğrulaması yapılır.
 5. Kullanıcı alanları düzenler ve seçerek uygular.
@@ -540,7 +565,7 @@ Kabul akışının simetriğidir. Önceden kabul varsa çakışma döner.
 
 1. Kullanıcı teklif durumunu açar.
 2. Senaryo ve tonu seçer.
-3. Sunucu sahiplik ve kotayı doğrular.
+3. Sunucu Pro yetkisini, sahipliği ve kotayı doğrular; Free sağlayıcıya ulaşmaz.
 4. Mesaj taslağı üretilir.
 5. Kullanıcı düzenler ve kopyalar.
 6. Otomatik gönderim yapılmaz.
@@ -570,7 +595,7 @@ Kabul akışının simetriğidir. Önceden kabul varsa çakışma döner.
 
 - Kota, tüketen işlem anında sunucuda hesaplanır.
 - Dolmuş kotada taslak kaybolmaz.
-- Kullanıcıya limit ve reset bilgisi gösterilir.
+- Kullanıcıya `aktif / 3` ve hangi durumların kontenjan açtığı gösterilir; aylık reset tarihi gösterilmez.
 - Yalnız çalışan Pro özellikleriyle yükseltme sunulur.
 - Sahte kapıda ödeme alınmaz.
 
@@ -721,6 +746,7 @@ Ortak kurallar:
 - Data API erişimi RLS’den ayrı olarak minimum explicit `GRANT` ile yönetilir; otomatik açılmaya güvenilmez. [Supabase RLS rehberi](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - Zamanlar `timestamptz` ve UTC, takvim tarihleri `date` olur.
 - Para alanları `numeric(14,2)`, miktar `numeric(12,3)` olur; API’de decimal string taşınır.
+- **Yuvarlama kararı — 2026-09-23:** Her hizmet kalemi `quantity × unit_price` sonucundan 2 ondalığa, tam yarımda yukarı yuvarlanır; teklif toplamı yuvarlanmış kalemlerin toplamıdır. Hesap DB numeric veya eşdeğer exact decimal ile yapılır. Örnek: `1.500 × 0.01 = 0.015 → 0.02`; iki böyle kalem `0.04` eder. Alanın numeric aralığı aşılırsa güvenli doğrulama hatası verilir; fiyat sessizce kırpılmaz.
 - `float`, `real` ve `double precision` kullanılmaz.
 - Para birimi `TRY|USD|EUR` check constraint’iyle sınırlandırılır.
 - İş nesnelerinde UUID, yüksek hacimli append-only olaylarda `bigint identity` kullanılır.
@@ -729,6 +755,7 @@ Ortak kurallar:
 - İstemci canonical durum, token, sayaç veya plan alanlarını yazamaz.
 - Genel soft delete uygulanmaz. Link iptali silme değildir. Hesap silme doğrulanmış hard-delete/saga akışıdır.
 - Teklif versiyonlama MVP’de yoktur.
+- Yayın sonrası plan yetkileri ve içerik koruması Bölüm 5.5'teki kesinleşmiş kararlara uyar; aynı iş tabloları her iki plan için kullanılır.
 
 ### 11.2 Teklif durumu ve paylaşım anahtarı
 
@@ -780,11 +807,11 @@ Ortak kurallar:
 #### `proposals`
 
 - **Amaç:** Sahiplik, teklif yapısı, yaşam döngüsü ve view agregaları.
-- **Kolonlar:** `id`, `user_id`, `client_id nullable`, `client_name`, `client_company nullable`, `project_name`, `start_date nullable`, `duration_text nullable`, `revision_limit nullable`, `currency`, `total_amount`, `tax_mode`, `lifecycle_status`, `decision_status`, `valid_until nullable`, `published_at`, `revoked_at`, `responded_at`, paylaşım alanları, `first_viewed_at`, `last_viewed_at`, `counted_view_count`, zamanlar ve `lock_version`.
+- **Kolonlar:** `id`, `user_id`, `client_id nullable`, `client_name`, `client_company nullable`, `project_name`, `start_date nullable`, `duration_text nullable`, `revision_limit nullable`, `currency`, `total_amount`, `tax_mode`, `lifecycle_status`, `publication_mode`, `decision_status`, `valid_until nullable`, `published_at`, `revoked_at`, `responded_at`, paylaşım alanları, `first_viewed_at`, `last_viewed_at`, `counted_view_count`, zamanlar ve `lock_version`.
 - **FK:** `user_id → auth.users cascade`; `client_id → clients on delete set null`.
-- **Varsayılan:** `draft`, `pending`, toplam `0`, view count `0`, generation `0`.
+- **Varsayılan:** `draft`, `pending`, publication mode `locked`, toplam `0`, view count `0`, generation `0`. Profil para birimi kullanıcı seçimiyle gelir; otomatik TRY, revizyon sayısı, geçerlilik süresi veya vergi modu varsayılmaz.
 - **Unique:** `share_selector`; verifier hash kullanılıyorsa partial unique.
-- **Check:** Currency, tax, status, nonnegative tutar/sayaç/revizyon.
+- **Check:** Currency, tax, status, `publication_mode in ('locked', 'live')`, nonnegative tutar/sayaç/revizyon; metin sınırları Bölüm 11.6.
 - **İndeks:** Kullanıcı+oluşturma, kullanıcı+durum, `client_id`, `valid_until`, `last_viewed_at`, selector/hash.
 - **Soft delete:** Yok; draft silme hard delete, yayınlanmış kayıt için revoke tercih edilir.
 - **Saklama:** Hesap ömrü ve onaylanacak retention politikası.
@@ -838,7 +865,7 @@ Ortak kurallar:
 - **İndeks:** `(proposal_id, created_at desc, id desc)`.
 - **Soft delete:** Yok.
 - **Saklama:** Teklif yaşam döngüsüne bağlı; kesin süre hukuk incelemesiyle.
-- **Tutarlılık:** İlk terminal karar kazanır.
+- **Tutarlılık:** İlk terminal karar kazanır ve değişmez; yanıtlanan teklif/section/item içeriği de korunur. Karar, görüntülenen içerik sürümüyle eşleşmelidir.
 
 #### `ai_generations`
 
@@ -886,7 +913,7 @@ Eşzamanlı AI isteklerinde “önce say, sonra ekle” yarışını önlemek i�
 - Check: Değerler nonnegative
 - Erişim: Kullanıcı kendi özetini read-only; yalnız güvenli sunucu işlemi yazabilir
 - Akış: Reserve → başarıda finalize → terminal hatada release
-- Aktif teklif kotası tanımı kesinleşmeden ilgili sayaç eklenmez.
+- Free'nin 3 eşzamanlı aktif teklif sınırı aylık kullanım sayacı değildir. Aktif satırlar kullanıcı bazlı transaction kilidi altında güncel durum/süreyle hesaplanır; `usage_counters` içine aylık teklif tüketimi eklenmez.
 
 #### `webhook_events`
 
@@ -902,11 +929,68 @@ Ayrı `rate_limits` tablosu peşinen eklenmez. Seçilen platform/managed store y
 ### 11.5 Kritik transaction’lar
 
 - Yayınlama: sahiplik, zorunlu alan, kota, toplam ve geçerlilik kontrolü; token üretimi ve lifecycle güncellemesi tek transaction.
+- Pro canlı düzenleme/yeniden yayınlama: güncel entitlement, parent kilidi, child değişiklikleri ve sürüm kontrolü aynı transaction; Free ve yanıtlanmış içerik değişikliği reddedilir.
 - View sayımı: dedupe insert başarılıysa aggregate atomik güncellenir.
 - Kabul/ret: proposal row lock, durum kontrolü, response insert ve proposal decision güncellemesi tek transaction.
 - Çoğaltma: proposal, sections ve items tek transaction; public ve geçmiş alanları sıfırlanır.
 - Client silme: proposal snapshot’ı korunur.
-- Retention günleri ve yayın sonrası düzenleme açık karar olarak kalır.
+- Retention günleri açıktır; yayın sonrası yetkiler ve ilk kararın değişmezliği Bölüm 5.5'te kesinleşmiştir.
+
+### 11.6 Metin sınırları ve doğrulama sözleşmesi
+
+**2026-09-23 teknik başlangıç sınırları:** Kullanıcının karakter kotası belirleme yetkisi doğrultusunda aşağıdaki üst sınırlar seçilmiştir. Free ve Pro için aynıdır; abonelik kullanım kotası değildir. Değiştirilirse UI, API, DB constraint'leri ve sınır testleri birlikte güncellenir.
+
+| Alan | En fazla karakter | Not |
+|---|---:|---|
+| Profil adı `full_name` | 200 | Onboarding öncesinde nullable |
+| Meslek `profession` | 120 | Serbest metin |
+| Marka/şirket adı `brand_name`, `company_name`, `client_company` | 200 | Opsiyonel |
+| Müşteri adı `clients.name`, teklif `client_name` | 200 | Müşteri kaydında boş/yalnız boşluk kabul edilmez |
+| Proje adı `project_name` | 200 | Yayında zorunlu |
+| İletişim/Auth form e-postası | 254 | Uzunluk, e-posta doğrulamasının yerine geçmez |
+| Public telefon `public_phone` | 32 | Opsiyonel; yeni zorunlu kişisel veri oluşturmaz |
+| Web sitesi `website_url` | 2.048 | Opsiyonel; ayrıca güvenli URL/protokol kontrolü |
+| Logo Storage yolu `logo_path` | 512 | Sunucu tarafından üretilir; signed URL veya dosya içeriği değildir |
+| Süre açıklaması `duration_text` | 200 | Ör. 4–6 hafta |
+| Bölüm başlığı `proposal_sections.title` | 120 | Bölüm türü ayrı allowlist ile doğrulanır |
+| Özet `summary` | 4.000 | Manuel metin ve AI uygulanmış sonuç |
+| Kapsam `scope` | 12.000 | Manuel metin için yeterli alan |
+| Teslimatlar `deliverables` | 8.000 | Düz metin |
+| Hariç tutulanlar `exclusions` | 6.000 | Düz metin |
+| Zaman planı `timeline` | 4.000 | Düz metin |
+| Revizyon koşulları `revision_terms` | 4.000 | Sayısal `revision_limit` yerine geçmez |
+| Ödeme planı `payment_plan` | 4.000 | Fiyat/vergi motoru değildir |
+| Ek koşullar `additional_terms` | 8.000 | Düz metin |
+| Hizmet kalemi açıklaması `proposal_items.description` | 2.000 | Dolu kalemde boş/yalnız boşluk kabul edilmez |
+| Birim etiketi `unit_label` | 32 | Opsiyonel; saat/adet vb. |
+| Müşteri mesajı `proposal_responses.message` | 4.000 | Mesaj türünde boş olamaz; kabul/ret türünde null |
+| AI proje açıklaması | 8.000 | Mevcut Bölüm 14.4 sınırı |
+| Birleşik AI girdisi | 20.000 | Dahil edilen bütün dinamik metin alanlarının toplamı |
+| AI teklif çıktısı, alan başına | 4.000 | Manuel bölüm kotasını artırmaz; daha sıkı olan sınır uygulanır |
+| AI teklif çıktısı, toplam | 16.000 | Yedi alanın toplamı |
+| AI takip mesajı çıktısı / kopyalama editörü | 4.000 | Yalnız Pro; otomatik gönderim yok |
+| Liste arama sorgusu | 200 | Kalıcı müşteri alanı değildir |
+
+Sekiz bölümün ayrı üst sınırlarının toplamı 50.000 karakterdir. Boş bölüm içeriği taslakta korunabilir; hangi alanların yayın öncesi zorunlu olduğu ayrıca yayın doğrulamasında uygulanır.
+
+Teknik metinler de sınırsız değildir:
+
+- Provider adı 64; provider model kimliği 128; prompt sürümü 64; güvenli hata kodu 64 karakter.
+- Provider customer/subscription/event kimlikleri en fazla 255 karakter; sağlayıcı seçildiğinde resmi sözleşmeyle doğrulanır. Taşan kimlik kesilmez veya farklı kayda eşlenmez, entegrasyon güvenli hata verir.
+- String kullanılıyorsa `request_id` 64, `idempotency_key` 128 karakter; UUID alanlarda gerçek UUID tipi/doğrulaması kullanılır.
+- Kontrollü plan/offer/event/entity/metric kodları en fazla 64, provider webhook event türü 128 karakter; enum/allowlist denetimi ayrıca zorunludur. UA sınıfı kontrollü kod en fazla 32 karakterdir; ham User-Agent alınmaz.
+- Audit `metadata` yalnız allowlist object; uygulamada UTF-8 serileştirilmiş JSON en fazla 4 KiB, DB'de de eşdeğer boyut koruması. İçindeki serbest teknik string değerler en fazla 256 karakter; metin/prompt/token/PII ekleme izni değildir.
+- Parola, hash, token ve imza alanlarına genel metin kotası veya otomatik trim uygulanmaz. Parolayı Supabase Auth doğrular; mevcut en az 8 karakter + harf/rakam politikası korunur. Hash/token format ve uzunluğu seçilen kriptografik algoritmayla doğrulanır, sessiz kısaltılmaz.
+
+Doğrulama ve test sözleşmesi:
+
+- İş metinleri NFC'ye, satır sonları LF'ye normalize edilip Unicode kod noktası olarak sayılır. UI/API sayacı JS `string.length` yerine aynı sayım sözleşmesini kullanır; DB `char_length` ve normalize saklama kontrolleriyle eşleşir. Birleşik emojinin birden fazla kod noktası olabileceği kabul edilir. [PostgreSQL metin işlevleri](https://www.postgresql.org/docs/17/functions-string.html)
+- Limit aşımında alan bazlı hata verilir; otomatik kesme yapılmaz ve kullanıcı girdisi korunur. Zorunlu alanların yalnız whitespace olması reddedilir; opsiyonel alanlar null, taslak bölüm içeriği boş string olabilir.
+- API/Zod ve PostgreSQL `CHECK` aynı limitleri uygular; yalnız HTML `maxlength` güvenlik kontrolü sayılmaz. Toplu bölüm kaydında ve AI merge sonrası nihai içerik yeniden doğrulanır.
+- Metin tabanlı teklif mutasyonlarında 1 MiB, müşteri mesajında 32 KiB ham istek gövdesi başlangıç güvenlik tavanıdır; dosya yükleme limitleri ayrıdır. Bunlar karakter kotasının yerine geçmez; aşımlar 413 verir.
+- Her alan için `N-1`, `N`, `N+1`, null/boşluk, Türkçe karakter, emoji ve CRLF/NFC testleri gerekir. Fazla uzun AI çıktısı/metadata ve yanlış enum ayrıca negatif test edilir.
+
+**Henüz seçilmeyenler:** Abonelik fiyatı/tahsilat para birimi production'a yakın belirlenecek; teklif TRY/USD/EUR desteği korunur. Varsayılan revizyon sayısı, otomatik geçerlilik süresi ve vergi seçimi atanmaz. Fiyat yuvarlaması ise Bölüm 11.1'de kesinleştirilmiştir; karakter kotasından ayrı bir hesaplama kuralıdır.
 
 ## 12. Row Level Security Planı
 
@@ -926,6 +1010,9 @@ Anonim tarayıcı
 - Auth kullanıcı işlemleri mümkün olduğunca kullanıcı JWT’si ve RLS altında yürür.
 - Service role yalnız dar server-only modüllerde kullanılır.
 - RLS kolon koruması değildir; kritik kolonlara direct write grant verilmez.
+- Satır sahipliği ile kolon yetkileri ayrı kontrol edilir. [Supabase kolon yetkileri](https://supabase.com/docs/guides/database/postgres/column-level-security)
+- `publication_mode`, lifecycle, decision, token ve sayaçlar kullanıcı tarafından doğrudan yazılamaz. Yayınlanmış section/item satırlarını doğrudan değiştirmek de yasaktır; aksi halde Free içerik kilidi alt tablolardan aşılabilir.
+- Taslak alt tablo yazımları dahil bütün içerik mutasyonları parent satırını kilitleyip durum ve sürümü yeniden kontrol eder; publish/edit/response yarışı yalnız bir anlık RLS kontrolüne bırakılmaz. Yayın sonrası write yalnız Bölüm 5.5'teki kontrollü transaction yolundan geçer.
 - Policy’lerde `TO authenticated`, `USING`, INSERT/UPDATE için `WITH CHECK` kullanılır.
 - UPDATE için gerekli SELECT policy unutulmaz.
 - `user_metadata` authorization kaynağı değildir.
@@ -941,8 +1028,8 @@ Anonim tarayıcı
 | `profiles` | Kendi satırını select/insert/update | Yok | Yok; yalnız public DTO | Hesap silme/bakım | Yok | JWT sahibi için gerekli minimum read |
 | `clients` | Kendi satırlarında CRUD | Yok | Yok | Hesap silme/onarım | Yok | Açıkça seçilen minimum isim/şirket |
 | `proposals` | Kendi kayıtlarını select; draft CRUD; kritik geçiş controlled action | Yok | Doğrudan yok | Token resolver ve transaction’lar | Yok | Seçili kendi proposal’ında minimum read |
-| `proposal_sections` | Parent sahibi CRUD | Yok | Doğrudan yok | Token sonrası allowlist read | Yok | Minimum read; onaysız write yok |
-| `proposal_items` | Parent sahibi CRUD | Yok | Doğrudan yok | Token sonrası allowlist read | Yok | Fiyat write yok |
+| `proposal_sections` | Parent sahibi select; draft CRUD; yayın sonrası yalnız Pro/pending kontrollü action | Yok | Doğrudan yok | Token sonrası allowlist read; yetkili edit transaction | Yok | Minimum read; onaysız write yok |
+| `proposal_items` | Parent sahibi select; draft CRUD; yayın sonrası yalnız Pro/pending kontrollü action | Yok | Doğrudan yok | Token sonrası allowlist read; yetkili edit transaction | Yok | Fiyat write yok |
 | `proposal_views` | Parent sahibi select; plan entitlement’ı UI’yi sınırlar | Yok | Doğrudan yok | View insert ve aggregate | Yok | Yok |
 | `proposal_responses` | Parent sahibi select; müşteri kararını değiştiremez | Yok | Doğrudan yok | Doğrulanmış public insert | Yok | Normalize durum read |
 | `ai_generations` | Kendi metadata özetini select | Yok | Yok | Reserve/finalize | Yok | Yalnız kendi generation kaydı |
@@ -972,10 +1059,12 @@ Service role teknik olarak RLS’yi bypass eder; yukarıdaki sınırlar purpose-
 | Profil oluştur/güncelle | Auth, kendi profil alanları, Zod | `ProfileDTO`; 400/401/409/500 | Orta | Upsert/version; içeriksiz event |
 | Logo yükleme | Auth, body/MIME/magic/decode/pixel kontrolü | Logo metadata; 413/415/422/storage error | Düşük | Request ID, immutable ad |
 | Müşteri oluşturma | Auth/RLS, ad/şirket sınırı | `ClientDTO`; 400/401/409 | Orta | Client request UUID |
-| Teklif oluşturma | Auth, plan/kota, bütün alan şemaları | Draft DTO; 400/401/403/409 | Orta | Tek transaction |
-| Teklif güncelleme | Owner, editable alan allowlist, version | Güncel DTO; 404/409/state error | Orta | `lock_version` |
+| Teklif oluşturma | Auth, sahiplik, bütün alan şemaları; aktif teklif kotası taslağı engellemez | Draft DTO; 400/401/403/409 | Orta | Tek transaction |
+| Teklif güncelleme | Owner, editable alan allowlist, version; yayında Pro/live/pending | Güncel DTO; 403/404/409/state error | Orta | Parent+children transaction, `lock_version` |
 | Teklif çoğaltma | Owner + Pro entitlement | Yeni draft ID; 403/404/409 | Düşük | Idempotency key |
 | Teklif yayınlama | Owner, alan/toplam/kota/geçerlilik | Durum ve URL; 409/422/500 | Düşük | Tekrar istek aynı sonucu |
+| Yayın modunu değiştirme | Owner, Pro, pending; locked/live allowlist | Mode ve version; 403/409 | Düşük | Parent lock ve sürüm kontrolü |
+| Teklifi yeniden yayınlama | Owner, Pro, pending, alan/toplam/kota/geçerlilik | Yeni URL; 403/409/422 | Düşük | Atomik generation/selector değişimi; eski link/nonce iptali |
 | Paylaşım anahtarı üretme/rotate | Owner, published state, açık rotate onayı | Aynı veya yeni URL | Düşük | Generation increment |
 | Bağlantıyı iptal etme | Owner, state transition | Revoked state | Düşük | Tekrar revoke idempotent |
 | Public teklif getirme | Token, yayın, revoke, expiry | `PublicProposalDTO`; uniform 404/410/429 | Public limit | GET idempotent, token maskeli |
@@ -983,8 +1072,8 @@ Service role teknik olarak RLS’yi bypass eder; yukarıdaki sınırlar purpose-
 | Teklifi kabul etme | Token, nonce, pending ve geçerli durum | Accepted; 409/410/429 | Çok sıkı | Row lock ve unique decision |
 | Teklifi reddetme | Kabul ile aynı | Rejected; aynı hata ailesi | Çok sıkı | Aynı transaction kuralı |
 | Müşteri mesajı | Token, nonce, düz metin, spam/length | Acknowledgement | Çok sıkı | Idempotency key |
-| AI teklif metni | Auth, owner, kota, input cap | Kaydedilmemiş structured draft | Sıkı + kota | Request reservation |
-| AI takip mesajı | Auth, owner, durum ve ton | Kopyalanabilir taslak | Sıkı + kota | Request reservation |
+| AI teklif metni | Auth, Pro, owner, kota, input cap | Kaydedilmemiş structured draft; Free 403 | Sıkı + kota | Yetki sonrası request reservation |
+| AI takip mesajı | Auth, Pro, owner, durum ve ton | Kopyalanabilir taslak; Free 403 | Sıkı + kota | Yetki sonrası request reservation |
 | Kota kontrol/reserve/finalize | Auth/internal AI, server planı | Entitlement ve kalan kullanım | Atomik | Composite counter |
 | Abonelik durumu kontrolü | Auth, kendi subscription’ı | Normalize plan/status | Orta | Read idempotent |
 | Ödeme webhook’u | Raw body imzası, replay ve event schema | Güvenli 2xx/4xx/5xx | Provider limit | Provider event ID unique |
@@ -1055,14 +1144,16 @@ Sağlayıcı/model kesinleştirilmez; Bölüm 34’teki benchmark sonrası seçi
 
 - Tek proje açıklaması: en fazla 8.000 karakter
 - Birleşik AI girdisi: en fazla 20.000 karakter
-- Alan başına çıktı: en fazla 4.000 karakter
-- Toplam çıktı: en fazla 16.000 karakter
+- Teklifte alan başına çıktı: en fazla 4.000 karakter
+- Teklifte toplam çıktı: en fazla 16.000 karakter
+- AI takip mesajı: en fazla 4.000 karakter
+- Alan eşlemesi, Unicode sayımı ve uygulanmış metin sınırları: Bölüm 11.6
 
 Bu değerler production AI uygulaması sırasında yürütülen maliyet ve kalite testlerinden sonra değiştirilebilir.
 
 Kota:
 
-1. Plan ve dönem okunur.
+1. Plan okunur; Free isteği sağlayıcı çağrısı ve rezervasyon öncesinde reddedilir. Pro için dönem ve kota okunur.
 2. Transaction içinde kullanım rezerve edilir.
 3. AI çağrısı yapılır.
 4. Başarıda rezervasyon kullanıma çevrilir.
@@ -1165,8 +1256,12 @@ Varsayılan tercih:
 Entitlement’lar yalnız server-side normalize abonelik ve sürümlü plan konfigürasyonundan hesaplanır:
 
 - `canCreateProposal`
+- `canPublishProposal`
 - `proposalLimit`
+- `canUseAI`
 - `aiQuota`
+- `canEditPublishedProposal`
+- `canRepublishProposal`
 - `viewHistoryWindow`
 - `canUseBranding`
 - `canDuplicate`
@@ -1174,9 +1269,12 @@ Entitlement’lar yalnız server-side normalize abonelik ve sürümlü plan konf
 
 İstemci plan claim’i veya gizlenmiş buton yetki kaynağı değildir.
 
+Free için aktif teklif limiti 3 ve AI kotası 0'dır; yayın sonrası edit/republish yetkisi yoktur. Pro aktif teklif sınırı ve AI kullanım miktarı ayrıca kararlaştırılır; belirsiz değer sessizce sınırsız kabul edilmez. Plan hakkı tek başına yeterli değildir: yanıtlanmış içerik hiçbir planda değiştirilemez; canlı düzenlemede `publication_mode` ve erişim durumu da kontrol edilir.
+
 ### 16.2 Fiyat testi
 
-- Aylık 149 TL ve 249 TL fiyatları deney varyantıdır.
+- Abonelik ücreti ve tahsilat para birimi MVP production'a yakın seçilecektir (2026-09-23 kararı). Önceki 149/249 TL örnekleri bağlayıcı fiyat/varsayılan/seed değildir.
+- Bu erteleme, freelancerın tekliflerinde desteklenen TRY/USD/EUR para birimlerini veya kurgusal test tutarlarını kaldırmaz.
 - Aynı paket test ediliyorsa varyant kullanıcıya kararlı şekilde atanır.
 - Gösterilen fiyat checkout boyunca korunur.
 - Yıllık plan, kurucu planı ve erken erişim fiyatı teklif edilebilir.
@@ -1218,7 +1316,7 @@ Kurallar:
 - İptal anında veya dönem sonunda olabilir; karar Bölüm 34’tedir.
 - Downgrade veri silmez.
 - Limit üzerindeki kayıtlar sessizce yok edilmez.
-- Yeni teklif veya AI kullanımı tanımlı limite göre kısıtlanır.
+- Yeni teklif aktivasyonu tanımlı aktif limite göre kısıtlanır; taslak bu kotayı tüketmez. Free'ye düşüşte yeni AI çağrıları kapanır.
 - Periyodik reconciliation local-provider sapmasını alarm olarak üretir.
 
 ## 17. KVKK, Gizlilik ve Veri Sorumluluğu
@@ -1524,7 +1622,7 @@ Kayıt yöntemi:
 - Ürün ekranı
 - Yaklaşık görüntülenme takibi
 - Düzenlenebilir AI teklif üretimi
-- 149/249 TL fiyat deneyi
+- Production'a yakın seçilecek ücret ve tahsilat para birimiyle fiyat deneyi
 - Kayıt veya beta deneme formu
 
 Ölçümler:
@@ -2109,6 +2207,8 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Teknik Notlar:** Temiz DB’de tekrarlanabilir migration.
 
+Metin uzunluğu ve Unicode kontrolleri Bölüm 11.6'ya uyar; sınır değerleri seed dosyasından türetilmez.
+
 **Güvenlik ve Veri Notları:** `auth.users` FK ve cross-user negatif test.
 
 **Kabul Kriterleri:**
@@ -2217,6 +2317,8 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Teknik Notlar:** Proposal snapshot için client silme davranışı belgelenir.
 
+Ad/şirket alanları Bölüm 11.6'daki 200 karakter sınırıyla API ve DB'de tutarlı doğrulanır.
+
 **Güvenlik ve Veri Notları:** Telefon/adres/vergi no eklenmez.
 
 **Kabul Kriterleri:**
@@ -2251,7 +2353,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Bağımlılıklar:** TASK-011.
 
-**Teknik Notlar:** Floating point yok; publish alanları controlled write olur.
+**Teknik Notlar:** Floating point yok; publish alanları controlled write olur. Bölüm 5.5'teki `publication_mode` parent'ta tutulur; alt tablolara plan/kilit kopyalanmaz. Bütün metin constraint'leri Bölüm 11.6'ya uyar.
 
 **Güvenlik ve Veri Notları:** Açık full token DB’de tutulmaz.
 
@@ -2260,6 +2362,8 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Bütün zorunlu alanlar modellenmiş.
 - [ ] Geçersiz currency/fiyat reddediliyor.
 - [ ] Section/item sırası kararlı.
+- [ ] Free'nin yayın kilidi parent/section/item doğrudan yazımıyla aşılamıyor.
+- [ ] Metinlerde N/N+1, Türkçe/emoji ve boş/null sınırları testli.
 - [ ] Migration testleri geçiyor.
 
 **Testler:**
@@ -2425,7 +2529,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Amaç:** UI, API ve DB durum çelişkisini önlemek.
 
-**Kapsam:** Draft, published, view, decision, expiry ve revoke geçişleri.
+**Kapsam:** Draft, published, view, decision, expiry, revoke ve Pro edit/republish geçişleri; Bölüm 5.5'teki ilk karar/içerik koruması.
 
 **Kapsam Dışı:** Kararsız gönderildi semantiği.
 
@@ -2441,6 +2545,8 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Yasak geçişler reddediliyor.
 - [ ] UTC expiry doğru.
 - [ ] UI ve server aynı sonucu gösteriyor.
+- [ ] Kabul/ret sonrası parent/section/item içeriği korunuyor; yeni koşullar yeni teklif gerektiriyor.
+- [ ] Eşzamanlı edit/yanıt yarışı, eski içeriğe verilmiş onayı yeni içeriğe uygulamıyor.
 
 **Testler:**
 
@@ -2503,7 +2609,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Bağımlılıklar:** TASK-018.
 
-**Teknik Notlar:** Decimal string ve belgeli yuvarlama kullanılır.
+**Teknik Notlar:** Decimal string ve Bölüm 11.1'deki önce kalemi 2 ondalığa yuvarla, sonra topla kuralı kullanılır; tam yarım yukarı yuvarlanır.
 
 **Güvenlik ve Veri Notları:** “Fatura yerine geçmez” gösterilir.
 
@@ -2511,6 +2617,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 - [ ] Toplam deterministik.
 - [ ] Floating point hatası yok.
+- [ ] `1.500 × 0.01` kalemi `0.02`; iki kalem toplamı `0.04`; numeric taşma güvenli hata veriyor.
 - [ ] Kalem sırası korunuyor.
 - [ ] Vergi etiketi doğru.
 
@@ -2690,6 +2797,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 **Kabul Kriterleri:**
 
 - [ ] Geçerli DTO dönüyor.
+- [ ] Free istekleri provider çağrısı/rezervasyon yapılmadan 403 ile reddediliyor.
 - [ ] Uzun/zararlı input provider’a gitmeden reddediliyor.
 - [ ] Invalid output sınırlı retry sonrası güvenli hata.
 - [ ] Secret/içerik loglanmıyor.
@@ -2762,7 +2870,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 **Kabul Kriterleri:**
 
 - [ ] Paralel istek kotayı aşmıyor.
-- [ ] Free/Pro server-side uygulanıyor.
+- [ ] Free için AI tamamen kapalı; Pro için tanımlanmış kota server-side uygulanıyor.
 - [ ] Provider hatasında form çalışıyor.
 - [ ] Double charge oluşmuyor.
 
@@ -2785,7 +2893,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Amaç:** Güvenli paylaşım yaşam döngüsü.
 
-**Kapsam:** Publish validation, selector/HMAC, re-copy, rotate, revoke ve expiry.
+**Kapsam:** Publish validation, selector/HMAC, re-copy, rotate, revoke, expiry ve Pro/pending yeniden yayınlama; Bölüm 5.5.
 
 **Kapsam Dışı:** Otomatik e-posta/WhatsApp.
 
@@ -2801,6 +2909,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Re-copy aynı linki üretiyor.
 - [ ] Rotate eski linki geçersiz kılıyor.
 - [ ] Revoked/expired işlem almıyor.
+- [ ] Free yeniden yayınlayamıyor; Pro/pending yeniden yayınlama yeni link oluşturuyor, eski link/nonce geçersiz ve geçmiş korunmuş kalıyor.
 
 **Testler:**
 
@@ -2909,6 +3018,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] Aynı tekrar idempotent.
 - [ ] Karşıt karar 409.
 - [ ] Eşzamanlı yarış tek sonuç veriyor.
+- [ ] Eski içerik sürümüne yanıt 409 veriyor; karar sonrası hiçbir planda içerik/karar değişmiyor.
 
 **Testler:**
 
@@ -2945,6 +3055,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 - [ ] XSS/uzun/spam payload reddediliyor.
 - [ ] Başka owner mesajı göremiyor.
 - [ ] Mesaj karar durumunu değiştirmiyor.
+- [ ] 4.000 karakter kabul, 4.001 karakter red; Türkçe/emoji sayımı UI/API/DB'de eşleşiyor.
 
 **Testler:**
 
@@ -3181,7 +3292,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Amaç:** Free/Pro hakları için tek server kaynağı oluşturmak.
 
-**Kapsam:** Teklif, AI, view history, çoğaltma ve branding hakları.
+**Kapsam:** Teklif, AI, yayın sonrası edit/republish, view history, çoğaltma ve branding hakları.
 
 **Kapsam Dışı:** Client-side yetki.
 
@@ -3195,6 +3306,8 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 - [ ] Tek entitlement matrisi var.
 - [ ] Teklif kota yarışı güvenli.
+- [ ] Free en fazla 3 eşzamanlı aktif yayına sahip; taslak ve kapanmış kayıtlar sayılmıyor, aylık reset yok.
+- [ ] Free AI/edit-published/republish erişimi sunucuda kapalı; Pro terminal içerik korumasını aşamıyor.
 - [ ] AI/history server-side sınırlandırılıyor.
 - [ ] Plan düşüşü deterministik.
 
@@ -3217,7 +3330,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Amaç:** Yalnız çalışan özellikleri satmak.
 
-**Kapsam:** Free/Pro, 149/249, yıllık/kurucu, kota ve upgrade/manage.
+**Kapsam:** Free/Pro, production'a yakın kararlaştırılacak ücret ve tahsilat para birimi, yıllık/kurucu koşulları, kota ve upgrade/manage.
 
 **Kapsam Dışı:** PDF ve özel şablonu aktif göstermek.
 
@@ -3738,7 +3851,7 @@ Kaynakta eşik verilmeyen rakamlar önerilen başlangıç deney eşiğidir; kan�
 | 3. AI teklif metni süreci hızlandırır | Benzer işte manuel/AI karşılaştırması | Medyan süre, kalite ve düzenleme | En az %30 süre azalması; kalite düşmez | Süre değişmez veya ağır düzeltme | Prompt/UI düzelt; yine olmazsa azalt |
 | 4. Kullanıcılar teklifleri gerçek müşterilere gönderir | Gerçek publish, human-view ve isteğe bağlı kullanım sonrası doğrulama | Doğrulanmış gönderim | En az 20 kullanıcıda gerçek gönderim | Demo/sahte veya çok düşük görüntüleme | Güven/sürtünme deneyi; gerekirse dur |
 | 5. Kullanıcılar ikinci ve üçüncü teklif için döner | 30/60 günlük müdahalesiz kohort | İkinci ve üçüncü teklif oranı | %30 ikinci, %20 üçüncü | İkinci <%15 veya yalnız reminder | Retention kök nedeni |
-| 6. Kullanıcılar profesyonel teklif akışı için ödeme yapar | 149/249, yıllık/kurucu ve çalışan checkout | Dönüşüm, gerçek ödeme, ikinci ay | %5, 10 ödeme ve ikinci ay devam | <%2, fake click veya yüksek churn | Fiyat/segment/paket yeniden |
+| 6. Kullanıcılar profesyonel teklif akışı için ödeme yapar | Production'a yakın seçilecek fiyatlar, yıllık/kurucu koşulları ve çalışan checkout | Dönüşüm, gerçek ödeme, ikinci ay | %5, 10 ödeme ve ikinci ay devam | <%2, fake click veya yüksek churn | Fiyat/segment/paket yeniden |
 | 7. TL ve yerel metinler Türkiye’de avantaj sağlar | Yerel ve nötr değer önerisi testi | Aktivasyon ve nitel tercih | Başlangıç: ≥%15 göreli artış veya güçlü tercih | Anlamlı fark yok | Yerellik iddiasını/pazarı yeniden değerlendir |
 | 8. Şeffaf KVKK takip güven sorunu oluşturmaz | Bildirim anlama ve terk/şikâyet takibi | Anlama, terk ve şikâyet | Başlangıç: ≥%80 doğru anlama, <%5 takip kaynaklı terk/şikâyet | Gizli takip algısı | Bildirimi sadeleştir, opt-in/hukuk incele |
 
@@ -3770,9 +3883,21 @@ Kaynakta eşik verilmeyen rakamlar önerilen başlangıç deney eşiğidir; kan�
 | Tek geliştirici scope yükü | Yüksek | Yüksek | Task sürüklenmesi | Küçük görev ve no-scope | Rollout ve provider sayısını azalt | Tüm fazlar |
 | Performans/a11y gecikmesi | Orta | Orta | LCP veya a11y fail | Bütçe ve CI | Release’i blokla, düzelt | 1F–1K |
 
-## 34. Açık Sorular ve Karar Bekleyen Konular
+## 34. Ürün Kararları ve Açık Sorular
 
-Aşağıdaki “öneri”ler başlangıç önerisidir, kesin ürün kararı değildir.
+### 34.1 Kesinleşen kararlar — 2026-09-23
+
+- Free: Eşzamanlı en fazla 3 aktif teklif. Yalnız yayınlanmış, süresi dolmamış, iptal edilmemiş ve kabul/ret almamış kayıtlar sayılır. Taslaklar sayılmaz; aylık reset yoktur.
+- Free'de AI yoktur; hem teklif üretimi hem takip mesajı Pro'ya özeldir. Pro teklif limiti ve AI kotası henüz belirlenmedi.
+- Taslaklar her iki planda düzenlenebilir. Yayın sonrası Free içerik kilitlidir; Pro yanıt bekleyen kayıtta kilitleme/canlı düzenleme/yeniden yayınlama yapabilir. Ayrıntılı teknik sözleşme Bölüm 5.5'tedir.
+- İlk kabul/ret değişmez; yanıtlanan teklif ve alt içerikleri her iki planda korunur. Yeni koşullar için yeni teklif gerekir. Böylece Bölüm 5.8, 5.10 ve 11.3 ile eski açık soru arasındaki çelişki giderilmiştir.
+- Abonelik fiyatı ve tahsilat para birimi MVP production'a yakın belirlenecek. Tekliflerde TRY/USD/EUR desteği korunacak; test tutarları abonelik fiyatı sayılmayacak.
+- Fiyat hesabında önce her kalem 2 ondalığa, tam yarımda yukarı yuvarlanacak; genel toplam bu kalemlerin toplamı olacak (Bölüm 11.1).
+- Metin üst sınırları Bölüm 11.6'da tanımlandı. Kurgusal fixture değerleri ürün varsayılanı veya gerçek müşteri verisi değildir; bozuk demo mock'ları kullanılmayacak.
+
+### 34.2 Karar bekleyen konular
+
+Aşağıdaki “öneri”ler başlangıç önerisidir, kesin ürün kararı değildir. Üstte kesinleşen kararları yeniden açık hale getirmez.
 
 | Konu | Seçenekler | Avantajlar | Riskler | Önerilen başlangıç kararı | Yeniden değerlendirme |
 |---|---|---|---|---|---|
@@ -3785,12 +3910,11 @@ Aşağıdaki “öneri”ler başlangıç önerisidir, kesin ürün kararı değ
 | IP işleme | Hiç yok, minimize/HMAC veya kısa raw | Abuse/dedupe doğruluğu | KVKK ve profiling riski | Ham IP saklama yok; ihtiyaçta profesyonel incelemeli HMAC | Tracking implementasyonu ve hukuk review |
 | Yaklaşık benzersiz görüntüleme | Session ID, IP+UA HMAC, time bucket veya hiç | Dedupe değeri | Yanlış kişi iddiası | Ayrı unique göstermeme; yalnız dedupe edilmiş toplam | Production veri kalitesi |
 | Müşteri kabul/ret kimlik doğrulaması | Token, e-posta OTP veya PIN | Daha güçlü kimlik kanıtı | Müşteri sürtünmesi ve e-posta kapsamı | Hesap yok; token+nonce+onay adayı | Public prototype ve gerçek yanıtlar |
-| Yanıt değiştirilebilir mi? | İlk terminal, değişebilir veya owner reset | Esneklik | Çelişki ve hukuki belirsizlik | İlk terminal ve idempotent adayı | İlk gerçek yanıtlar |
-| Yayın sonrası düzenleme | Kilit, canlı edit veya revoke/re-publish | Kilit sürüm belirsizliğini azaltır | Kullanıcı sürtünmesi | Versiyonlama yokken kilit/revoke-copy adayı | 1C öncesi ve Faz 2 |
-| Müşteriye hangi sürüm gösterilir? | Latest, snapshot veya yeni token | Latest basit; snapshot güvenilir | Sessiz içerik değişimi | Yayın kilidi seçilirse ilk yayın içeriği | Publish politikası kararı |
 | Hazır Pro özellikleri | Sınırsız teklif, çoğaltma, history, branding vb. | Gelir testi | Çalışmayan özelliği satma | Yalnız release checklist’i geçen entitlement | Her release |
-| Ücretsiz “aktif teklif” tanımı | Tüm açık, yalnız yayınlanan veya aylık yayın sayısı | Farklı gelir/UX dengeleri | Kullanıcı şaşkınlığı ve kota abuse | Yayınlanmış, süresi geçmemiş, iptal/terminal olmayan aday | Fiyat testi ve support |
-| AI kota birimi | Başarılı üretim, token, karakter veya kredi | Kullanıcı anlaşılabilirliği/maliyet doğruluğu | Karmaşıklık | UI’da üretim kredisi; içeride token/maliyet tavanı | AI implementasyonu ve aylık maliyet |
+| Pro aktif teklif sınırı | Sayısal limit veya açıklanmış adil kullanım | Maliyet/gelir dengesi | Belirsiz sınırsız vaadi | Rakam henüz seçilmedi; Free 3 kararı sabit | Entitlement uygulaması öncesi |
+| Pro AI kota miktarı ve birimi | Başarılı üretim, token, karakter veya kredi | Kullanıcı anlaşılabilirliği/maliyet doğruluğu | Karmaşıklık | Pro için miktar/birim seçilecek; Free AI kapalı | AI implementasyonu ve aylık maliyet |
+| Abonelik fiyatı ve tahsilat para birimi | Pazar ve maliyet verisine göre | Gerçek maliyetle fiyatlama | Erken fiyat sabitleme | MVP production'a yakın seçilecek; 149/249 örnekleri bağlayıcı değil | Gerçek checkout öncesi |
+| Revizyon/geçerlilik/vergi varsayılanları | Kullanıcı seçimi veya açık başlangıç değeri | Form kolaylığı | Kullanıcı adına koşul belirleme | Şimdilik otomatik varsayılan yok; fixture ürün kuralı değildir | Teklif formu uygulanırken |
 | Hesap silme sonrası saklama | Hemen aktif silme + backup TTL veya hukuki minimum | Veri minimizasyonu | Provider backup sınırı | Aktif sistemden hemen; en kısa belgeli backup TTL | Production ve provider değişimi |
 | İlk pazar yalnız Türkiye mi? | Türkiye, TR-first-global veya global | Odak ya da pazar büyüklüğü | Fazla dar/geniş kapsam | Türkiye öncelikli iki persona; global vaat yok | İlk 100 kullanıcı |
 | İngilizce teklif desteği MVP’de mi? | Yalnız Türkçe, çift dil veya serbest içerik | Daha geniş kullanım | Prompt/UI/test kapsamı | Karar bekliyor; kanıt yoksa Türkçe UI, manuel serbest metin | Görüşme ve prototip |
@@ -3809,7 +3933,7 @@ Aşağıdaki “öneri”ler başlangıç önerisidir, kesin ürün kararı değ
 
 ## 35. Nihai MVP Tanımı
 
-MVP; freelance yazılım geliştirici ve freelance UI/UX veya web tasarımcısının e-posta hesabıyla giriş yapıp profil ve marka bilgilerini belirlediği, bütün zorunlu kapsam-fiyat-koşul alanlarıyla manuel ya da tamamen düzenlenebilir ve kullanıcı onayı gerektiren AI taslağıyla teklif oluşturduğu, tahmin edilmesi zor ve iptal edilebilir bağlantıyı kendi iletişim kanalından paylaştığı, müşterinin hesap açmadan responsive ve noindex sayfada teklifi görüntüleyip kabul, ret veya mesaj bıraktığı, teklif sahibinin yaklaşık ilk/son/toplam görüntülenme ve durumları gördüğü ve yalnız düzenleyip kopyalayabildiği AI takip mesajı ürettiği güvenli web ürünüdür. Ürün CRM, fatura, proje yönetimi veya otomatik iletişim platformu değildir.
+MVP; freelance yazılım geliştirici ve freelance UI/UX veya web tasarımcısının e-posta hesabıyla giriş yapıp profil ve marka bilgilerini belirlediği, bütün zorunlu kapsam-fiyat-koşul alanlarıyla manuel veya Pro'da düzenlenebilir ve kullanıcı onayı gerektiren AI taslağıyla teklif oluşturduğu, tahmin edilmesi zor ve iptal edilebilir bağlantıyı kendi iletişim kanalından paylaştığı, müşterinin hesap açmadan responsive ve noindex sayfada teklifi görüntüleyip kabul, ret veya mesaj bıraktığı, teklif sahibinin yaklaşık ilk/son/toplam görüntülenme ve durumları gördüğü ve Pro'da yalnız düzenleyip kopyalayabildiği AI takip mesajı ürettiği güvenli web ürünüdür. Free eşzamanlı 3 aktif teklifle ve AI olmadan çalışır; yayın sonrası yetkiler Bölüm 5.5'e uyar. Ürün CRM, fatura, proje yönetimi veya otomatik iletişim platformu değildir.
 
 ### MVP’de bulunanlar
 
@@ -3820,13 +3944,13 @@ MVP; freelance yazılım geliştirici ve freelance UI/UX veya web tasarımcısı
 - Güvenli numeric fiyat ve vergi etiketi
 - “Fatura yerine geçmez” uyarısı
 - Taslak, düzenleme, çoğaltma, önizleme, yayınlama ve iptal
-- Server-side AI, yedi düzenlenebilir alan, açık apply, kota ve fallback
+- Pro'ya özel server-side AI, yedi düzenlenebilir alan, açık apply, kota ve fallback
 - Selector/HMAC tabanlı public token ve minimum DTO
 - Responsive/noindex müşteri sayfası
 - Hesapsız kabul, ret ve mesaj
 - Yaklaşık görüntülenme, bot/dedupe/minimizasyon ve şeffaflık
 - Sayfalanmış teklif listesi, filtre ve detay
-- Beş senaryo ve dört tonlu, yalnız kopyalanabilir takip mesajı
+- Pro'ya özel beş senaryo ve dört tonlu, yalnız kopyalanabilir AI takip mesajı
 - Yalnız çalışan Free/Pro entitlement’ları
 - Hosted ödeme, imzalı webhook ve kart verisi saklamama
 - RLS, dosya güvenliği, veri silme, hukuk sayfaları, analitik, observability, a11y ve deployment

@@ -386,7 +386,7 @@ export function LandingPage() {
           <div><strong>Şeffaflık</strong><a href="#guven">Gizlilik ve kapsam</a><a href="#aydinlatma">Aydınlatma özeti</a><a href="#waitlist">Form demosu</a></div>
           <div><strong>İletişim</strong><p>Kalıcı bekleme listesi ve iletişim kanalı henüz aktif değildir.</p></div>
         </div>
-        <div className="lp-container lp-footer__bottom">© 2026 kapsam. Tüm hakları saklıdır.</div>
+        <div className="lp-container lp-footer__bottom">© 2026 <BrandMark /> by cagankerg </div>
       </footer>
     </div>
   );
