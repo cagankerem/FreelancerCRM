@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-26
+Son güncelleme: 2026-09-28
 
 ## Takip Sistemi
 
@@ -40,10 +40,14 @@ Son güncelleme: 2026-09-26
   - 2026-09-26: Yalnız boşluğu kontrol edilen local DB'ye iki kurgusal Auth kullanıcısı/profil/müşteri/taslak içeren seed uygulandı; seeding açıldı, gizli local uygulama env dosyası üretildi ve her iki seed hesabının girişi doğrulandı. Eski gelişme satırları tarihsel kayıt olarak korunuyor.
   - 2026-09-26: Görev sırasına dönülerek typed public env doğrulaması, browser client ve korumalı rota proxy'sinde eksik env için fail-fast eklendi; 5 env testi, lint ve typecheck geçti. Uzak ortamların gerçek izolasyonu ve otomatik secret taraması doğrulanmadığı için görev kısmi.
   - 2026-09-28: Kullanıcı kararıyla preview, staging ve production Supabase projeleri yayına çıkış aşamasına ertelendi; yerel ortam ve ayrım kuralları hazırlanacak. Gerçek uzak ortam izolasyonu doğrulanmadığından TASK-003 kısmi kalır; otomatik secret taraması da açıktır.
+  - 2026-09-28: Sabit Gitleaks 8.30.1 ile `secrets:self-test` geçici sentetik anahtarı yakaladı; `secrets:scan` 247 depo dosyasını ve Git geçmişini bulgusuz taradı. Uzak ortam izolasyonu ertelendiğinden görev kısmi kalır.
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
   - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.
   - 2026-09-26: `test:db`, `db:check-empty`, `db:migrate`, `db:migrations` ve `db:advisors` local komutları eklendi; DB testleri mevcut verileri hedeflemiyor, CI bağlantısı henüz yok.
+  - 2026-09-28: Kullanıcı TASK-003'ün bulut ortamı izolasyonu ertelendiği için kısmi kalmasına rağmen TASK-004'e geçiş istisnasını onayladı. İlk CI işi TASK-003'te açık otomatik secret taramasını da doğrulayacak; TASK-005'e geçiş izni verilmedi.
+  - 2026-09-28: PR için salt-okunur, SHA ile sabitlenmiş action'lı `secret-scan` workflow'u eklendi; yerel self-test ve çalışma ağacı/geçmiş taraması geçti. Gerçek PR sonucu ve GitHub Pro gerekli status check/merge engeli henüz doğrulanmadı.
+  - 2026-09-28: PR #2'de `secret-scan` geçti; yalnız sentetik anahtar içeren geçici PR #3'te aynı check başarısız oldu. Test PR'ı kapatılıp dalı silindi, yerel tarama yeniden temiz geçti. GitHub Pro henüz etkin olmadığından required check ve fiili merge engeli doğrulanmadı.
 - [ ] TASK-005: Correlation ID ve güvenli logger kur
 
 ## Faz 1B: Auth ve Profil
