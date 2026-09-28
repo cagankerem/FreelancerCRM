@@ -71,6 +71,24 @@ npm run lint
 npm run typecheck
 ~~~
 
+Secret taraması için Gitleaks `8.30.1` kurulu olmalıdır. Aynı tarayıcı ve
+varsayılan kurallarla önce geçici, kullanılmayan sentetik anahtar self-test'i,
+ardından Git'e girebilecek mevcut dosyalar ve tüm yerel Git geçmişi taranır:
+
+~~~bash
+npm run secrets:self-test
+npm run secrets:scan
+~~~
+
+PR'da `secret-scan` kontrolü aynı sırayı çalıştırır. Workflow yalnız okuma
+izniyle çalışır; production anahtarı, PR yorumu veya bulgu artefaktı kullanmaz.
+Bulgu çıktısı anahtar değerini içermez, yalnız dosya/satır/kuralı gösterir;
+ham tarama raporları geçici dizinde tutulup silinir. İstisnalar gerekirse
+yalnız doğrulanmış sahte pozitife dar kapsamda eklenir; `.env` dosyaları için
+genel istisna yoktur. Git'in yok saydığı kişisel dosyalar PR kapsamına girmez.
+GitHub'da bu kontrolün birleşmeyi engellemesi için ayrıca `secret-scan` job'ını
+gerekli status check yapmak gerekir.
+
 TASK-001 temelinin temiz kurulumdan development ve production smoke testlerine
 kadar tam kabul kontrolü:
 
