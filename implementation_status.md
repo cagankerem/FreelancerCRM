@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-23
+Son güncelleme: 2026-09-26
 
 ## Takip Sistemi
 
@@ -36,28 +36,46 @@ Son güncelleme: 2026-09-23
   - 2026-09-15: Local config'te explicit Data API grant, HTTP Auth callback/reset allowlist, en az 8 karakter + harf/rakam politikası uygulandı; S3/vector/pgdelta ve seed oluşturulana kadar seeding kapatıldı. Parola negatif testleri ve onaylı local reset sonrası tablo izin testi geçti; localhost Docker ağına rağmen host port bağları tüm arayüzlerde kaldığından başlatma kontrolü servisleri verileri korunarak durdurdu. Ağ sorunu açık; seed.sql sonraki adım.
   - 2026-09-15: Docker Desktop'ın ağ varsayılanını uygulamaması, yalnız projeye ait Supabase alt süreçlerinde açık 127.0.0.1 port bağı kullanan adaptörle çözüldü; başlatma, tekrar başlatma ve onaylı boş local reset sonrası beş yayınlanan port localhost olarak doğrulandı, otomatik tablo izinleri kapalı kaldı ve 5 adaptör testi geçti. Seed.sql henüz oluşturulmadı; sonraki adım.
   - 2026-09-23: Migration/seed öncesi ürün kararları plan.md'ye işlendi: Free eşzamanlı 3 aktif teklif ve AI kapalı; Pro yayın sonrası yetkiler; değişmez kabul/ret ve yanıtlanan içerik; alan bazlı metin sınırları ve önce kalem yuvarlama. Abonelik fiyatı ertelendi, teklif TRY/USD/EUR desteği korundu; bu adımda migration/seed veya veri silme yapılmadı.
+  - 2026-09-26: CLI ile oluşturulan 3 migration ve 8 iş tablosu, her reset öncesi boşluğu doğrulanan local DB'de baştan uygulandı; 82 SQL ve 9 eşzamanlılık/yaşam döngüsü testi, security advisor ve tip üretimi geçti. Seed henüz yok; seeding kapalı, ortam/client entegrasyonu tamamlanmış sayılmıyor.
+  - 2026-09-26: Yalnız boşluğu kontrol edilen local DB'ye iki kurgusal Auth kullanıcısı/profil/müşteri/taslak içeren seed uygulandı; seeding açıldı, gizli local uygulama env dosyası üretildi ve her iki seed hesabının girişi doğrulandı. Eski gelişme satırları tarihsel kayıt olarak korunuyor.
+  - 2026-09-26: Görev sırasına dönülerek typed public env doğrulaması, browser client ve korumalı rota proxy'sinde eksik env için fail-fast eklendi; 5 env testi, lint ve typecheck geçti. Uzak ortamların gerçek izolasyonu ve otomatik secret taraması doğrulanmadığı için görev kısmi.
+  - 2026-09-28: Kullanıcı kararıyla preview, staging ve production Supabase projeleri yayına çıkış aşamasına ertelendi; yerel ortam ve ayrım kuralları hazırlanacak. Gerçek uzak ortam izolasyonu doğrulanmadığından TASK-003 kısmi kalır; otomatik secret taraması da açıktır.
 - [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
   - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.
+  - 2026-09-26: `test:db`, `db:check-empty`, `db:migrate`, `db:migrations` ve `db:advisors` local komutları eklendi; DB testleri mevcut verileri hedeflemiyor, CI bağlantısı henüz yok.
 - [ ] TASK-005: Correlation ID ve güvenli logger kur
 
 ## Faz 1B: Auth ve Profil
 
-- [ ] TASK-006: Kayıt, giriş ve çıkış akışlarını geliştir
-- [ ] TASK-007: Şifre sıfırlama, session ve korumalı rotaları geliştir
-- [ ] TASK-008: Profil şeması ve RLS migration’ını oluştur
-- [ ] TASK-009: Onboarding ve profil/marka UI’sini geliştir
+- [ ] TASK-006: Kayıt, giriş ve çıkış akışlarını geliştir — Kısmi
+  - 2026-09-26: SSR Auth kayıt/giriş/çıkış formları ve callback eklendi; seed girişleri ve sıfırdan kayıt tarayıcıda geçti. Çıkış ve güvenlik E2E matrisi henüz tamamlanmadı.
+- [ ] TASK-007: Şifre sıfırlama, session ve korumalı rotaları geliştir — Kısmi
+  - 2026-09-26: Next.js proxy ile cookie yenileme ve doğrulanmış claims altında app/onboarding guard eklendi; parola sıfırlama ve expiry/reuse testleri henüz yok.
+- [x] TASK-008: Profil şeması ve RLS migration’ını oluştur
+  - 2026-09-26: Profil şeması, Auth FK, alan/Unicode sınırları, owner RLS ve kolon izinleri oluşturuldu; SQL insert/read/update ve cross-user/anon negatifleri, temiz migration, lint ve typecheck doğrulandı; şema belgelendi. Auth ekranları bu işin dışında.
+- [ ] TASK-009: Onboarding ve profil/marka UI’sini geliştir — Kısmi
+  - 2026-09-26: Ad, meslek ve TRY/USD/EUR seçimiyle gerçek DB'ye profil kaydı tarayıcıda geçti; marka/logo ayarları henüz yok.
 - [ ] TASK-010: Güvenli logo yüklemeyi geliştir
 
 ## Faz 1C: Teklif Veri Modeli
 
-- [ ] TASK-011: Clients migration ve RLS oluştur
-- [ ] TASK-012: Proposal, section ve item migration’larını oluştur
-- [ ] TASK-013: View, response, AI, subscription ve log migration’larını oluştur
-- [ ] TASK-014: Tam RLS matrisi ve testlerini uygula
-- [ ] TASK-015: Minimum müşteri oluşturma/seçme işlemlerini geliştir
-- [ ] TASK-016: Teklif taslak CRUD işlemlerini geliştir
-- [ ] TASK-017: Teklif durum makinesini uygula
+- [x] TASK-011: Clients migration ve RLS oluştur
+  - 2026-09-26: Minimum müşteri şeması, owner CRUD/RLS, metin sınırları ve indexler tamamlandı; duplicate ad kabulü, kullanıcı izolasyonu ve müşteri silindiğinde teklif snapshot'ının korunması test edildi; şema belgelendi.
+- [x] TASK-012: Proposal, section ve item migration’larını oluştur
+  - 2026-09-26: Üç içerik tablosu, numeric kalem/toplam hesabı, currency/metin sınırları, kontrollü yayın alanları ve Free/Pro içerik koruması tamamlandı; temiz migration ve sınır/izolasyon testleri geçti; şema belgelendi.
+- [ ] TASK-013: View, response, AI, subscription ve log migration’larını oluştur — Kısmi
+  - 2026-09-26: View/response ve minimum subscription modeli eklendi; değişmez ilk karar, idempotency ve görüntülenme dedupe testleri geçti. AI, usage counter, activity log, webhook ve tam faturalama modeli henüz yok; Pro kota/fiyatı varsayılmadı.
+- [ ] TASK-014: Tam RLS matrisi ve testlerini uygula — Kısmi
+  - 2026-09-26: Mevcut 8 iş tablosunda RLS, dar kolon/RPC izinleri ve iki kullanıcı izolasyonu doğrulandı; security advisor temiz. Gelecekteki AI/webhook/log tablolarının aktör matrisi kapsam dışı kaldı.
+- [ ] TASK-015: Minimum müşteri oluşturma/seçme işlemlerini geliştir — Kısmi
+  - 2026-09-26: Auth altında minimal müşteri oluşturma/listesi ve teklif formunda seçim tarayıcıda geçti; çoklu teklif/negatif UI matrisi ve API belgesi tamamlanmadı.
+- [ ] TASK-016: Teklif taslak CRUD işlemlerini geliştir — Kısmi
+  - 2026-09-26: Atomik DB kayıt/güncelleme ve taslak silme fonksiyonları, owner kontrolü ve optimistic version eklendi; HTTP/server action ve uygulama bağlantısı henüz yok.
+  - 2026-09-26: Taslak oluşturma action'ı, owner listesi/detayı ve kalem toplamı gerçek tarayıcıda doğrulandı; düzenleme/silme arayüzü henüz yok.
+- [ ] TASK-017: Teklif durum makinesini uygula — Kısmi
+  - 2026-09-26: DB seviyesinde yayın/iptal, Pro kilit/canlı/yeniden yayın, değişmez yanıt ve Free eşzamanlı kota yarışları test edildi; uygulama servisleri ve public güvenlik katmanı henüz yok.
+  - 2026-09-26: Free sahibi için tarih seçimiyle server-side yayınlama ve HMAC paylaşım bağlantısı tarayıcıdan çalıştı; Pro sayısal kota hâlâ belirsiz olduğundan Pro yayını fail-closed.
 
 ## Faz 1D: Teklif Oluşturucu
 
@@ -76,9 +94,12 @@ Son güncelleme: 2026-09-23
 
 ## Faz 1F: Public Teklif Sayfası
 
-- [ ] TASK-027: Yayınlama, token, iptal ve expiry işlemlerini geliştir
-- [ ] TASK-028: Public teklif resolver’ı geliştir
-- [ ] TASK-029: Responsive public teklif sayfasını geliştir
+- [ ] TASK-027: Yayınlama, token, iptal ve expiry işlemlerini geliştir — Kısmi
+  - 2026-09-26: Free yayınlama action'ı, sürümlü HMAC verifier ve hash doğrulaması eklendi; iptal/rotasyon UI ve Pro kota kararı bekliyor.
+- [ ] TASK-028: Public teklif resolver’ı geliştir — Kısmi
+  - 2026-09-26: Selector + constant-time verifier denetimli read-only API, minimum DTO ve invalid/tamper 404 kontrolü geçti; rate limit ve diğer public mutation katmanı tamamlanmadı.
+- [ ] TASK-029: Responsive public teklif sayfasını geliştir — Kısmi
+  - 2026-09-26: Server render belge, toplam, vergi/fatura uyarısı ve noindex/no-referrer eklendi; responsive/a11y ve kabul/ret UI doğrulaması bekliyor.
 - [ ] TASK-030: Kabul ve ret işlemlerini geliştir
 - [ ] TASK-031: Public müşteri mesajını geliştir
 
@@ -109,7 +130,9 @@ Son güncelleme: 2026-09-23
 
 - [ ] TASK-043: Hukuki sayfaları ve takip/fatura bildirimlerini hazırla
 - [ ] TASK-044: Analitik pipeline ve event sözlüğünü geliştir
-- [ ] TASK-045: Hesap ve veri silmeyi geliştir
+- [ ] TASK-045: Hesap ve veri silmeyi geliştir — Kısmi
+  - 2026-09-26: Auth Admin API ile yalnız smoke hesabı silinirken private trigger'ın proposals erişim izni hatası görüldü; geniş yetki değişiklikleri otomatik güvenlik incelemesinde reddedildi. Dar çözüm için kullanıcı onayı bekleniyor; test hesabı duruyor.
+  - 2026-09-26: Kullanıcı onayıyla yalnız `private.guard_child` trigger'ı sahibi bağlamına alındı; Auth FK silme sırasında gereksiz kalem toplamı güncellemesi gerçek `current_user` kontrolüyle atlandı. Önceki smoke hesabı ve yeni test hesabı Auth Admin API ile silindi, bağlı kayıt kalmadı; tam ürün silme/saga akışı henüz yok.
 - [ ] TASK-046: Rate limit ve güvenlik sertleştirmesini tamamla
 - [ ] TASK-047: Hata sağlayıcısı, health, metric ve alarmları kur
 - [ ] TASK-048: Performans ve erişilebilirliği tamamla

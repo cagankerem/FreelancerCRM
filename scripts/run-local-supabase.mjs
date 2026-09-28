@@ -6,10 +6,13 @@ import { localDockerEnvironment, networkName } from "./lib/local-docker.mjs";
 const commands = {
   reset: ["db", "reset", "--local"],
   types: ["gen", "types", "typescript", "--local", "--schema", "public"],
+  migrate: ["migration", "up", "--local"],
+  migrations: ["migration", "list", "--local"],
+  advisors: ["db", "advisors", "--local", "--type", "security", "--fail-on", "warn"],
 };
 try {
   const [command, ...extra] = process.argv.slice(2);
-  assert.ok(Object.hasOwn(commands, command), "Expected reset or types.");
+  assert.ok(Object.hasOwn(commands, command), "Unknown local database command.");
   assert.ok(extra.length === 0 || (extra.length === 1 && extra[0] === "--help"), "Local commands accept only --help.");
   const directory = fileURLToPath(new URL("../", import.meta.url));
   const cli = fileURLToPath(new URL("../apps/web/node_modules/supabase/dist/supabase.js", import.meta.url));

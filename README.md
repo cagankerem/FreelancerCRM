@@ -129,15 +129,34 @@ yerine kök komutlarını kullanın.
 
 `db:reset` **yerel verileri silip veritabanını yeniden kurar**; `db:types` ise
 TypeScript veritabanı tiplerini standart çıktıya üretir. İkisi de aynı proje ağı
-ve adaptörünü kullanır; uzak veritabanı seçenekleri kabul edilmez. `seed.sql`
-henüz oluşturulmadığından seeding kapalıdır. `db:status` çıktısını paylaşırken
+ve adaptörünü kullanır; uzak veritabanı seçenekleri kabul edilmez. Yerel
+`seed.sql` yalnız kurgusal test kayıtları içerir. `db:status` çıktısını paylaşırken
 anahtarları gizleyin.
+
+`npm run db:setup-app-env`, yalnız yerel Supabase çalışırken
+`apps/web/.env.local` dosyasını oluşturur; var olan dosyayı değiştirmez.
+`NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` tarayıcıda
+görünür. `SUPABASE_SERVICE_ROLE_KEY` ve `SHARE_HMAC_KEY_V1` yalnız sunucuda
+kalmalıdır. Browser/server client'ları eksik veya geçersiz public env değerinde
+hata verir; korumalı rotaların proxy'si env eksikken sessizce geçiş yapmaz.
+Yerel ortam dışında HTTP Supabase URL kabul edilmez.
+
+Preview, staging ve production için ayrı Supabase projeleri ve ayrı deployment
+env değerleri kullanılmalıdır; `.env.local` bu ortamlara kopyalanmamalıdır.
+2026-09-28 kararıyla bulut projelerinin kurulması yayına çıkış aşamasına
+ertelendi. Bu nedenle TASK-003'ün gerçek ortam izolasyonu kabul kriteri kısmi
+kalır. Uzak projeler henüz oluşturulmadı veya bu depoya bağlanmadı. Her ortam için
+public URL/key ve sunucu secret'ları dağıtım platformunun gizli ortam
+ayarlarında tutulmalı; production verisi test/preview ortamına taşınmamalıdır.
 
 Adaptör testleri: `npm run test:local-db-tools`. Adaptör, CLI `2.116.0` komut
 biçimi için testlidir; CLI yükseltilirken testler ve gerçek port bağları tekrar
 kontrol edilmelidir. Desteklenmeyen Docker seçenekleri sessizce geçirilmez.
 
 ## Mimari
+
+Yerel şema, migration sırası, dar yetkili DB işlemleri ve test komutları:
+[Supabase veritabanı temeli](./supabase/README.md).
 
 Uygulama dizinleri, Server/Client Component sınırı, secret import kuralları,
 `/demo` ile gelecekteki gerçek `/app` ayrımı ve TASK-003 Supabase yerleşimi

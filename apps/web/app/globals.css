@@ -4,6 +4,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.product-shell { max-width: 1120px; margin: 0 auto; padding: 2rem 1rem 5rem; color: var(--on-surface); }
+.product-narrow { max-width: 620px; }
+.product-shell h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 750; margin: 1.25rem 0 .6rem; }
+.product-shell h2 { font-size: 1.25rem; font-weight: 700; margin: 1.6rem 0 .7rem; }
+.product-shell p { margin: .5rem 0 1rem; }
+.product-shell a { color: var(--primary); text-decoration: underline; text-underline-offset: .2em; }
+.product-header { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; padding-bottom: 1.25rem; border-bottom: 1px solid var(--outline); }
+.product-header nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+.product-header .product-logo { font-size: 1.4rem; font-weight: 800; text-decoration: none; }
+.product-form { display: grid; gap: 1rem; margin: 1.5rem 0 2rem; }
+.product-form label { display: grid; gap: .4rem; font-weight: 650; }
+.product-form label small { font-weight: 400; }
+.product-form input, .product-form select { width: 100%; min-height: 3rem; padding: .6rem .75rem; border: 1px solid var(--control-outline); border-radius: .75rem; background: var(--surface); color: var(--on-surface); }
+.product-form button, .product-header button { min-height: 3rem; padding: .6rem 1rem; border-radius: .75rem; background: var(--primary); color: var(--on-primary); font-weight: 700; cursor: pointer; }
+.product-form :focus-visible, .product-header :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 1rem; }
+.product-grid article, .product-list li { padding: 1rem; border: 1px solid var(--outline); border-radius: .9rem; background: var(--surface); }
+.product-list { display: grid; gap: .7rem; margin: 1rem 0; padding: 0; list-style: none; }
+.product-list li span { display: block; color: var(--on-surface-muted); }
+.product-shell [role="alert"] { padding: .8rem 1rem; border: 1px solid var(--danger); border-radius: .75rem; color: var(--danger); }
+
 :root {
   color-scheme: light;
 

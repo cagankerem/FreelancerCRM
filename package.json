@@ -22,6 +22,13 @@
     "db:stop": "npm exec --prefix apps/web -- supabase --workdir . stop",
     "db:reset": "node scripts/run-local-supabase.mjs reset",
     "db:status": "npm exec --prefix apps/web -- supabase --workdir . status",
-    "db:types": "node scripts/run-local-supabase.mjs types"
+    "db:types": "node scripts/run-local-supabase.mjs types",
+    "db:migrate": "node scripts/run-local-supabase.mjs migrate",
+    "db:migrations": "node scripts/run-local-supabase.mjs migrations",
+    "db:advisors": "node scripts/run-local-supabase.mjs advisors",
+    "test:db": "node scripts/test-local-db.mjs && node scripts/test-local-db-concurrency.mjs",
+    "db:check-empty": "node scripts/check-local-db-empty.mjs",
+    "db:setup-app-env": "node scripts/setup-local-app-env.mjs",
+    "test:product:local": "npm run test:product:local --prefix apps/web"
   }
 }
