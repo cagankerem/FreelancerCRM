@@ -15,6 +15,8 @@
     "test:local-db-tools": "node --test scripts/local-docker.test.mjs",
     "lint": "cd apps/web && npm run lint",
     "typecheck": "cd apps/web && npm run typecheck",
+    "secrets:scan": "node scripts/secrets-scan.mjs",
+    "secrets:self-test": "node scripts/secrets-scan-self-test.mjs",
     "validate:task-001": "node scripts/validate-task-001.mjs",
     "validate:task-002": "node scripts/validate-task-002.mjs",
     "db:init": "npm exec --prefix apps/web -- supabase --workdir . init",
