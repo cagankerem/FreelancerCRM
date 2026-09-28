@@ -86,8 +86,10 @@ Bulgu çıktısı anahtar değerini içermez, yalnız dosya/satır/kuralı göst
 ham tarama raporları geçici dizinde tutulup silinir. İstisnalar gerekirse
 yalnız doğrulanmış sahte pozitife dar kapsamda eklenir; `.env` dosyaları için
 genel istisna yoktur. Git'in yok saydığı kişisel dosyalar PR kapsamına girmez.
-GitHub'da bu kontrolün birleşmeyi engellemesi için ayrıca `secret-scan` job'ını
-gerekli status check yapmak gerekir.
+Public GitHub deposunda `main` için `secret-scan` job'ı gerekli status check
+olarak ayarlıdır; GitHub Actions kaynağına bağlıdır ve yönetici için de
+uygulanır. Geçici PR ile başarısız check'in birleşmeyi engellediği, temiz
+güncellemeden sonra PR'ın tekrar birleşebilir olduğu doğrulandı.
 
 TASK-001 temelinin temiz kurulumdan development ve production smoke testlerine
 kadar tam kabul kontrolü:
