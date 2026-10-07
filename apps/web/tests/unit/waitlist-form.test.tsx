@@ -24,9 +24,7 @@ describe("WaitlistForm", () => {
     renderWaitlistForm();
 
     const form = screen.getByRole("form", { name: "Alpha sürümüne katıl" });
-    await user.click(
-      within(form).getByRole("button", { name: "Alpha sürümüne katıl" }),
-    );
+    await user.click(within(form).getByRole("button", { name: "Alpha sürümüne katıl" }));
 
     const email = screen.getByRole("textbox", { name: /e-posta adresin/i });
     const error = await screen.findByRole("alert");
@@ -35,10 +33,7 @@ describe("WaitlistForm", () => {
     expect(email).toHaveFocus();
     expect(email).toHaveAttribute("aria-invalid", "true");
     expect(email).toHaveAttribute("aria-describedby", error.id);
-    expect(email.closest('[data-slot="field"]')).toHaveAttribute(
-      "data-invalid",
-      "true",
-    );
+    expect(email.closest('[data-slot="field"]')).toHaveAttribute("data-invalid", "true");
     expect(window.localStorage.getItem(WAITLIST_STORAGE_KEY)).toBeNull();
   });
 
@@ -48,13 +43,9 @@ describe("WaitlistForm", () => {
 
     const email = screen.getByRole("textbox", { name: /e-posta adresin/i });
     await user.type(email, "gecersiz");
-    await user.click(
-      screen.getByRole("button", { name: "Alpha sürümüne katıl" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Alpha sürümüne katıl" }));
 
-    expect(
-      await screen.findByText("Geçerli bir e-posta adresi gir."),
-    ).toBeVisible();
+    expect(await screen.findByText("Geçerli bir e-posta adresi gir.")).toBeVisible();
 
     await user.clear(email);
     await user.type(email, "user@example.com");
@@ -62,10 +53,7 @@ describe("WaitlistForm", () => {
     await waitFor(() => {
       expect(email).toHaveAttribute("aria-invalid", "false");
       expect(email).not.toHaveAttribute("aria-describedby");
-      expect(email.closest('[data-slot="field"]')).toHaveAttribute(
-        "data-invalid",
-        "false",
-      );
+      expect(email.closest('[data-slot="field"]')).toHaveAttribute("data-invalid", "false");
     });
   });
 
@@ -82,13 +70,9 @@ describe("WaitlistForm", () => {
     await user.type(email, "  USER@Example.COM  ");
     await user.selectOptions(persona, "designer");
     await user.click(consent);
-    await user.click(
-      screen.getByRole("button", { name: "Alpha sürümüne katıl" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Alpha sürümüne katıl" }));
 
-    const successMessage = await screen.findByText(
-      /demo kaydın bu cihazda saklandı/i,
-    );
+    const successMessage = await screen.findByText(/demo kaydın bu cihazda saklandı/i);
     expect(successMessage).toBeVisible();
     const successRegion = successMessage.closest('[role="status"]');
     expect(successRegion).toHaveAttribute("aria-live", "polite");
@@ -116,13 +100,8 @@ describe("WaitlistForm", () => {
     });
     renderWaitlistForm();
 
-    await user.type(
-      screen.getByRole("textbox", { name: /e-posta adresin/i }),
-      "user@example.com",
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Alpha sürümüne katıl" }),
-    );
+    await user.type(screen.getByRole("textbox", { name: /e-posta adresin/i }), "user@example.com");
+    await user.click(screen.getByRole("button", { name: "Alpha sürümüne katıl" }));
 
     const errorMessage = await screen.findByText(
       "Kayıt bu tarayıcıda saklanamadı. Lütfen daha sonra tekrar dene.",

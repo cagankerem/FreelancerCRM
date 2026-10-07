@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: "true"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.3"
+      - run: npm run ci:clean
+      - run: npm ci --prefix apps/web
+      - run: git diff --exit-code -- apps/web/package-lock.json
+      - run: npm run ci:validate
+      - run: npm run test:ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run build
+      - run: npm run test:integration
+
+  browser:
+    name: browser
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.3"
+      - run: npm run ci:clean
+      - run: npm ci --prefix apps/web
+      - run: git diff --exit-code -- apps/web/package-lock.json
+      - run: cd apps/web && npx --no-install playwright install --with-deps chromium firefox webkit
+      - run: npm run build
+      - run: npm run test:browser
+        env:
+          PLAYWRIGHT_SERVER_MODE: production
+
+  database:
+    name: database
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.3"
+      - run: npm run ci:clean
+      - run: npm ci --prefix apps/web
+      - run: git diff --exit-code -- apps/web/package-lock.json
+      - run: npm run ci:db
+      - run: npm run ci:db:cleanup
+        if: always()
+
+  production-audit:
+    name: production-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.3"
+      - run: npm run ci:clean
+      - run: npm ci --prefix apps/web
+      - run: git diff --exit-code -- apps/web/package-lock.json
+      - run: npm run audit:production
+
+  dependency-report:
+    name: dependency-report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.3"
+      - run: npm run ci:clean
+      - run: npm ci --prefix apps/web
+      - run: git diff --exit-code -- apps/web/package-lock.json
+      - run: npm run audit:all

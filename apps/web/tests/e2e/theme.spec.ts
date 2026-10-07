@@ -2,9 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { gotoWithTheme, themes } from "../helpers/accessibility";
 
-test("resolves the dark semantic token set from the system preference", async ({
-  page,
-}) => {
+test("resolves the dark semantic token set from the system preference", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");
 
@@ -39,17 +37,13 @@ test("resolves the dark semantic token set from the system preference", async ({
 });
 
 for (const theme of themes) {
-  test(`renders real landing surfaces in ${theme} theme`, async ({
-    page,
-  }) => {
+  test(`renders real landing surfaces in ${theme} theme`, async ({ page }) => {
     await gotoWithTheme(page, theme);
 
     const landingTheme = await page.locator(".lp-page").evaluate((element) => {
       const root = getComputedStyle(document.documentElement);
       const styles = getComputedStyle(element);
-      const conversionPanel = getComputedStyle(
-        document.querySelector(".lp-conversion-panel")!,
-      );
+      const conversionPanel = getComputedStyle(document.querySelector(".lp-conversion-panel")!);
       const footer = getComputedStyle(document.querySelector(".lp-footer")!);
       const resolveColor = (variable: string) => {
         const probe = document.createElement("span");
@@ -67,16 +61,10 @@ for (const theme of themes) {
         onSurfaceColor: resolveColor("--on-surface"),
         rootCanvas: root.getPropertyValue("--canvas").trim().toLowerCase(),
         rootSurface: root.getPropertyValue("--surface").trim().toLowerCase(),
-        rootOnSurface: root
-          .getPropertyValue("--on-surface")
-          .trim()
-          .toLowerCase(),
+        rootOnSurface: root.getPropertyValue("--on-surface").trim().toLowerCase(),
         rootPrimary: root.getPropertyValue("--primary").trim().toLowerCase(),
         lpCanvas: styles.getPropertyValue("--lp-canvas").trim().toLowerCase(),
-        lpSurface: styles
-          .getPropertyValue("--lp-surface")
-          .trim()
-          .toLowerCase(),
+        lpSurface: styles.getPropertyValue("--lp-surface").trim().toLowerCase(),
         lpInk: styles.getPropertyValue("--lp-ink").trim().toLowerCase(),
         primary: styles.getPropertyValue("--primary").trim().toLowerCase(),
         conversionSurface: conversionPanel.backgroundColor,
@@ -95,18 +83,14 @@ for (const theme of themes) {
     expect(landingTheme.footerSurface).toBe(landingTheme.surfaceColor);
   });
 
-  test(`keeps the landing focus color canonical in ${theme} theme`, async ({
-    page,
-  }) => {
+  test(`keeps the landing focus color canonical in ${theme} theme`, async ({ page }) => {
     await gotoWithTheme(page, theme);
 
     const email = page.getByRole("textbox", { name: /e-posta adresin/i });
     await email.focus();
 
     await expect
-      .poll(() =>
-        email.evaluate((element) => getComputedStyle(element).outlineColor),
-      )
+      .poll(() => email.evaluate((element) => getComputedStyle(element).outlineColor))
       .toBe("rgb(37, 99, 235)");
 
     const focusStyles = await email.evaluate((element) => {
@@ -128,9 +112,7 @@ for (const theme of themes) {
   });
 }
 
-test("persists an explicit light preference over a dark system preference", async ({
-  page,
-}) => {
+test("persists an explicit light preference over a dark system preference", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.addInitScript(() => {
     window.localStorage.setItem("kapsam-theme", "light");

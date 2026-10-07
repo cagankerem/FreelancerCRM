@@ -10,8 +10,13 @@ export async function saveProfile(form: FormData) {
   const { id, db } = await requireUser();
   const { data: existing } = await db.from("profiles").select("id").eq("id", id).maybeSingle();
   const mutation = existing
-    ? db.from("profiles").update({ ...input.data, onboarding_completed_at: new Date().toISOString() }).eq("id", id)
-    : db.from("profiles").insert({ id, ...input.data, onboarding_completed_at: new Date().toISOString() });
+    ? db
+        .from("profiles")
+        .update({ ...input.data, onboarding_completed_at: new Date().toISOString() })
+        .eq("id", id)
+    : db
+        .from("profiles")
+        .insert({ id, ...input.data, onboarding_completed_at: new Date().toISOString() });
   const { error } = await mutation;
   if (error) redirect("/onboarding?error=save");
   redirect("/app");

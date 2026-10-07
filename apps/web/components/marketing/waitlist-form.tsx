@@ -9,22 +9,10 @@ import type { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
-import {
-  clearWaitlistSubmissions,
-  saveWaitlistSubmission,
-} from "@/lib/client/waitlist-storage";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { clearWaitlistSubmissions, saveWaitlistSubmission } from "@/lib/client/waitlist-storage";
 import { waitlistFormSchema } from "@/lib/shared/schemas/waitlist";
 
 const defaultValues = {
@@ -37,10 +25,7 @@ type SubmissionStatus = "idle" | "success" | "duplicate" | "storage-error";
 
 type WaitlistFormProps = {
   price: number;
-  onTrackEvent: (
-    name: string,
-    detail?: Record<string, string | number>,
-  ) => void;
+  onTrackEvent: (name: string, detail?: Record<string, string | number>) => void;
 };
 
 export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
@@ -84,9 +69,7 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
     form.reset(defaultValues);
   };
 
-  const handleInvalidSubmit = (
-    errors: FieldErrors<z.input<typeof waitlistFormSchema>>,
-  ) => {
+  const handleInvalidSubmit = (errors: FieldErrors<z.input<typeof waitlistFormSchema>>) => {
     setStatus("idle");
     onTrackEvent("waitlist_submit_failed", {
       reason: errors.email ? "invalid_email" : "invalid_form",
@@ -136,19 +119,14 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
                     autoComplete="email"
                     placeholder="ornek@eposta.com"
                     aria-invalid={fieldState.invalid}
-                    aria-describedby={
-                      fieldState.invalid ? "waitlist-email-error" : undefined
-                    }
+                    aria-describedby={fieldState.invalid ? "waitlist-email-error" : undefined}
                     onChange={(event) => {
                       field.onChange(event);
                       clearFeedback();
                     }}
                   />
                 </span>
-                <FieldError
-                  id="waitlist-email-error"
-                  errors={[fieldState.error]}
-                />
+                <FieldError id="waitlist-email-error" errors={[fieldState.error]} />
               </Field>
             )}
           />
@@ -166,26 +144,17 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
                   id="waitlist-persona"
                   className="lp-native-select"
                   aria-invalid={fieldState.invalid}
-                  aria-describedby={
-                    fieldState.invalid ? "waitlist-persona-error" : undefined
-                  }
+                  aria-describedby={fieldState.invalid ? "waitlist-persona-error" : undefined}
                   onChange={(event) => {
                     field.onChange(event);
                     clearFeedback();
                   }}
                 >
                   <NativeSelectOption value="">Seçiniz</NativeSelectOption>
-                  <NativeSelectOption value="developer">
-                    Freelance yazılımcı
-                  </NativeSelectOption>
-                  <NativeSelectOption value="designer">
-                    UI/UX tasarımcısı
-                  </NativeSelectOption>
+                  <NativeSelectOption value="developer">Freelance yazılımcı</NativeSelectOption>
+                  <NativeSelectOption value="designer">UI/UX tasarımcısı</NativeSelectOption>
                 </NativeSelect>
-                <FieldError
-                  id="waitlist-persona-error"
-                  errors={[fieldState.error]}
-                />
+                <FieldError id="waitlist-persona-error" errors={[fieldState.error]} />
               </Field>
             )}
           />
@@ -199,10 +168,9 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
         >
           <strong id="aydinlatma-baslik">Aydınlatma ve gizlilik özeti</strong>
           <p>
-            E-posta adresi, isteğe bağlı persona ve iletişim tercihi yalnızca bu
-            cihazda saklanır; sunucuya gönderilmez. Kalıcı bekleme listesi devreye
-            alınmadan önce veri sorumlusu, saklama süresi ve iletişim kanalı ayrıca
-            açıklanacaktır.
+            E-posta adresi, isteğe bağlı persona ve iletişim tercihi yalnızca bu cihazda saklanır;
+            sunucuya gönderilmez. Kalıcı bekleme listesi devreye alınmadan önce veri sorumlusu,
+            saklama süresi ve iletişim kanalı ayrıca açıklanacaktır.
           </p>
         </div>
 
@@ -225,9 +193,7 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
                   inputRef={ref}
                   aria-invalid={fieldState.invalid}
                   aria-labelledby="waitlist-consent-label"
-                  aria-describedby={
-                    fieldState.invalid ? "waitlist-consent-error" : undefined
-                  }
+                  aria-describedby={fieldState.invalid ? "waitlist-consent-error" : undefined}
                   onCheckedChange={(isChecked) => {
                     onChange(isChecked);
                     clearFeedback();
@@ -239,13 +205,9 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
                     htmlFor="waitlist-consent"
                     id="waitlist-consent-label"
                   >
-                    İsteğe bağlı: Alpha süreci dışındaki ürün duyurularını da almak
-                    istiyorum.
+                    İsteğe bağlı: Alpha süreci dışındaki ürün duyurularını da almak istiyorum.
                   </FieldLabel>
-                  <FieldError
-                    id="waitlist-consent-error"
-                    errors={[fieldState.error]}
-                  />
+                  <FieldError id="waitlist-consent-error" errors={[fieldState.error]} />
                 </FieldContent>
               </Field>
             );
@@ -263,13 +225,14 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
       >
         {status === "success" ? (
           <span className="is-success">
-            <CheckCircle2 />Demo kaydın bu cihazda saklandı. Bu, gerçek bir erken
-            erişim başvurusu değildir.
+            <CheckCircle2 />
+            Demo kaydın bu cihazda saklandı. Bu, gerçek bir erken erişim başvurusu değildir.
           </span>
         ) : null}
         {status === "duplicate" ? (
           <span className="is-info">
-            <Mail />Bu e-posta bu cihazdaki demo kayıtlarda zaten bulunuyor.
+            <Mail />
+            Bu e-posta bu cihazdaki demo kayıtlarda zaten bulunuyor.
           </span>
         ) : null}
         {status === "storage-error" ? (
@@ -279,7 +242,8 @@ export function WaitlistForm({ price, onTrackEvent }: WaitlistFormProps) {
         ) : null}
         {status === "idle" ? (
           <span>
-            <ShieldCheck />Kart bilgisi istenmez. Verilerin minimum düzeyde tutulur.
+            <ShieldCheck />
+            Kart bilgisi istenmez. Verilerin minimum düzeyde tutulur.
           </span>
         ) : null}
       </div>

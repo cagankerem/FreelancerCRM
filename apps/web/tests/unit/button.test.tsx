@@ -25,9 +25,7 @@ describe("Button", () => {
   it("uses the documented large-button height", () => {
     render(<Button size="lg">Devam et</Button>);
 
-    expect(screen.getByRole("button", { name: "Devam et" })).toHaveClass(
-      "h-[52px]",
-    );
+    expect(screen.getByRole("button", { name: "Devam et" })).toHaveClass("h-[52px]");
   });
 
   it("uses the accessible primary-family text token for link actions", () => {
@@ -59,8 +57,6 @@ describe("Button", () => {
       "bg-danger-action",
       "text-danger-action-foreground",
     );
-    expect(screen.getByRole("button", { name: "Kaydı sil" })).not.toHaveClass(
-      "bg-action-primary",
-    );
+    expect(screen.getByRole("button", { name: "Kaydı sil" })).not.toHaveClass("bg-action-primary");
   });
 });

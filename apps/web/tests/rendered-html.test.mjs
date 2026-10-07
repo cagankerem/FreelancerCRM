@@ -9,30 +9,31 @@ import { fileURLToPath } from "node:url";
 
 const HOST = "127.0.0.1";
 const appDirectory = fileURLToPath(new URL("..", import.meta.url));
-const nextCli = fileURLToPath(
-  new URL("../node_modules/next/dist/bin/next", import.meta.url),
-);
+const nextCli = fileURLToPath(new URL("../node_modules/next/dist/bin/next", import.meta.url));
 
 let nextServer;
 let serverLog = "";
 let serverPort;
 
-before(async () => {
-  serverPort = await findAvailablePort();
-  nextServer = spawn(
-    process.execPath,
-    [nextCli, "start", "--hostname", HOST, "--port", String(serverPort)],
-    {
-      cwd: appDirectory,
-      env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
+before(
+  async () => {
+    serverPort = await findAvailablePort();
+    nextServer = spawn(
+      process.execPath,
+      [nextCli, "start", "--hostname", HOST, "--port", String(serverPort)],
+      {
+        cwd: appDirectory,
+        env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
 
-  nextServer.stdout.on("data", appendServerLog);
-  nextServer.stderr.on("data", appendServerLog);
-  await waitForServer();
-}, { timeout: 30_000 });
+    nextServer.stdout.on("data", appendServerLog);
+    nextServer.stderr.on("data", appendServerLog);
+    await waitForServer();
+  },
+  { timeout: 30_000 },
+);
 
 after(async () => {
   if (!nextServer || nextServer.exitCode !== null) return;
@@ -176,9 +177,18 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(landing, /useSyncExternalStore/);
   assert.match(landing, /<DemoApp layout="embedded" \/>/);
   assert.doesNotMatch(landing, /<iframe/i);
-  assert.ok(landing.indexOf('className="lp-hero lp-section"') < landing.indexOf('className="lp-preview lp-section"'));
-  assert.ok(landing.indexOf('className="lp-preview lp-section"') < landing.indexOf('className="lp-transformation lp-section"'));
-  const navSource = landing.slice(landing.indexOf('<nav aria-label="Ana navigasyon">'), landing.indexOf("</nav>"));
+  assert.ok(
+    landing.indexOf('className="lp-hero lp-section"') <
+      landing.indexOf('className="lp-preview lp-section"'),
+  );
+  assert.ok(
+    landing.indexOf('className="lp-preview lp-section"') <
+      landing.indexOf('className="lp-transformation lp-section"'),
+  );
+  const navSource = landing.slice(
+    landing.indexOf('<nav aria-label="Ana navigasyon">'),
+    landing.indexOf("</nav>"),
+  );
   assert.match(navSource, /href="#urun">Ürün/);
   assert.match(navSource, /href="#problem-cozumu">Problem Çözümü/);
   assert.match(navSource, /href="#nasil-calisir">Nasıl Çalışır\?/);
@@ -210,7 +220,7 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   assert.match(prototype, /Düzenlediğin mesaj değiştirilsin mi/);
   assert.match(prototype, /Bu belge fatura yerine geçmez/);
   assert.match(prototype, /Görüntülenme verileri.*yaklaşık olabilir/s);
-  assert.match(prototype, /elektronik imza veya hukuki kimlik doğrulaması değildir/);
+  assert.match(prototype, /elektronik\s+imza\s+veya\s+hukuki\s+kimlik\s+doğrulaması\s+değildir/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /max-height:\s*calc\(100dvh - 32px\)/);
@@ -249,8 +259,6 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
   ];
 
   await Promise.all(
-    removedPrototypePaths.map((path) =>
-      assert.rejects(access(new URL(path, import.meta.url))),
-    ),
+    removedPrototypePaths.map((path) => assert.rejects(access(new URL(path, import.meta.url)))),
   );
 });

@@ -31,16 +31,13 @@ await runCommand("form, schema, and state unit/integration tests", npmCommand, [
   "run",
   "test:unit",
 ]);
-await runCommand("production build", npmCommand, [
-  "run",
-  "build",
-  "--",
-  "--webpack",
-]);
+await runCommand("production build", npmCommand, ["run", "build", "--", "--webpack"]);
 
-const nodeTestFiles = (await readdir(join(appDirectory, "tests"), {
-  withFileTypes: true,
-}))
+const nodeTestFiles = (
+  await readdir(join(appDirectory, "tests"), {
+    withFileTypes: true,
+  })
+)
   .filter((entry) => entry.isFile() && entry.name.endsWith(".test.mjs"))
   .map((entry) => join(appDirectory, "tests", entry.name))
   .sort();
@@ -82,9 +79,7 @@ async function runCommand(label, executable, arguments_, environment = commandEn
   assert.equal(
     exitCode,
     0,
-    `${executable} ${arguments_.join(" ")} failed${
-      signal ? ` with ${signal}` : ""
-    }.`,
+    `${executable} ${arguments_.join(" ")} failed${signal ? ` with ${signal}` : ""}.`,
   );
 }
 

@@ -18,7 +18,9 @@ export function localDockerEnvironment() {
         FREELANCERCRM_DOCKER_BIN: realpathSync(candidate),
         PATH: `${shimDirectory}${delimiter}${searchPath}`,
       };
-    } catch { /* Try the next executable on PATH. */ }
+    } catch {
+      /* Try the next executable on PATH. */
+    }
   }
   throw new Error("Docker executable not found on PATH.");
 }
@@ -26,17 +28,59 @@ export function localDockerEnvironment() {
 // These are the flags emitted by the pinned Supabase CLI's create/run builders.
 // Parse only Docker options; never rewrite a command inside a container.
 const valueFlags = new Set([
-  "-p", "--publish", "-e", "--env", "--env-file", "-v", "--volume",
-  "--name", "--hostname", "--volumes-from", "--tmpfs", "--expose",
-  "--health-cmd", "--health-interval", "--health-timeout", "--health-retries",
-  "--health-start-period", "--health-start-interval", "--restart", "--security-opt",
-  "--add-host", "--network", "--network-alias", "--label", "-l", "--entrypoint",
-  "--user", "-u", "--workdir", "-w", "--mount", "--platform", "--pull",
-  "--cap-add", "--cap-drop", "--ulimit", "--shm-size", "--memory", "--cpus",
+  "-p",
+  "--publish",
+  "-e",
+  "--env",
+  "--env-file",
+  "-v",
+  "--volume",
+  "--name",
+  "--hostname",
+  "--volumes-from",
+  "--tmpfs",
+  "--expose",
+  "--health-cmd",
+  "--health-interval",
+  "--health-timeout",
+  "--health-retries",
+  "--health-start-period",
+  "--health-start-interval",
+  "--restart",
+  "--security-opt",
+  "--add-host",
+  "--network",
+  "--network-alias",
+  "--label",
+  "-l",
+  "--entrypoint",
+  "--user",
+  "-u",
+  "--workdir",
+  "-w",
+  "--mount",
+  "--platform",
+  "--pull",
+  "--cap-add",
+  "--cap-drop",
+  "--ulimit",
+  "--shm-size",
+  "--memory",
+  "--cpus",
 ]);
 const booleanFlags = new Set([
-  "--rm", "-d", "--detach", "-i", "--interactive", "-t", "--tty", "-it",
-  "--init", "--privileged", "--read-only", "--no-healthcheck",
+  "--rm",
+  "-d",
+  "--detach",
+  "-i",
+  "--interactive",
+  "-t",
+  "--tty",
+  "-it",
+  "--init",
+  "--privileged",
+  "--read-only",
+  "--no-healthcheck",
 ]);
 
 export function localhostPortArgs(input) {
@@ -56,12 +100,17 @@ export function localhostPortArgs(input) {
     const value = equal < 0 ? args[index] : arg.slice(equal + 1);
     assert.ok(value, "Missing Docker option value.");
     if (flag === "--network") network = value;
-    if (flag === "-p" || flag === "--publish") ports.push({ index, value, prefix: equal < 0 ? "" : `${flag}=` });
+    if (flag === "-p" || flag === "--publish")
+      ports.push({ index, value, prefix: equal < 0 ? "" : `${flag}=` });
   }
   if (network !== networkName) return args;
   for (const { index, value, prefix } of ports) {
     // Reject unexpected bindings rather than permit an externally reachable port.
-    assert.match(value, /^(?:127\.0\.0\.1:)?\d+:\d+(?:\/(?:tcp|udp))?$/, "Unsupported local port mapping.");
+    assert.match(
+      value,
+      /^(?:127\.0\.0\.1:)?\d+:\d+(?:\/(?:tcp|udp))?$/,
+      "Unsupported local port mapping.",
+    );
     args[index] = prefix + (value.startsWith("127.0.0.1:") ? value : `127.0.0.1:${value}`);
   }
   return args;

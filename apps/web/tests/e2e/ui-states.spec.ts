@@ -22,17 +22,12 @@ for (const theme of themes) {
     page,
   }) => {
     await gotoWithTheme(page, theme, "/test-fixtures/ui-states");
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-      "content",
-      /noindex/,
-    );
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     await expect(page.getByRole("navigation")).toHaveCount(0);
 
     const primary = page.getByRole("button", { name: "Birincil işlem" });
     const normalBackground = await backgroundColor(primary);
-    expect(normalBackground).toBe(
-      await resolvedVariableColor(primary, "--action-primary"),
-    );
+    expect(normalBackground).toBe(await resolvedVariableColor(primary, "--action-primary"));
 
     await primary.hover();
     await expect
@@ -42,21 +37,15 @@ for (const theme of themes) {
 
     await page.mouse.down();
     await expect
-      .poll(() =>
-        primary.evaluate((element) => getComputedStyle(element).translate),
-      )
+      .poll(() => primary.evaluate((element) => getComputedStyle(element).translate))
       .not.toBe("none");
     await page.mouse.up();
 
     await page.reload();
-    await expect(page.locator("html")).toHaveClass(
-      new RegExp(`(^|\\s)${theme}(\\s|$)`),
-    );
+    await expect(page.locator("html")).toHaveClass(new RegExp(`(^|\\s)${theme}(\\s|$)`));
     await page.keyboard.press("Tab");
     await expect(primary).toBeFocused();
-    expect(
-      await primary.evaluate((element) => element.matches(":focus-visible")),
-    ).toBe(true);
+    expect(await primary.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
     const focusStyles = await primary.evaluate((element) => {
       const styles = getComputedStyle(element);
       return {
@@ -87,43 +76,28 @@ for (const theme of themes) {
     await checkbox.click();
     await expect(checkbox).toHaveAttribute("aria-checked", "true");
     await expect(page.getByText("Bildirim seçildi", { exact: true })).toBeVisible();
-    await expect(
-      checkbox.locator('[data-slot="checkbox-indicator"]'),
-    ).toBeVisible();
+    await expect(checkbox.locator('[data-slot="checkbox-indicator"]')).toBeVisible();
     await expect.poll(() => backgroundColor(checkbox)).toBe(selectedBackground);
     expect(selectedBackground).not.toBe(unselectedBackground);
 
     const invalidInput = page.getByRole("textbox", { name: "Hatalı alan" });
-    const fieldError = page
-      .getByRole("alert")
-      .filter({ hasText: "Geçerli bir değer gir." });
+    const fieldError = page.getByRole("alert").filter({ hasText: "Geçerli bir değer gir." });
     await expect(invalidInput).toHaveAttribute("aria-invalid", "true");
-    await expect(invalidInput).toHaveAttribute(
-      "aria-describedby",
-      "fixture-invalid-error",
-    );
+    await expect(invalidInput).toHaveAttribute("aria-describedby", "fixture-invalid-error");
     await expect(fieldError).toBeVisible();
-    expect(
-      await fieldError.evaluate((element) => getComputedStyle(element).color),
-    ).toBe(await resolvedVariableColor(fieldError, "--danger"));
+    expect(await fieldError.evaluate((element) => getComputedStyle(element).color)).toBe(
+      await resolvedVariableColor(fieldError, "--danger"),
+    );
 
-    const loading = page
-      .getByRole("status")
-      .filter({ hasText: "Test içeriği yükleniyor" });
+    const loading = page.getByRole("status").filter({ hasText: "Test içeriği yükleniyor" });
     await expect(loading).toHaveAttribute("aria-busy", "true");
     await expect(loading).toHaveAttribute("aria-live", "polite");
-    await expect(
-      loading.locator('[role="status"], [role="alert"], [aria-live]'),
-    ).toHaveCount(0);
+    await expect(loading.locator('[role="status"], [role="alert"], [aria-live]')).toHaveCount(0);
 
-    const errorState = page
-      .getByRole("alert")
-      .filter({ hasText: "İçerik yüklenemedi" });
+    const errorState = page.getByRole("alert").filter({ hasText: "İçerik yüklenemedi" });
     await expect(errorState).toContainText("Güvenli kullanıcı mesajı gösteriliyor.");
     await expect(errorState).not.toContainText(/error|exception|secret/i);
     await errorState.getByRole("button", { name: "Tekrar dene" }).click();
-    await expect(
-      page.getByRole("status").filter({ hasText: "Tekrar denendi" }),
-    ).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: "Tekrar denendi" })).toBeVisible();
   });
 }

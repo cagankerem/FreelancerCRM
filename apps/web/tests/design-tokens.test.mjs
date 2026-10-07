@@ -11,18 +11,13 @@ const projectDirectory = dirname(dirname(appDirectory));
 const [designDocument, globalStyles, landingStyles] = await Promise.all([
   readFile(join(projectDirectory, "DESIGN.md"), "utf8"),
   readFile(join(appDirectory, "app", "globals.css"), "utf8"),
-  readFile(
-    join(appDirectory, "components", "marketing", "landing-page.css"),
-    "utf8",
-  ),
+  readFile(join(appDirectory, "components", "marketing", "landing-page.css"), "utf8"),
 ]);
 
 const canonicalColors = parseDesignColors(designDocument);
 const lightTokens = parseCustomProperties(extractBlock(globalStyles, ":root"));
 const darkTokens = parseCustomProperties(extractBlock(globalStyles, ".dark"));
-const themeExports = parseCustomProperties(
-  extractBlock(globalStyles, "@theme inline"),
-);
+const themeExports = parseCustomProperties(extractBlock(globalStyles, "@theme inline"));
 
 const shadcnAliases = {
   background: "canvas",
@@ -89,13 +84,13 @@ test("globals.css implements every canonical DESIGN.md color in both themes", ()
 
   for (const [name, values] of canonicalColors) {
     assert.equal(
-      lightTokens.get(name),
-      values.light,
+      lightTokens.get(name)?.toLowerCase(),
+      values.light.toLowerCase(),
       `Light --${name} must match DESIGN.md.`,
     );
     assert.equal(
-      darkTokens.get(name),
-      values.dark,
+      darkTokens.get(name)?.toLowerCase(),
+      values.dark.toLowerCase(),
       `Dark --${name} must match DESIGN.md.`,
     );
   }
@@ -135,9 +130,7 @@ test("@theme inline exports every canonical color and preserves shadcn exports",
 });
 
 test("landing compatibility colors resolve through canonical semantic tokens", () => {
-  const landingTokens = parseCustomProperties(
-    extractBlock(landingStyles, ".lp-page"),
-  );
+  const landingTokens = parseCustomProperties(extractBlock(landingStyles, ".lp-page"));
 
   for (const [alias, canonical] of Object.entries(landingAliases)) {
     assert.equal(
@@ -155,30 +148,21 @@ test("landing compatibility colors resolve through canonical semantic tokens", (
 });
 
 test("landing contains no theme-dependent raw color literals", () => {
-  const rawColors = [
-    ...landingStyles.matchAll(/#[0-9a-f]{3,8}\b|rgba?\(/gi),
-  ].map((match) => match[0]);
-
-  assert.deepEqual(
-    rawColors,
-    [],
-    "Landing colors must derive from canonical semantic tokens.",
+  const rawColors = [...landingStyles.matchAll(/#[0-9a-f]{3,8}\b|rgba?\(/gi)].map(
+    (match) => match[0],
   );
+
+  assert.deepEqual(rawColors, [], "Landing colors must derive from canonical semantic tokens.");
 });
 
 test("focus and ring remain bound to the canonical focus color in every CSS scope", () => {
-  assert.match(
-    globalStyles,
-    /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--focus\);/s,
-  );
+  assert.match(globalStyles, /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--focus\);/s);
 
   for (const [file, styles] of [
     ["app/globals.css", globalStyles],
     ["components/marketing/landing-page.css", landingStyles],
   ]) {
-    const ringValues = [...styles.matchAll(/--ring:\s*([^;]+);/g)].map(
-      (match) => match[1].trim(),
-    );
+    const ringValues = [...styles.matchAll(/--ring:\s*([^;]+);/g)].map((match) => match[1].trim());
 
     assert.ok(ringValues.length > 0, `${file} must declare a ring token.`);
     assert.deepEqual(
@@ -194,8 +178,7 @@ function parseDesignColors(markdown) {
   assert.ok(colorsSection, "DESIGN.md colors section was not found.");
 
   const colors = new Map();
-  const tokenPattern =
-    /^  ([a-z0-9-]+):\n    light: "([^"]+)"\n    dark: "([^"]+)"/gm;
+  const tokenPattern = /^  ([a-z0-9-]+):\n    light: "([^"]+)"\n    dark: "([^"]+)"/gm;
 
   for (const match of colorsSection[1].matchAll(tokenPattern)) {
     colors.set(match[1], { light: match[2], dark: match[3] });
@@ -222,8 +205,9 @@ function extractBlock(styles, selector) {
 
 function parseCustomProperties(block) {
   return new Map(
-    [...block.matchAll(/^\s*--([a-z0-9-]+):\s*([^;]+);/gm)].map(
-      (match) => [match[1], match[2].trim()],
-    ),
+    [...block.matchAll(/^\s*--([a-z0-9-]+):\s*([^;]+);/gm)].map((match) => [
+      match[1],
+      match[2].trim(),
+    ]),
   );
 }

@@ -9,13 +9,20 @@ if (existsSync(envFile)) {
   console.log("apps/web/.env.local already exists; left unchanged.");
   process.exit(0);
 }
-const cli = fileURLToPath(new URL("../apps/web/node_modules/supabase/dist/supabase.js", import.meta.url));
+const cli = fileURLToPath(
+  new URL("../apps/web/node_modules/supabase/dist/supabase.js", import.meta.url),
+);
 const result = spawnSync(process.execPath, [cli, "--workdir", root, "status", "--output", "json"], {
-  cwd: root, encoding: "utf8",
+  cwd: root,
+  encoding: "utf8",
 });
 if (result.status !== 0) throw new Error("Start local Supabase before setting up app environment.");
 const status = JSON.parse(result.stdout);
-if (!status.API_URL?.startsWith("http://127.0.0.1:") || !status.PUBLISHABLE_KEY || !status.SERVICE_ROLE_KEY) {
+if (
+  !status.API_URL?.startsWith("http://127.0.0.1:") ||
+  !status.PUBLISHABLE_KEY ||
+  !status.SERVICE_ROLE_KEY
+) {
   throw new Error("Local Supabase URL or required keys are missing.");
 }
 const lines = [

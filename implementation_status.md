@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-28
+Son güncelleme: 2026-10-07
 
 ## Takip Sistemi
 
@@ -50,6 +50,7 @@ Son güncelleme: 2026-09-28
   - 2026-09-28: PR için salt-okunur, SHA ile sabitlenmiş action'lı `secret-scan` workflow'u eklendi; yerel self-test ve çalışma ağacı/geçmiş taraması geçti. Gerçek PR sonucu ve GitHub Pro gerekli status check/merge engeli henüz doğrulanmadı.
   - 2026-09-28: PR #2'de `secret-scan` geçti; yalnız sentetik anahtar içeren geçici PR #3'te aynı check başarısız oldu. Test PR'ı kapatılıp dalı silindi, yerel tarama yeniden temiz geçti. GitHub Pro henüz etkin olmadığından required check ve fiili merge engeli doğrulanmadı.
   - 2026-09-28: Depo kullanıcı kararıyla public yapıldı; `main` dalında GitHub Actions kaynaklı `secret-scan` required check'i ve yöneticiye uygulama etkin. Geçici PR #4 sentetik bulguyla `FAILURE`/`BLOCKED`, girdi geçmişten çıkarılınca `SUCCESS`/`CLEAN` oldu; PR birleşmeden kapatılıp dalı silindi. Diğer TASK-004 CI kapıları henüz eksik.
+  - 2026-10-07: Temiz npm kurulum, Prettier, lint/typegen/typecheck, unit/integration/build, production tarayıcı, geçici local DB ve audit işleri eklendi. Yerelde 36 Vitest, 20 node:test, 24 CI politika ve 40 tarayıcı testi geçti; production audit sıfır, tam audit geliştirme ağacında 8 high bulgu raporluyor. Gerçek PR ve yeni required check negatif/pozitif kabulü sürüyor.
 - [ ] TASK-005: Correlation ID ve güvenli logger kur
 
 ## Faz 1B: Auth ve Profil

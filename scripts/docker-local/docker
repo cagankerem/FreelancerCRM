@@ -11,8 +11,13 @@ try {
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));
   }
-  child.on("error", () => { console.error("Failed to launch Docker."); process.exitCode = 1; });
-  child.on("exit", (code, signal) => { process.exitCode = code ?? (signal ? 1 : 0); });
+  child.on("error", () => {
+    console.error("Failed to launch Docker.");
+    process.exitCode = 1;
+  });
+  child.on("exit", (code, signal) => {
+    process.exitCode = code ?? (signal ? 1 : 0);
+  });
 } catch (error) {
   console.error(error instanceof Error ? error.message : "Local Docker adapter failed.");
   process.exitCode = 1;

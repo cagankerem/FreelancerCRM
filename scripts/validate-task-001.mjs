@@ -55,16 +55,12 @@ async function smokeTestServer(script) {
   let serverLog = "";
 
   console.log(`\n[TASK-001] npm run ${script}: checking / and /demo on port ${port}`);
-  const child = spawn(
-    "npm",
-    ["run", script, "--", "--hostname", HOST, "--port", String(port)],
-    {
-      cwd: appDirectory,
-      detached: process.platform !== "win32",
-      env: commandEnvironment,
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
+  const child = spawn("npm", ["run", script, "--", "--hostname", HOST, "--port", String(port)], {
+    cwd: appDirectory,
+    detached: process.platform !== "win32",
+    env: commandEnvironment,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 
   const appendLog = (chunk) => {
     const text = chunk.toString();

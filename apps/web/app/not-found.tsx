@@ -1,8 +1,8 @@
-import { FileQuestion } from "lucide-react"
-import Link from "next/link"
+import { FileQuestion } from "lucide-react";
+import Link from "next/link";
 
-import { buttonVariants } from "@/components/ui/button"
-import { EmptyState } from "@/components/ui/empty-state"
+import { buttonVariants } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function NotFound() {
   return (
@@ -25,5 +25,5 @@ export default function NotFound() {
         }
       />
     </main>
-  )
+  );
 }

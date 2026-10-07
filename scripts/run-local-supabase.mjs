@@ -13,12 +13,23 @@ const commands = {
 try {
   const [command, ...extra] = process.argv.slice(2);
   assert.ok(Object.hasOwn(commands, command), "Unknown local database command.");
-  assert.ok(extra.length === 0 || (extra.length === 1 && extra[0] === "--help"), "Local commands accept only --help.");
+  assert.ok(
+    extra.length === 0 || (extra.length === 1 && extra[0] === "--help"),
+    "Local commands accept only --help.",
+  );
   const directory = fileURLToPath(new URL("../", import.meta.url));
-  const cli = fileURLToPath(new URL("../apps/web/node_modules/supabase/dist/supabase.js", import.meta.url));
-  const result = spawnSync(process.execPath, [cli, "--workdir", directory, "--network-id", networkName, ...commands[command], ...extra], {
-    cwd: directory, env: localDockerEnvironment(), stdio: "inherit",
-  });
+  const cli = fileURLToPath(
+    new URL("../apps/web/node_modules/supabase/dist/supabase.js", import.meta.url),
+  );
+  const result = spawnSync(
+    process.execPath,
+    [cli, "--workdir", directory, "--network-id", networkName, ...commands[command], ...extra],
+    {
+      cwd: directory,
+      env: localDockerEnvironment(),
+      stdio: "inherit",
+    },
+  );
   if (result.error) throw result.error;
   process.exitCode = result.status ?? 1;
 } catch (error) {

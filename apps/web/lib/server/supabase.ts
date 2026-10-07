@@ -33,6 +33,7 @@ export async function userClient() {
 export function serviceClient() {
   const { url } = publicSupabaseSettings();
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key || key.startsWith("replace-with-")) throw new Error("Supabase server environment is missing or invalid.");
+  if (!key || key.startsWith("replace-with-"))
+    throw new Error("Supabase server environment is missing or invalid.");
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
