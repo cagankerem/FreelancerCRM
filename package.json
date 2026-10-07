@@ -21,6 +21,7 @@
     "test:ci": "node --test scripts/ci-policy.test.mjs scripts/dependency-audit.test.mjs scripts/ci-database.test.mjs scripts/local-docker.test.mjs",
     "ci:clean": "node scripts/check-clean-install.mjs",
     "ci:validate": "node scripts/validate-ci.mjs",
+    "ci:evidence": "node scripts/check-ci-evidence.mjs",
     "ci:db": "node scripts/ci-database.mjs",
     "ci:db:cleanup": "node scripts/ci-database.mjs cleanup",
     "audit:production": "node scripts/dependency-audit.mjs production",

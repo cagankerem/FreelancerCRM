@@ -220,16 +220,30 @@ yöneticiye de uygulanır ve dalın güncel olması gerekir. Check adları
 değişirse GitHub branch protection ayarı da güncellenmelidir.
 `dependency-report` bulguları ayrıca raporlar; high/critical production
 bulgusu `production-audit` üzerinden engellenir. Audit servisine erişim
-veya rapor doğrulama hatası iki işi de başarısız yapar.
+veya rapor doğrulama hatası ilgili işi başarısız yapar.
 
 Kırmızı check için aynı satırdaki yerel komutu çalıştırın. Typecheck Next.js
 tiplerini kendisi üretir; integration testleri build'den sonra çalışır.
 Tarayıcı hatasında önce browser kurulumunu ve production sunucuyu kontrol
 edin; yerelde `CI` olmadan mevcut screenshot/trace desteği kullanılabilir.
-DB hatası için geçici runner'da migration/seed/test aşamasını kontrol edin;
+DB hatası için geçici runner'da migration/seed/test aşamasını ve varsa
+güvenli SQLSTATE kodunu kontrol edin; ham CLI çıktısı loglanmaz.
 production'a bağlanarak veya mevcut yerel verileri silerek hata gidermeyin.
 Audit bulgusunda ilgili paketi/lockfile'ı kontrollü güncelleyin ve testleri
 yeniden çalıştırın; `npm audit fix --force` kullanılmaz.
+
+Maintainer kabul kontrolü: `npm run ci:evidence -- <CI-run-id> <secret-run-id>`.
+Bu salt-okunur komut tamamlanmış işlerin loglarını geçici dizinde Gitleaks
+ile tarar, artefakt olmadığını ve `main` required check/yönetici kuralını
+doğrular. Ham loglar ve rapor işlem sonunda silinir; değerler ekrana basılmaz.
+
+Kabul kanıtı: [PR #6](https://github.com/cagankerem/FreelancerCRM/pull/6)
+üzerinde kasıtlı format, E2E, migration ve production bağımlılık hataları
+ilgili dört check'i başarısız ve PR'ı `BLOCKED` yaptı
+([negatif çalışma](https://github.com/cagankerem/FreelancerCRM/actions/runs/37616249854)).
+Hatalar geri alınınca aynı PR'da bütün check'ler geçti ve durum `CLEAN` oldu
+([pozitif çalışma](https://github.com/cagankerem/FreelancerCRM/actions/runs/37617485109)).
+Test PR'ı birleştirilmez; kasıtlı girdiler ürün dalına taşınmaz.
 
 ## Mimari
 

@@ -25,10 +25,14 @@ function run(command, args, label, options = {}) {
     ...options,
   });
   // CLI output can include local passwords/keys. Never emit raw stdout/stderr.
-  if (result.error || result.status !== 0)
+  if (result.error || result.status !== 0) {
+    const sqlState = `${result.stdout ?? ""}\n${result.stderr ?? ""}`.match(
+      /\bSQLSTATE\s+([A-Z0-9]{5})\b/,
+    )?.[1];
     throw new Error(
-      `${label} failed (exit ${result.status ?? "unavailable"}); raw output omitted. Reproduce the documented local command on a disposable database.`,
+      `${label} failed (exit ${result.status ?? "unavailable"}${sqlState ? `; SQLSTATE ${sqlState}` : ""}); raw output omitted. Reproduce the documented local command on a disposable database.`,
     );
+  }
   return result.stdout ?? "";
 }
 function names(kind) {
