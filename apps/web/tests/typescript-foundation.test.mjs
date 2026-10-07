@@ -38,7 +38,7 @@ test("keeps strict TypeScript on standard Next.js types", async () => {
     readJson(join(appDirectory, "tsconfig.json")),
   ]);
 
-  assert.equal(appPackage.scripts.typecheck, "tsc --noEmit");
+  assert.equal(appPackage.scripts.typecheck, "next typegen && tsc --noEmit");
   assert.equal(tsconfig.compilerOptions.strict, true);
   assert.equal(tsconfig.compilerOptions.noEmit, true);
   assert.equal(tsconfig.compilerOptions.moduleResolution, "bundler");
@@ -69,8 +69,7 @@ test("documents unavoidable type overrides at verified boundaries", async () => 
     const sourceLines = source.split(/\r?\n/);
 
     function visit(node) {
-      const isConstAssertion =
-        ts.isAsExpression(node) && node.type.getText(sourceFile) === "const";
+      const isConstAssertion = ts.isAsExpression(node) && node.type.getText(sourceFile) === "const";
       const isTypeOverride =
         (ts.isAsExpression(node) && !isConstAssertion) ||
         ts.isTypeAssertionExpression(node) ||
@@ -80,9 +79,7 @@ test("documents unavoidable type overrides at verified boundaries", async () => 
         const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
         const rationale = `${sourceLines[line - 1] ?? ""}\n${sourceLines[line] ?? ""}`;
         if (!/type-boundary:\s*\S/i.test(rationale)) {
-          undocumentedOverrides.push(
-            `${relative(appDirectory, file)}:${line + 1}`,
-          );
+          undocumentedOverrides.push(`${relative(appDirectory, file)}:${line + 1}`);
         }
       }
 

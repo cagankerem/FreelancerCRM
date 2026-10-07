@@ -9,13 +9,9 @@ export const WAITLIST_STORAGE_KEY = "kapsam-alpha-waitlist-v1";
 type StoragePort = Pick<Storage, "getItem" | "removeItem" | "setItem">;
 
 export type SaveWaitlistResult =
-  | { status: "saved" }
-  | { status: "duplicate" }
-  | { status: "failure" };
+  { status: "saved" } | { status: "duplicate" } | { status: "failure" };
 
-export type ClearWaitlistResult =
-  | { status: "cleared" }
-  | { status: "failure" };
+export type ClearWaitlistResult = { status: "cleared" } | { status: "failure" };
 
 export function saveWaitlistSubmission(
   submission: WaitlistSubmission,
@@ -53,9 +49,7 @@ export function saveWaitlistSubmission(
   }
 }
 
-export function clearWaitlistSubmissions(
-  storageOverride?: StoragePort,
-): ClearWaitlistResult {
+export function clearWaitlistSubmissions(storageOverride?: StoragePort): ClearWaitlistResult {
   try {
     const storage = storageOverride ?? window.localStorage;
     storage.removeItem(WAITLIST_STORAGE_KEY);

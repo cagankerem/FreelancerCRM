@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { TriangleAlert } from "lucide-react"
+import { TriangleAlert } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/shared/utils"
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/shared/utils";
 
 type ErrorStateProps = {
-  title?: string
-  description?: string
-  onRetry?: () => void
-  retryLabel?: string
-  headingLevel?: "h1" | "h2" | "h3"
-  className?: string
-}
+  title?: string;
+  description?: string;
+  onRetry?: () => void;
+  retryLabel?: string;
+  headingLevel?: "h1" | "h2" | "h3";
+  className?: string;
+};
 
 function ErrorState({
   title = "Bir şeyler ters gitti",
@@ -22,7 +22,7 @@ function ErrorState({
   headingLevel = "h2",
   className,
 }: ErrorStateProps) {
-  const Heading = headingLevel
+  const Heading = headingLevel;
 
   return (
     <div
@@ -30,7 +30,7 @@ function ErrorState({
       data-slot="error-state"
       className={cn(
         "mx-auto flex w-full max-w-md flex-col items-center rounded-[18px] border border-border bg-card p-8 text-center text-card-foreground shadow-sm",
-        className
+        className,
       )}
     >
       <div
@@ -41,17 +41,15 @@ function ErrorState({
         <TriangleAlert className="size-6" />
       </div>
       <Heading className="mt-5 text-lg font-semibold text-balance">{title}</Heading>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground text-pretty">
-        {description}
-      </p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground text-pretty">{description}</p>
       {onRetry ? (
         <Button className="mt-6 px-5" onClick={onRetry}>
           {retryLabel}
         </Button>
       ) : null}
     </div>
-  )
+  );
 }
 
-export { ErrorState }
-export type { ErrorStateProps }
+export { ErrorState };
+export type { ErrorStateProps };

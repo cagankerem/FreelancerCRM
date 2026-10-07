@@ -1,0 +1,17 @@
+# Generated/dependency/runtime files; source code and workflow files remain checked.
+**/node_modules/**
+**/.next/**
+**/coverage/**
+**/test-results/**
+**/playwright-report/**
+**/outputs/**
+**/work/**
+**/.codex/**
+**/.agents/**
+supabase/.temp/**
+supabase/.branches/**
+**/next-env.d.ts
+**/package-lock.json
+skills-lock.json
+# Documentation is maintained manually; plan.md is the normative product source.
+**/*.md

@@ -1,6 +1,6 @@
-import type { Metadata } from "next"
+import type { Metadata } from "next";
 
-import { UiStateFixture } from "@/components/testing/ui-state-fixture"
+import { UiStateFixture } from "@/components/testing/ui-state-fixture";
 
 export const metadata: Metadata = {
   title: "UI durum testi",
@@ -8,8 +8,8 @@ export const metadata: Metadata = {
     follow: false,
     index: false,
   },
-}
+};
 
 export default function UiStatesPage() {
-  return <UiStateFixture />
+  return <UiStateFixture />;
 }

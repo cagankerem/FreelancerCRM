@@ -29,10 +29,7 @@ describe("waitlist storage", () => {
   });
 
   it("recognizes normalized legacy entries without duplicating them", () => {
-    const legacyEntries = JSON.stringify([
-      " USER@Example.COM ",
-      { email: "other@example.com" },
-    ]);
+    const legacyEntries = JSON.stringify([" USER@Example.COM ", { email: "other@example.com" }]);
     window.localStorage.setItem(WAITLIST_STORAGE_KEY, legacyEntries);
 
     const result = saveWaitlistSubmission({

@@ -6,5 +6,7 @@ export async function GET(request: NextRequest) {
   if (!code) return NextResponse.redirect(new URL("/auth/login?error=invalid", request.url));
   const db = await userClient();
   const { error } = await db.auth.exchangeCodeForSession(code);
-  return NextResponse.redirect(new URL(error ? "/auth/login?error=invalid" : "/onboarding", request.url));
+  return NextResponse.redirect(
+    new URL(error ? "/auth/login?error=invalid" : "/onboarding", request.url),
+  );
 }

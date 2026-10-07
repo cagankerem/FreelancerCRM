@@ -1,15 +1,12 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/shared/utils"
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/shared/utils";
 
 type LoadingStateProps = {
-  label?: string
-  className?: string
-}
+  label?: string;
+  className?: string;
+};
 
-function LoadingState({
-  label = "İçerik yükleniyor",
-  className,
-}: LoadingStateProps) {
+function LoadingState({ label = "İçerik yükleniyor", className }: LoadingStateProps) {
   return (
     <div
       role="status"
@@ -18,7 +15,7 @@ function LoadingState({
       data-slot="loading-state"
       className={cn(
         "mx-auto flex w-full max-w-md flex-col rounded-[18px] border border-border bg-card p-8 text-card-foreground shadow-sm",
-        className
+        className,
       )}
     >
       <span className="sr-only">{label}</span>
@@ -31,8 +28,8 @@ function LoadingState({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export { LoadingState }
-export type { LoadingStateProps }
+export { LoadingState };
+export type { LoadingStateProps };

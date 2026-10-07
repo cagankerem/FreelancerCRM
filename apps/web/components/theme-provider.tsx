@@ -5,11 +5,7 @@ import type { ComponentProps } from "react";
 
 type ThemeProviderProps = Omit<
   ComponentProps<typeof NextThemesProvider>,
-  | "attribute"
-  | "defaultTheme"
-  | "enableColorScheme"
-  | "enableSystem"
-  | "storageKey"
+  "attribute" | "defaultTheme" | "enableColorScheme" | "enableSystem" | "storageKey"
 >;
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {

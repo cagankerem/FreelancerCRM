@@ -4,16 +4,33 @@ import { readFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
-const variables = Object.fromEntries(readFileSync(new URL("../.env.local", import.meta.url), "utf8")
-  .trim().split("\n").map((line) => line.split(/=(.*)/s).slice(0, 2)));
-assert.ok(variables.NEXT_PUBLIC_SUPABASE_URL.startsWith("http://127.0.0.1:"), "Local Supabase only.");
-const service = createClient(variables.NEXT_PUBLIC_SUPABASE_URL, variables.SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
+const variables = Object.fromEntries(
+  readFileSync(new URL("../.env.local", import.meta.url), "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => line.split(/=(.*)/s).slice(0, 2)),
+);
+assert.ok(
+  variables.NEXT_PUBLIC_SUPABASE_URL.startsWith("http://127.0.0.1:"),
+  "Local Supabase only.",
+);
+const service = createClient(
+  variables.NEXT_PUBLIC_SUPABASE_URL,
+  variables.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: { persistSession: false, autoRefreshToken: false },
+  },
+);
 const existing = await service.auth.admin.listUsers({ page: 1, perPage: 100 });
 if (existing.error) throw new Error("Cannot inspect local smoke accounts.");
-if (existing.data.users.some((user) => user.email?.startsWith("product-smoke-") && user.email.endsWith("@example.invalid"))) {
-  throw new Error("An earlier product-smoke account remains. Resolve Auth account deletion before another run.");
+if (
+  existing.data.users.some(
+    (user) => user.email?.startsWith("product-smoke-") && user.email.endsWith("@example.invalid"),
+  )
+) {
+  throw new Error(
+    "An earlier product-smoke account remains. Resolve Auth account deletion before another run.",
+  );
 }
 const email = `product-smoke-${randomUUID()}@example.invalid`;
 const password = "YerelSmoke2026!";
@@ -28,7 +45,10 @@ try {
   await page.getByRole("heading", { name: "Profilini tamamla" }).waitFor();
   console.log("ok - new Auth user reaches onboarding");
 
-  const auth = createClient(variables.NEXT_PUBLIC_SUPABASE_URL, variables.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  const auth = createClient(
+    variables.NEXT_PUBLIC_SUPABASE_URL,
+    variables.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  );
   const signIn = await auth.auth.signInWithPassword({ email, password });
   assert.ifError(signIn.error);
   createdId = signIn.data.user.id;
@@ -49,7 +69,9 @@ try {
   console.log("ok - owner-only client creation and read");
 
   await page.goto("http://localhost:3000/app/proposals/new");
-  await page.locator('select[name="client_id"]').selectOption({ label: "Test Müşterisi · Kurgusal Şirket" });
+  await page
+    .locator('select[name="client_id"]')
+    .selectOption({ label: "Test Müşterisi · Kurgusal Şirket" });
   await page.locator('input[name="project_name"]').fill("Kurgusal Mobil Uygulama");
   await page.locator('select[name="tax_mode"]').selectOption("excluded");
   await page.locator('input[name="description"]').fill("Tasarım çalışması");
@@ -63,7 +85,8 @@ try {
   await browser.close();
   if (createdId) {
     const { data, error } = await service.auth.admin.getUserById(createdId);
-    if (error || data.user?.email !== email) throw new Error("Test user identity mismatch; manual inspection required.");
+    if (error || data.user?.email !== email)
+      throw new Error("Test user identity mismatch; manual inspection required.");
     const removed = await service.auth.admin.deleteUser(createdId);
     if (removed.error) throw new Error("Could not remove the exact synthetic smoke user.");
     console.log("Synthetic smoke user and its dependent data removed.");

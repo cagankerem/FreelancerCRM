@@ -1,11 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { WAITLIST_STORAGE_KEY } from "../../lib/client/waitlist-storage";
-import {
-  expectNoAxeViolations,
-  gotoWithTheme,
-  themes,
-} from "../helpers/accessibility";
+import { expectNoAxeViolations, gotoWithTheme, themes } from "../helpers/accessibility";
 
 const formName = "Alpha sürümüne katıl";
 
@@ -59,9 +55,7 @@ for (const theme of themes) {
     await expectNoAxeViolations(page, "#waitlist");
   });
 
-  test(`waitlist selected state is semantic and axe-clean in ${theme} theme`, async ({
-    page,
-  }) => {
+  test(`waitlist selected state is semantic and axe-clean in ${theme} theme`, async ({ page }) => {
     await gotoWithTheme(page, theme);
 
     const form = page.getByRole("form", { name: formName });
@@ -72,9 +66,7 @@ for (const theme of themes) {
 
     await expect(persona).toHaveValue("designer");
     await expect(consent).toHaveAttribute("aria-checked", "true");
-    await expect(
-      consent.locator('[data-slot="checkbox-indicator"]'),
-    ).toBeVisible();
+    await expect(consent.locator('[data-slot="checkbox-indicator"]')).toBeVisible();
 
     await expectNoAxeViolations(page, "#waitlist");
   });
@@ -88,13 +80,9 @@ for (const theme of themes) {
     const status = form.getByRole("status");
     await expect(status).toContainText(/demo kaydın bu cihazda saklandı/i);
     await expect(status).toHaveAttribute("aria-live", "polite");
-    await expect(
-      status.locator('[role="status"], [role="alert"], [aria-live]'),
-    ).toHaveCount(0);
+    await expect(status.locator('[role="status"], [role="alert"], [aria-live]')).toHaveCount(0);
     await expect
-      .poll(() =>
-        page.evaluate((key) => window.localStorage.getItem(key), WAITLIST_STORAGE_KEY),
-      )
+      .poll(() => page.evaluate((key) => window.localStorage.getItem(key), WAITLIST_STORAGE_KEY))
       .not.toBeNull();
 
     await expectNoAxeViolations(page, "#waitlist");
@@ -107,10 +95,7 @@ for (const theme of themes) {
       const originalSetItem = Storage.prototype.setItem;
       Storage.prototype.setItem = function setItem(key, value) {
         if (key === waitlistKey) {
-          throw new DOMException(
-            "SECRET quota implementation detail",
-            "QuotaExceededError",
-          );
+          throw new DOMException("SECRET quota implementation detail", "QuotaExceededError");
         }
         originalSetItem.call(this, key, value);
       };
@@ -118,9 +103,7 @@ for (const theme of themes) {
     await gotoWithTheme(page, theme);
 
     const form = page.getByRole("form", { name: formName });
-    await form
-      .getByRole("textbox", { name: /e-posta adresin/i })
-      .fill("storage@example.com");
+    await form.getByRole("textbox", { name: /e-posta adresin/i }).fill("storage@example.com");
     await form.getByRole("button", { name: formName }).click();
 
     const alert = form.getByRole("alert");
@@ -128,9 +111,7 @@ for (const theme of themes) {
       "Kayıt bu tarayıcıda saklanamadı. Lütfen daha sonra tekrar dene.",
     );
     await expect(alert).not.toHaveAttribute("aria-live");
-    await expect(
-      alert.locator('[role="status"], [role="alert"], [aria-live]'),
-    ).toHaveCount(0);
+    await expect(alert.locator('[role="status"], [role="alert"], [aria-live]')).toHaveCount(0);
     await expect(page.getByText(/secret quota/i)).toHaveCount(0);
 
     await expectNoAxeViolations(page, "#waitlist");

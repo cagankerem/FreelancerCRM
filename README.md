@@ -173,6 +173,78 @@ Adaptör testleri: `npm run test:local-db-tools`. Adaptör, CLI `2.116.0` komut
 biçimi için testlidir; CLI yükseltilirken testler ve gerçek port bağları tekrar
 kontrol edilmelidir. Desteklenmeyen Docker seçenekleri sessizce geçirilmez.
 
+## CI ve kalite kapıları
+
+`CI` workflow'u `main` hedefli her PR'da ve `main` push'larında çalışır.
+Her iş yeni `ubuntu-24.04` runner'ında, Node `22.23.3` ile başlar;
+`npm run ci:clean` yerel env, eski bağımlılık ve build çıktısı olmadığını
+doğrular. Ardından tek normatif lockfile ile `npm ci --prefix apps/web`
+çalışır ve lockfile'ın değişmediği kontrol edilir. `node_modules` veya
+`.next` çıktısı işler arasında taşınmaz.
+
+| Check | Kapsam | Kökten yerel komutlar |
+| --- | --- | --- |
+| `quality` | Workflow/politika doğrulaması, format, lint, temiz Next.js tip üretimi, strict TypeScript, Vitest, Docker adaptörü, production build, node:test ve rendered HTML | `npm run ci:validate`, `npm run test:ci`, `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`, `npm run test:integration` |
+| `browser` | Production sunucuda Chromium tam E2E/axe matrisi; Firefox ve WebKit kritik light/dark smoke | `CI=true PLAYWRIGHT_SERVER_MODE=production npm run test:browser` (önce `npm run build`) |
+| `database` | Yeni yerel Postgres, tüm migration'lar, iki kurgusal kullanıcılı seed, SQL/RLS izolasyonu, yarış testleri, security advisor, kaynak temizliği | CI: `npm run ci:db`; mevcut yerel geliştirme: `npm run test:db` |
+| `production-audit` | Production high/critical bulguları engeller | `npm run audit:production` |
+| `dependency-report` | Development dahil tam bağımlılık ağacını ayrı iş özeti olarak raporlar | `npm run audit:all` |
+| `secret-scan` | Gitleaks self-test, mevcut dosyalar ve Git geçmişi | `npm run secrets:self-test`, `npm run secrets:scan` |
+
+İlk kurulum: `npm run install-all`. Tarayıcı kurulumu:
+`cd apps/web && npx --no-install playwright install --with-deps chromium firefox webkit`.
+Format düzeltmesi: `npm run format`. Prettier `3.9.9` kaynak kodu,
+JSON/CSS ve workflow dosyalarını kapsar; üretilmiş çıktılar, lockfile'lar
+ve elle yönetilen Markdown belgeleri kapsam dışıdır. `plan.md` normatif
+kabul kriterlerini korur. SQL, Supabase migration/DB kapısında doğrulanır.
+
+DB CI komutu yalnız GitHub-hosted Linux runner'ında çalışır. Önceden var
+olan proje container/volume/network'ünü ve uygulama/uzak DB env değerlerini
+reddeder; oluşturduğu kaynakları kendi run kimliğiyle işaretler. Temiz DB'de
+`db reset --local` migration ve seed'i baştan uygular; ikinci migration
+uygulaması no-op olarak doğrulanır. Testlerin sonunda ve workflow'un
+`always()` adımında yalnız bu run'ın kaynakları `stop --no-backup` ile silinir.
+Kişisel yerel DB bu komutun hedefi değildir. Mevcut verili yerel DB'ye reset
+uygulamadan önce içeriği kontrol edip kullanıcı onayı alınmalıdır.
+
+Workflow ve bütün işler `contents: read` ile çalışır; checkout credentials
+kalıcı tutulmaz. Action'lar tam commit SHA'sına, actionlint `1.7.12`
+SHA-256 doğrulamasına sabitlenmiştir. CI production anahtarı veya verisi
+almaz. Ham Supabase çıktısı ve audit JSON'u loglanmaz; audit özeti yalnız
+paket/severity bilgisi içerir. CI'da trace, video ve screenshot kapalıdır;
+test/DB/env dosyaları artefakt olarak yüklenmez.
+
+`main` için `secret-scan`, `quality`, `browser`, `database` ve
+`production-audit` GitHub Actions kaynaklı required check'lerdir. Kural
+yöneticiye de uygulanır ve dalın güncel olması gerekir. Check adları
+değişirse GitHub branch protection ayarı da güncellenmelidir.
+`dependency-report` bulguları ayrıca raporlar; high/critical production
+bulgusu `production-audit` üzerinden engellenir. Audit servisine erişim
+veya rapor doğrulama hatası ilgili işi başarısız yapar.
+
+Kırmızı check için aynı satırdaki yerel komutu çalıştırın. Typecheck Next.js
+tiplerini kendisi üretir; integration testleri build'den sonra çalışır.
+Tarayıcı hatasında önce browser kurulumunu ve production sunucuyu kontrol
+edin; yerelde `CI` olmadan mevcut screenshot/trace desteği kullanılabilir.
+DB hatası için geçici runner'da migration/seed/test aşamasını ve varsa
+güvenli SQLSTATE kodunu kontrol edin; ham CLI çıktısı loglanmaz.
+production'a bağlanarak veya mevcut yerel verileri silerek hata gidermeyin.
+Audit bulgusunda ilgili paketi/lockfile'ı kontrollü güncelleyin ve testleri
+yeniden çalıştırın; `npm audit fix --force` kullanılmaz.
+
+Maintainer kabul kontrolü: `npm run ci:evidence -- <CI-run-id> <secret-run-id>`.
+Bu salt-okunur komut tamamlanmış işlerin loglarını geçici dizinde Gitleaks
+ile tarar, artefakt olmadığını ve `main` required check/yönetici kuralını
+doğrular. Ham loglar ve rapor işlem sonunda silinir; değerler ekrana basılmaz.
+
+Kabul kanıtı: [PR #6](https://github.com/cagankerem/FreelancerCRM/pull/6)
+üzerinde kasıtlı format, E2E, migration ve production bağımlılık hataları
+ilgili dört check'i başarısız ve PR'ı `BLOCKED` yaptı
+([negatif çalışma](https://github.com/cagankerem/FreelancerCRM/actions/runs/37616249854)).
+Hatalar geri alınınca aynı PR'da bütün check'ler geçti ve durum `CLEAN` oldu
+([pozitif çalışma](https://github.com/cagankerem/FreelancerCRM/actions/runs/37617485109)).
+Test PR'ı birleştirilmez; kasıtlı girdiler ürün dalına taşınmaz.
+
 ## Mimari
 
 Yerel şema, migration sırası, dar yetkili DB işlemleri ve test komutları:

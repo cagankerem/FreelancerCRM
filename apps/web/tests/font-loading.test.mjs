@@ -6,10 +6,7 @@ const appDirectory = new URL("../", import.meta.url);
 
 const [layoutSource, landingStyles] = await Promise.all([
   readFile(new URL("app/layout.tsx", appDirectory), "utf8"),
-  readFile(
-    new URL("components/marketing/landing-page.css", appDirectory),
-    "utf8",
-  ),
+  readFile(new URL("components/marketing/landing-page.css", appDirectory), "utf8"),
 ]);
 
 test("Manrope and Sora use their variable weight axes", () => {
@@ -26,8 +23,8 @@ test("Manrope and Sora use their variable weight axes", () => {
 });
 
 test("landing weights remain inside the downloaded variable-font ranges", () => {
-  const weights = [...landingStyles.matchAll(/font-weight:\s*(\d+)/g)].map(
-    ([, weight]) => Number(weight),
+  const weights = [...landingStyles.matchAll(/font-weight:\s*(\d+)/g)].map(([, weight]) =>
+    Number(weight),
   );
 
   assert.ok(weights.length > 0, "Expected explicit landing font weights.");

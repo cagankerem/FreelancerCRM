@@ -1,25 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ErrorState } from "@/components/ui/error-state"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { LoadingState } from "@/components/ui/loading-state"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ErrorState } from "@/components/ui/error-state";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { LoadingState } from "@/components/ui/loading-state";
 
 function UiStateFixture() {
-  const [selected, setSelected] = useState(false)
-  const [retryCount, setRetryCount] = useState(0)
+  const [selected, setSelected] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   return (
     <main className="min-h-dvh bg-background px-6 py-12 text-foreground">
       <div className="mx-auto grid w-full max-w-5xl gap-10">
         <header>
-          <p className="text-sm font-semibold text-on-primary-container">
-            Yalnız test amaçlı
-          </p>
+          <p className="text-sm font-semibold text-on-primary-container">Yalnız test amaçlı</p>
           <h1 className="mt-2 text-3xl font-semibold">Temel UI durumları</h1>
         </header>
 
@@ -45,9 +43,7 @@ function UiStateFixture() {
               aria-invalid="true"
               aria-describedby="fixture-invalid-error"
             />
-            <FieldError id="fixture-invalid-error">
-              Geçerli bir değer gir.
-            </FieldError>
+            <FieldError id="fixture-invalid-error">Geçerli bir değer gir.</FieldError>
           </Field>
 
           <div className="flex max-w-md items-start gap-3">
@@ -73,10 +69,7 @@ function UiStateFixture() {
           </div>
         </section>
 
-        <section
-          aria-labelledby="fixture-route-states"
-          className="grid gap-6 lg:grid-cols-2"
-        >
+        <section aria-labelledby="fixture-route-states" className="grid gap-6 lg:grid-cols-2">
           <h2 id="fixture-route-states" className="sr-only">
             Rota durumları
           </h2>
@@ -100,7 +93,7 @@ function UiStateFixture() {
         </section>
       </div>
     </main>
-  )
+  );
 }
 
-export { UiStateFixture }
+export { UiStateFixture };

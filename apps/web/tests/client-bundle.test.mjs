@@ -43,10 +43,7 @@ async function collectBrowserArtifacts(directory) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
       artifacts.push(...(await collectBrowserArtifacts(path)));
-    } else if (
-      entry.isFile() &&
-      clientArtifactExtensions.has(extname(entry.name))
-    ) {
+    } else if (entry.isFile() && clientArtifactExtensions.has(extname(entry.name))) {
       artifacts.push(path);
     }
   }

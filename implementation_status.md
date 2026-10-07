@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-09-28
+Son güncelleme: 2026-10-07
 
 ## Takip Sistemi
 
@@ -42,7 +42,7 @@ Son güncelleme: 2026-09-28
   - 2026-09-28: Kullanıcı kararıyla preview, staging ve production Supabase projeleri yayına çıkış aşamasına ertelendi; yerel ortam ve ayrım kuralları hazırlanacak. Gerçek uzak ortam izolasyonu doğrulanmadığından TASK-003 kısmi kalır; otomatik secret taraması da açıktır.
   - 2026-09-28: Sabit Gitleaks 8.30.1 ile `secrets:self-test` geçici sentetik anahtarı yakaladı; `secrets:scan` 247 depo dosyasını ve Git geçmişini bulgusuz taradı. Uzak ortam izolasyonu ertelendiğinden görev kısmi kalır.
   - 2026-09-28: Public depoda `main` için gerekli `secret-scan` kontrolü yöneticiye de uygulanacak şekilde etkinleştirildi; PR negatif/pozitif testiyle birleşme kapısı doğrulandı. Uzak Supabase ortam izolasyonu ertelendiğinden görev kısmi kalır.
-- [ ] TASK-004: Test ve CI kapılarını kur — Kısmi
+- [x] TASK-004: Test ve CI kapılarını kur
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
   - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.
   - 2026-09-26: `test:db`, `db:check-empty`, `db:migrate`, `db:migrations` ve `db:advisors` local komutları eklendi; DB testleri mevcut verileri hedeflemiyor, CI bağlantısı henüz yok.
@@ -50,6 +50,8 @@ Son güncelleme: 2026-09-28
   - 2026-09-28: PR için salt-okunur, SHA ile sabitlenmiş action'lı `secret-scan` workflow'u eklendi; yerel self-test ve çalışma ağacı/geçmiş taraması geçti. Gerçek PR sonucu ve GitHub Pro gerekli status check/merge engeli henüz doğrulanmadı.
   - 2026-09-28: PR #2'de `secret-scan` geçti; yalnız sentetik anahtar içeren geçici PR #3'te aynı check başarısız oldu. Test PR'ı kapatılıp dalı silindi, yerel tarama yeniden temiz geçti. GitHub Pro henüz etkin olmadığından required check ve fiili merge engeli doğrulanmadı.
   - 2026-09-28: Depo kullanıcı kararıyla public yapıldı; `main` dalında GitHub Actions kaynaklı `secret-scan` required check'i ve yöneticiye uygulama etkin. Geçici PR #4 sentetik bulguyla `FAILURE`/`BLOCKED`, girdi geçmişten çıkarılınca `SUCCESS`/`CLEAN` oldu; PR birleşmeden kapatılıp dalı silindi. Diğer TASK-004 CI kapıları henüz eksik.
+  - 2026-10-07: Temiz npm kurulum, Prettier, lint/typegen/typecheck, unit/integration/build, production tarayıcı, geçici local DB ve audit işleri eklendi. Yerelde 36 Vitest, 20 node:test, 24 CI politika ve 40 tarayıcı testi geçti; production audit sıfır, tam audit geliştirme ağacında 8 high bulgu raporluyor. Gerçek PR ve yeni required check negatif/pozitif kabulü sürüyor.
+  - 2026-10-07: PR #5 CI kapıları geçti; geçici PR #6 format/E2E/migration/production audit hatalarıyla FAILURE/BLOCKED, hatalar kaldırılınca tüm kontroller SUCCESS/CLEAN oldu. Beş required check yöneticiye de uygulanıyor; 8 migration, sentetik seed, 82 SQL ve 9 eşzamanlılık testi ile kaynak temizliği doğrulandı. Salt-okunur/SHA sabitli CI, log secret taraması, sıfır artefakt ve README komutları doğrulandı; production audit 0, development ağacındaki 8 high ayrıca raporlanıyor.
 - [ ] TASK-005: Correlation ID ve güvenli logger kur
 
 ## Faz 1B: Auth ve Profil

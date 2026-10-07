@@ -17,12 +17,8 @@ describe("App Router state boundaries", () => {
   it("renders a useful home action for unknown routes", () => {
     render(<NotFound />);
 
-    expect(
-      screen.getByRole("heading", { level: 1, name: "Sayfa bulunamadı" }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole("link", { name: "Ana sayfaya dön" }),
-    ).toHaveAttribute("href", "/");
+    expect(screen.getByRole("heading", { level: 1, name: "Sayfa bulunamadı" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Ana sayfaya dön" })).toHaveAttribute("href", "/");
   });
 
   it("keeps technical errors private and delegates recovery to Next.js", async () => {

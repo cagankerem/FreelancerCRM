@@ -8,9 +8,7 @@ const VIEWPORTS = [
 ] as const;
 
 for (const viewport of VIEWPORTS) {
-  test(`landing does not overflow horizontally at ${viewport.width}px`, async ({
-    page,
-  }) => {
+  test(`landing does not overflow horizontally at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto("/");
 
@@ -24,17 +22,16 @@ for (const viewport of VIEWPORTS) {
     expect(documentWidths.document).toBeLessThanOrEqual(documentWidths.viewport);
 
     if (viewport.width <= 375) {
-      const fields = await page.locator(".lp-form-row > .lp-field").evaluateAll(
-        (elements) =>
-          elements.map((element) => {
-            const bounds = element.getBoundingClientRect();
-            return {
-              bottom: bounds.bottom,
-              left: bounds.left,
-              top: bounds.top,
-              width: bounds.width,
-            };
-          }),
+      const fields = await page.locator(".lp-form-row > .lp-field").evaluateAll((elements) =>
+        elements.map((element) => {
+          const bounds = element.getBoundingClientRect();
+          return {
+            bottom: bounds.bottom,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          };
+        }),
       );
 
       expect(fields).toHaveLength(2);
@@ -60,10 +57,7 @@ test("mobile waitlist anchor clears the sticky navigation", async ({ page }) => 
           return Number.NEGATIVE_INFINITY;
         }
 
-        return (
-          waitlist.getBoundingClientRect().top -
-          navigation.getBoundingClientRect().bottom
-        );
+        return waitlist.getBoundingClientRect().top - navigation.getBoundingClientRect().bottom;
       }),
     )
     .toBeGreaterThanOrEqual(0);

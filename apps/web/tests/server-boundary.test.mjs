@@ -10,9 +10,7 @@ import ts from "typescript";
 
 const execFileAsync = promisify(execFile);
 const appDirectory = fileURLToPath(new URL("..", import.meta.url));
-const sourceRoots = ["app", "components", "lib"].map((directory) =>
-  join(appDirectory, directory),
-);
+const sourceRoots = ["app", "components", "lib"].map((directory) => join(appDirectory, directory));
 const serverDirectory = join(appDirectory, "lib", "server");
 const clientDirectory = join(appDirectory, "lib", "client");
 const sharedDirectory = join(appDirectory, "lib", "shared");
@@ -22,9 +20,7 @@ const nextCli = join(appDirectory, "node_modules", "next", "dist", "bin", "next"
 const sourceFiles = await collectSourceFiles(sourceRoots);
 const sourceFileSet = new Set(sourceFiles);
 const sourceByFile = new Map(
-  await Promise.all(
-    sourceFiles.map(async (file) => [file, await readFile(file, "utf8")]),
-  ),
+  await Promise.all(sourceFiles.map(async (file) => [file, await readFile(file, "utf8")])),
 );
 const moduleSpecifiersByFile = new Map(
   sourceFiles.map((file) => [file, collectModuleSpecifiers(file, sourceByFile.get(file))]),
@@ -243,8 +239,8 @@ function collectModuleSpecifiers(file, source) {
 }
 
 function collectReExportSpecifiers(file, source) {
-  return parseSourceFile(file, source).statements
-    .filter(
+  return parseSourceFile(file, source)
+    .statements.filter(
       (statement) =>
         ts.isExportDeclaration(statement) &&
         statement.moduleSpecifier &&
@@ -367,7 +363,7 @@ async function createInvalidClientImportFixture() {
     ),
     writeFile(
       join(appDirectoryInFixture, "layout.tsx"),
-      'export default function Layout({ children }: { children: React.ReactNode }) { return <html><body>{children}</body></html>; }\n',
+      "export default function Layout({ children }: { children: React.ReactNode }) { return <html><body>{children}</body></html>; }\n",
     ),
     writeFile(
       join(appDirectoryInFixture, "page.tsx"),

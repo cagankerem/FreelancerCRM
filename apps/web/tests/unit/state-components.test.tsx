@@ -23,9 +23,7 @@ describe("LoadingState", () => {
   it("supports a context-specific accessible label", () => {
     render(<LoadingState label="Teklifler hazırlanıyor" />);
 
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Teklifler hazırlanıyor",
-    );
+    expect(screen.getByRole("status")).toHaveTextContent("Teklifler hazırlanıyor");
   });
 });
 
@@ -39,12 +37,8 @@ describe("EmptyState", () => {
       />,
     );
 
-    expect(
-      screen.getByRole("heading", { name: "Henüz teklif yok" }),
-    ).toBeVisible();
-    expect(
-      screen.getByText("İlk teklifini oluşturarak başlayabilirsin."),
-    ).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Henüz teklif yok" })).toBeVisible();
+    expect(screen.getByText("İlk teklifini oluşturarak başlayabilirsin.")).toBeVisible();
     expect(isInaccessible(screen.getByLabelText("Dekoratif daire"))).toBe(true);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();

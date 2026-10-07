@@ -20,8 +20,10 @@ const sora = Sora({
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
+  const protocol =
+    requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const socialImage = `${protocol}://${host}/og.png`;
 
   return {
@@ -29,8 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: "Kapsam",
       template: "%s · Kapsam",
     },
-    description:
-      "Freelancerlar için profesyonel teklif oluşturma ve yaklaşık görüntülenme takibi.",
+    description: "Freelancerlar için profesyonel teklif oluşturma ve yaklaşık görüntülenme takibi.",
     openGraph: {
       title: "Kapsam — Tekliflerini oluştur, paylaş ve takip et",
       description: "Freelancerlar için AI destekli teklif oluşturma ve takip deneyimi.",

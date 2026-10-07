@@ -1,22 +1,18 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/shared/utils"
-import { ChevronDownIcon } from "lucide-react"
+import { cn } from "@/lib/shared/utils";
+import { ChevronDownIcon } from "lucide-react";
 
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
-  size?: "sm" | "default"
-}
+  size?: "sm" | "default";
+};
 
-function NativeSelect({
-  className,
-  size = "default",
-  ...props
-}: NativeSelectProps) {
+function NativeSelect({ className, size = "default", ...props }: NativeSelectProps) {
   return (
     <div
       className={cn(
         "group/native-select relative w-fit has-[select:disabled]:opacity-50",
-        className
+        className,
       )}
       data-slot="native-select-wrapper"
       data-size={size}
@@ -27,35 +23,33 @@ function NativeSelect({
         className="h-12 min-h-12 w-full min-w-0 appearance-none rounded-[14px] border border-input bg-card py-2 pr-9 pl-3.5 text-sm text-card-foreground transition-colors outline-none select-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-[size=sm]:h-10 data-[size=sm]:min-h-10 data-[size=sm]:rounded-[12px] data-[size=sm]:py-1 dark:aria-invalid:border-destructive/70 dark:aria-invalid:ring-destructive/30"
         {...props}
       />
-      <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground select-none" aria-hidden="true" data-slot="native-select-icon" />
+      <ChevronDownIcon
+        className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground select-none"
+        aria-hidden="true"
+        data-slot="native-select-icon"
+      />
     </div>
-  )
+  );
 }
 
-function NativeSelectOption({
-  className,
-  ...props
-}: React.ComponentProps<"option">) {
+function NativeSelectOption({ className, ...props }: React.ComponentProps<"option">) {
   return (
     <option
       data-slot="native-select-option"
       className={cn("bg-[Canvas] text-[CanvasText]", className)}
       {...props}
     />
-  )
+  );
 }
 
-function NativeSelectOptGroup({
-  className,
-  ...props
-}: React.ComponentProps<"optgroup">) {
+function NativeSelectOptGroup({ className, ...props }: React.ComponentProps<"optgroup">) {
   return (
     <optgroup
       data-slot="native-select-optgroup"
       className={cn("bg-[Canvas] text-[CanvasText]", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { NativeSelect, NativeSelectOptGroup, NativeSelectOption }
+export { NativeSelect, NativeSelectOptGroup, NativeSelectOption };
