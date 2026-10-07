@@ -44,6 +44,7 @@ function names(kind) {
     .filter(Boolean);
 }
 function supabase(args, label) {
+  console.log(`DB CI: ${label}`);
   return run(process.execPath, [cli, "--workdir", root, "--network-id", network, ...args], label, {
     env: localDockerEnvironment(),
   });

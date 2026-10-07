@@ -14,8 +14,9 @@ export function publicSupabaseSettings() {
 }
 
 export async function userClient() {
-  const { url, key } = publicSupabaseSettings();
   const store = await cookies();
+  // Establish request-time rendering before validating runtime settings.
+  const { url, key } = publicSupabaseSettings();
   return createServerClient(url, key, {
     cookies: {
       getAll: () => store.getAll(),
