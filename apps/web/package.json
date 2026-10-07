@@ -27,7 +27,6 @@
     "@supabase/supabase-js": "2.115.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lodash": "4.17.20",
     "lucide-react": "^1.26.0",
     "motion": "^12.42.2",
     "next": "16.3.8",
