@@ -1,6 +1,10 @@
 # Generated/dependency/runtime files; source code and workflow files remain checked.
 **/node_modules/**
 **/.next/**
+**/dist/**
+**/.wrangler/**
+**/.vinext/**
+**/.workers/**
 **/coverage/**
 **/test-results/**
 **/playwright-report/**

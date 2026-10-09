@@ -83,6 +83,7 @@ describe("Supabase client guards run before client creation/network", () => {
     expect(createBrowserClient).toHaveBeenCalledWith(
       supabaseProjects.test.url,
       supabaseProjects.test.publishableKey,
+      { cookieOptions: { secure: true } },
     );
     expect(createServerClient).toHaveBeenCalled();
   });

@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      // Same-origin form POSTs need a concrete Origin for Workers' CSRF checks.
+      // Callback and public token routes retain the global no-referrer policy.
+      ...["/auth/login", "/auth/register", "/app/:path*", "/onboarding"].map((source) => ({
+        source,
+        headers: [{ key: "Referrer-Policy", value: "same-origin" }],
+      })),
     ];
   },
 };

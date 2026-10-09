@@ -1,5 +1,29 @@
 # FreelancerCRM
 
+## Workers staging (controlled vinext beta adapter)
+
+Native Next.js commands remain available. Workers uses pinned vinext 1.1.0,
+Vite 8.3.4, Wrangler 4.149.0 and compatibility date 2026-10-06.
+
+- `npm run workers:dev` / `npm run workers:build`: local workerd development/build.
+- `npm run test:workers:runtime`: built workerd browser/Auth boundary tests and local product smoke; port 3000 must be free.
+- `npm run workers:build:staging`: isolated build without local env/secret files; production project metadata is excluded.
+- `npm run workers:deploy:staging -- <build-directory> --from-cli`: test-only deployment using macOS Supabase CLI Keychain access; secrets are never printed and temporary secret files are removed. Without the flag, use hidden input in your own terminal.
+- `npm run auth:configure:test`: configure and verify only the test project's exact staging Site URL/callback; email confirmation remains unchanged.
+- `npm run test:workers:staging`: HTTPS smoke with exact synthetic accounts and cleanup; never run in PR quality CI. Real email verification is a separate acceptance check.
+- `npm run ci:workers`: fresh GitHub-hosted CI only; disposable local Supabase, migrations/seed/DB checks, built workerd browser/product checks and owned-resource cleanup.
+
+Staging: `https://freelancercrm-staging.cagankeremergun.workers.dev` →
+`FreelancerCRM-test`. Production deployment and PR preview automation are not
+configured by these commands. Never deploy local `dist` or publish `.dev.vars`
+as an artifact. Cloud session cookies require Secure; callback/public proposals
+retain no-referrer and private/no-store. Private form origin checks remain enabled.
+
+React/React DOM/RSC are patched to 19.2.8. The narrow `satori → fflate` override
+pins patched 0.7.5 and can be removed when satori requires that patch itself.
+The full audit still reports the known braces root advisory, including vinext's
+indirect chain; the production audit and runtime bundle review are distinct checks.
+
 ## v0.1.0
 
 ### Kapsam — alpha landing ve yönlendirilmiş ürün demosu

@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { parsePublicSupabaseEnv } from "@/lib/shared/schemas/supabase-env";
+import { parsePublicSupabaseEnv, supabaseCookieOptions } from "@/lib/shared/schemas/supabase-env";
 import { supabaseProjects } from "@/lib/shared/supabase-projects";
 
 describe("Supabase public environment", () => {
+  it.each(["preview", "staging", "production"])("requires Secure cookies in %s", (environment) => {
+    expect(supabaseCookieOptions(environment).secure).toBe(true);
+  });
+  it.each(["local", "ci"])("permits loopback HTTP cookies only in %s", (environment) => {
+    expect(supabaseCookieOptions(environment).secure).toBe(false);
+  });
   it("accepts localhost and the explicitly selected production project", () => {
     expect(
       parsePublicSupabaseEnv({

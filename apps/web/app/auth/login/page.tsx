@@ -6,14 +6,17 @@ export const metadata: Metadata = { title: "Giriş", robots: { index: false } };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; confirmation?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, confirmation } = await searchParams;
   return (
     <main className="product-shell product-narrow">
       <h1>Giriş yap</h1>
       <p>Teklif çalışma alanına devam et.</p>
       {error && <p role="alert">E-posta veya parola doğrulanamadı.</p>}
+      {confirmation === "sent" && (
+        <p role="status">Devam etmek için e-posta doğrulama bağlantısını kontrol et.</p>
+      )}
       <form action={login} className="product-form">
         <label>
           E-posta
