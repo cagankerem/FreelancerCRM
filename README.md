@@ -161,13 +161,38 @@ kalmalıdır. Browser/server client'ları eksik veya geçersiz public env değer
 hata verir; korumalı rotaların proxy'si env eksikken sessizce geçiş yapmaz.
 Yerel ortam dışında HTTP Supabase URL kabul edilmez.
 
-Preview, staging ve production için ayrı Supabase projeleri ve ayrı deployment
-env değerleri kullanılmalıdır; `.env.local` bu ortamlara kopyalanmamalıdır.
-2026-09-28 kararıyla bulut projelerinin kurulması yayına çıkış aşamasına
-ertelendi. Bu nedenle TASK-003'ün gerçek ortam izolasyonu kabul kriteri kısmi
-kalır. Uzak projeler henüz oluşturulmadı veya bu depoya bağlanmadı. Her ortam için
-public URL/key ve sunucu secret'ları dağıtım platformunun gizli ortam
-ayarlarında tutulmalı; production verisi test/preview ortamına taşınmamalıdır.
+2026-10-09 kullanıcı onayıyla iki uzak Supabase projesi hedeflenir:
+preview ve staging ortak test projesini, production ayrı projeyi kullanır.
+Preview/staging DB, Auth ve Storage kaynaklarını paylaşır; birbirinden izole
+değildir. Ortak proje yalnız sentetik veri içerir; production verisi ve sunucu
+secret'ları test ortamına taşınmaz. Ortak test migration dağıtımları kontrollü
+ve sıralı yapılır. PR kalite CI'sı bağımsız geçici yerel DB kullanmaya devam eder;
+production'a otomatik migration uygulanmaz.
+
+`.env.local` buluta kopyalanmamalıdır. Production ile ortak test projesinin
+public URL/key ve sunucu secret'ları ayrı tutulur; deployment kurulduğunda
+platformun ortam ayarlarına uygun kapsamla eklenir. Vercel kurulumu ve gerçek
+ürün yayını bu aşamada ertelenir.
+
+Kullanıcı mevcut FreelancerCRM bulut projesinde yalnız deneme verileri
+olduğunu bildirdi; bu bildirim sıfırlama veya veri silme onayı değildir.
+2026-10-09'da kullanıcı tarafından verilen referanslarla doğrudan erişim
+doğrulandı. `FreelancerCRM` organizasyonu (`xyyupigqexfdjtqcvmgs`) Free
+plandadır; yeni test projesi aylık 0 maliyet teyidiyle aynı organizasyonda
+oluşturuldu. İki proje de Frankfurt (`eu-central-1`) bölgesindedir.
+
+| Rol | Proje | Referans |
+|---|---|---|
+| Production için ayrılmış; henüz yayın yok | FreelancerCRM | `ammrkpwfznlcbdyrqlkn` |
+| Ortak preview/staging | FreelancerCRM-test | `pbqgjfzylnhaiadlpvkq` |
+
+Her iki projede salt-okunur SQL bağlantısı geçti; public iş tablosu ve Auth
+kullanıcı sayısı 0, güvenlik advisor bulgusu yok. Mevcut projeye migration,
+seed veya reset uygulanmadı. Bu kontroller uygulama env eşlemesi, Auth
+callback ayarları veya uçtan uca production–test izolasyonu yerine geçmez.
+Yerel uygulama env dosyaları değiştirilmedi, sunucu anahtarları alınmadı
+ve projeler CLI üzerinden bu depoya bağlanmadı. TASK-003 kalan ortam/config
+ve uçtan uca bağlantı/izolasyon kontrolleri geçene kadar kısmi kalır.
 
 Adaptör testleri: `npm run test:local-db-tools`. Adaptör, CLI `2.116.0` komut
 biçimi için testlidir; CLI yükseltilirken testler ve gerçek port bağları tekrar

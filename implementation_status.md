@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-10-07
+Son güncelleme: 2026-10-09
 
 ## Takip Sistemi
 
@@ -10,6 +10,10 @@ Son güncelleme: 2026-10-07
 - Tamamlanmamış görevlerin sonuna gerektiğinde `— Devam ediyor`, `— Kısmi` veya `— Bloke` eklenir.
 - Anlamlı bir gelişme olduğunda görevin altına tarihli tek satır yazılır.
 - Kabul kriterleri burada tekrarlanmaz; `plan.md` içinde tutulur.
+
+## Kullanıcının İstediği Proje Araçları
+
+- 2026-10-09: `asd-ste100` v0.4.0 skill'i `.agents/skills/asd-ste100` altına [upstream commit](https://github.com/danyuchn/asd-ste100-skill/commit/32511c6992ecb5f1971e46a2943f2e6adceedafe) üzerinden eklendi; yedi dosyanın Git blob hash'i kaynakla eşleşti. Mac'in aktif Homebrew `python3` sürümü 3.14.5'ten Python.org ve Homebrew'da doğrulanan güncel kararlı 3.14.8'e yükseltildi. Linter `--selftest`, temiz stdin ve iki beklenen bulgulu negatif fixture kontrolleri yeni Python ile geçti; pip ve SSL import'u doğrulandı. Bu kullanıcı talebi TASK kabul durumlarını değiştirmez.
 
 ## Faz 1A: Proje Temeli
 
@@ -42,6 +46,8 @@ Son güncelleme: 2026-10-07
   - 2026-09-28: Kullanıcı kararıyla preview, staging ve production Supabase projeleri yayına çıkış aşamasına ertelendi; yerel ortam ve ayrım kuralları hazırlanacak. Gerçek uzak ortam izolasyonu doğrulanmadığından TASK-003 kısmi kalır; otomatik secret taraması da açıktır.
   - 2026-09-28: Sabit Gitleaks 8.30.1 ile `secrets:self-test` geçici sentetik anahtarı yakaladı; `secrets:scan` 247 depo dosyasını ve Git geçmişini bulgusuz taradı. Uzak ortam izolasyonu ertelendiğinden görev kısmi kalır.
   - 2026-09-28: Public depoda `main` için gerekli `secret-scan` kontrolü yöneticiye de uygulanacak şekilde etkinleştirildi; PR negatif/pozitif testiyle birleşme kapısı doğrulandı. Uzak Supabase ortam izolasyonu ertelendiğinden görev kısmi kalır.
+  - 2026-10-09: Kullanıcı ortak preview/staging test projesi + ayrı production olmak üzere iki uzak Supabase projesini onayladı; plan/README ortam kararı güncellendi. Mevcut FreelancerCRM'in yalnız deneme verisi içerdiği kullanıcı bildirimi, silme onayı sayılmadı; bağlı Supabase hesabında proje görünmediği için hedef organizasyon/proje referansı bekleniyor. Uzak kaynak veya veri değiştirilmedi; izolasyon/bağlantı kabulü henüz geçmedi.
+  - 2026-10-09: Kullanıcının verdiği proje/organizasyon referanslarıyla erişim ve Free plan doğrulandı; Frankfurt'ta aylık 0 maliyet teyidiyle FreelancerCRM-test (pbqgjfzylnhaiadlpvkq) oluşturuldu, mevcut FreelancerCRM (ammrkpwfznlcbdyrqlkn) production için ayrıldı. Her ikisinde salt-okunur SQL bağlantısı geçti, public tablo/Auth kullanıcı sayısı 0 ve güvenlik advisor bulgusu yok; mevcut DB/env verileri değiştirilmedi. Uygulama env eşlemesi, Auth callback ve uçtan uca izolasyon/bağlantı testleri henüz tamamlanmadığından görev kısmi.
 - [x] TASK-004: Test ve CI kapılarını kur
   - 2026-08-06: Build ve temel rendered HTML testleri mevcut; CI, migration, unit, integration ve E2E kapıları eksik.
   - 2026-08-20: Production high/critical bulgularını engelleyen ve tam bağımlılık ağacını ayrıca raporlayan audit politikası plan.md’ye eklendi; kalıcı CI kapısı henüz uygulanmadı.
@@ -52,6 +58,7 @@ Son güncelleme: 2026-10-07
   - 2026-09-28: Depo kullanıcı kararıyla public yapıldı; `main` dalında GitHub Actions kaynaklı `secret-scan` required check'i ve yöneticiye uygulama etkin. Geçici PR #4 sentetik bulguyla `FAILURE`/`BLOCKED`, girdi geçmişten çıkarılınca `SUCCESS`/`CLEAN` oldu; PR birleşmeden kapatılıp dalı silindi. Diğer TASK-004 CI kapıları henüz eksik.
   - 2026-10-07: Temiz npm kurulum, Prettier, lint/typegen/typecheck, unit/integration/build, production tarayıcı, geçici local DB ve audit işleri eklendi. Yerelde 36 Vitest, 20 node:test, 24 CI politika ve 40 tarayıcı testi geçti; production audit sıfır, tam audit geliştirme ağacında 8 high bulgu raporluyor. Gerçek PR ve yeni required check negatif/pozitif kabulü sürüyor.
   - 2026-10-07: PR #5 CI kapıları geçti; geçici PR #6 format/E2E/migration/production audit hatalarıyla FAILURE/BLOCKED, hatalar kaldırılınca tüm kontroller SUCCESS/CLEAN oldu. Beş required check yöneticiye de uygulanıyor; 8 migration, sentetik seed, 82 SQL ve 9 eşzamanlılık testi ile kaynak temizliği doğrulandı. Salt-okunur/SHA sabitli CI, log secret taraması, sıfır artefakt ve README komutları doğrulandı; production audit 0, development ağacındaki 8 high ayrıca raporlanıyor.
+  - 2026-10-08: Development güvenlik giderimi bloke: 8 high paketin kökü [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), braces <=3.0.3 için yayımlanmış yama yok; güncel Next ESLint/shadcn aynı zinciri taşıyor, shadcn CSS build'de kullanılıyor. Manifest/lockfile/CI değişmedi; tam audit 8 high/0 critical, production 0, düşük seviye bulgu 0; npm ci, format/lint/typecheck/build, 36 unit/20 integration/24 CI politika/40 tarayıcı testi, workflow doğrulaması ve secret self-test/taraması geçti. Upstream yama veya ayrıca onaylanmış alternatif bağımlılık/yama bakımı kararı gerekiyor; bu güvenlik giderimi tamamlanmadı.
 - [ ] TASK-005: Correlation ID ve güvenli logger kur
 
 ## Faz 1B: Auth ve Profil

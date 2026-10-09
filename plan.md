@@ -1759,9 +1759,18 @@ Sev-1/2, veri sızıntısı/kaybı, ödeme tutarsızlığı veya ana akışı en
 | Ortam | Amaç ve veri |
 |---|---|
 | Local | Local Supabase, sentetik seed, mock/sandbox AI ve ödeme |
-| Preview | PR build ve entegrasyon; production’dan ayrı test Supabase/secrets |
-| Staging | Webhook, Edge, migration ve ödeme için production-benzeri kalıcı ortam |
+| Preview | PR build ve entegrasyon; staging ile ortak, production’dan ayrı test Supabase/secrets |
+| Staging | Webhook, Edge, migration ve ödeme için kalıcı test ortamı; preview ile ortak Supabase |
 | Production | Ayrı Vercel/Supabase, least privilege, backup ve alarm |
+
+2026-10-09 kullanıcı kararı: Maliyeti azaltmak için iki uzak Supabase projesi
+kullanılır: ortak preview/staging test projesi ve ayrı production projesi.
+Preview ile staging arasında DB/Auth/Storage izolasyonu yoktur; bu paylaşım
+production–test izolasyonunu gevşetmez. Test projesi yalnız sentetik veri içerir;
+production verisi veya sunucu secret’ları bu projeye taşınmaz. PR kalite CI’sı
+ortak uzak DB’ye değil bağımsız geçici yerel DB’ye bağlanır. Ortak test
+projesindeki migration dağıtımları kontrollü ve sıralı yapılır; production’a
+otomatik uygulanmaz. Vercel kurulumu ve ürünün gerçek yayını ayrıca ele alınır.
 
 Kurallar:
 
