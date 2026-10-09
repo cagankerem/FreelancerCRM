@@ -19,6 +19,7 @@ defaults:
 
 env:
   CI: "true"
+  NEXT_PUBLIC_APP_ENV: "ci"
   NEXT_TELEMETRY_DISABLED: "1"
 
 jobs:

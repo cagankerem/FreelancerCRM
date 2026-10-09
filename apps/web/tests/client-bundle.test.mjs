@@ -8,6 +8,8 @@ const appDirectory = fileURLToPath(new URL("..", import.meta.url));
 const clientBundleDirectory = join(appDirectory, ".next", "static");
 const clientArtifactExtensions = new Set([".js", ".map"]);
 const serverOnlyMarkers = [
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_SERVER_KEY_BINDING",
   "oai-authenticated-user-email",
   "oai-authenticated-user-full-name",
   "/signin-with-chatgpt",

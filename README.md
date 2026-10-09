@@ -161,6 +161,48 @@ kalmalıdır. Browser/server client'ları eksik veya geçersiz public env değer
 hata verir; korumalı rotaların proxy'si env eksikken sessizce geçiş yapmaz.
 Yerel ortam dışında HTTP Supabase URL kabul edilmez.
 
+### Uygulama ortamı–proje eşlemesi
+
+| Çalışma yeri | `NEXT_PUBLIC_APP_ENV` | İzin verilen Supabase |
+|---|---|---|
+| Yerel geliştirme | `local` | Yalnız `localhost` / `127.0.0.1` |
+| PR kalite testleri | `ci` | CI'ın bağımsız geçici yerel Supabase'i |
+| Preview / staging | `preview` / `staging` | `https://pbqgjfzylnhaiadlpvkq.supabase.co` |
+| Production | `production` | `https://ammrkpwfznlcbdyrqlkn.supabase.co` |
+
+Her deployment'a kendi URL/public anahtarı ve gerekiyorsa sunucu anahtarı
+verilir. Bulutta ortam seçicisi zorunludur. Eski yerel `.env.local` dosyaları
+korunur; seçici yoksa yalnız loopback URL yerel kabul edilir.
+`NODE_ENV=production` deployment seçicisi değildir: yerel/CI production
+build'i bulut production projesine yönlendirilmez.
+
+Browser, server ve Auth proxy istemciyi oluşturmadan önce aynı URL/public-key
+eşlemesini doğrular. URL'de kullanıcı bilgisi, path, query ve fragment
+reddedilir. CI sunucusu, seçici değiştirilse de uzak proje kabul etmez.
+Bu kontrol ağ isteğiyle proje keşfetmez.
+
+Uzak public anahtarlar salt-okunur proje bilgisinden alınan güncel
+`sb_publishable_` değerleriyle eşleştirilir; yalnız bu public değerler
+`apps/web/lib/shared/supabase-projects.ts` içinde bulunur. Key rotation sonrası
+liste doğrulanmış yeni public değerlerle güncellenmeli ve uygulama yeniden
+build edilmelidir. Uzak legacy anon anahtar yerine publishable anahtar kullanılır.
+Sunucu anahtarı bu dosyaya veya `NEXT_PUBLIC_*` değişkenlerine konulmaz.
+Gitleaks'in genel API-key kuralının bu iki doğrulanmış public değerdeki
+sahte pozitifleri yalnız ilgili iki satırdaki açıklamalı istisnayla ayrılır;
+klasör/env dosyaları veya secret kuralları topluca dışlanmaz.
+
+`SUPABASE_SERVICE_ROLE_KEY` mevcut sunucu değişkeninin adıdır; legacy
+`service_role` veya yeni `sb_secret_` değeri alabilir. Legacy anahtarın
+role/proje claim'i kontrol edilir; bu imza doğrulaması değildir, gerçek
+yetkilendirmeyi Supabase yapar. Opak secret için sunucuda ayrıca
+`SUPABASE_SERVER_KEY_BINDING=<proje-ref>:<anahtarın SHA-256 hex özeti>`
+gerekir (local için ref `local`). Bu bağ hedef projenin doğrulanmış anahtarından
+bağımsız provisioning sırasında hazırlanmalı; çalışma anında verilen herhangi
+bir anahtardan otomatik türetilmemelidir. Eksik/uyuşmayan bağda admin istemcisi
+oluşturulmaz. Anahtar veya özeti loglanmamalı, secret değerleri sohbet/git'e
+konulmamalıdır. Bu aşamada uzak sunucu anahtarı alınmadı veya deployment
+değişkeni kurulmadı; Vercel dağıtımında bu değerler ortam kapsamında sağlanacak.
+
 2026-10-09 kullanıcı onayıyla iki uzak Supabase projesi hedeflenir:
 preview ve staging ortak test projesini, production ayrı projeyi kullanır.
 Preview/staging DB, Auth ve Storage kaynaklarını paylaşır; birbirinden izole
