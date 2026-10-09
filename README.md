@@ -26,6 +26,13 @@ Both synthetic accounts and dependent rows were cleaned; the test database has
 zero users/profiles/proposals, eight migrations and eight RLS-enabled tables.
 The user deferred real signup/email-verification callback testing.
 
+All seven checks passed in [CI run 37999446531](https://github.com/cagankerem/FreelancerCRM/actions/runs/37999446531).
+`workers-runtime` is now required alongside the existing five protected checks.
+In [negative run 37999942035](https://github.com/cagankerem/FreelancerCRM/actions/runs/37999942035),
+only Workers failed and PR #8 was BLOCKED; the temporary failing step was removed.
+CI logs passed secret scanning and runs produced zero artifacts. Until this PR
+is merged, other branches based on old main may lack the newly required job.
+
 React/React DOM/RSC are patched to 19.2.8. The narrow `satori → fflate` override
 pins patched 0.7.5 and can be removed when satori requires that patch itself.
 The full audit still reports the known braces root advisory, including vinext's
