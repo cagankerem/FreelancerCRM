@@ -175,7 +175,7 @@ try {
     "Renewed cookies lost Secure flag.",
   );
   console.log("ok - expired access cookie is replaced using a real refresh session");
-  await page.getByRole("button", { name: "Çıkış yap" }).click();
+  await page.getByRole("button", { name: "Çıkış", exact: true }).click();
   await page.getByRole("heading", { name: "Giriş yap" }).waitFor();
   await page.goto(`${stagingOrigin}/app`);
   await page.getByRole("heading", { name: "Giriş yap" }).waitFor();

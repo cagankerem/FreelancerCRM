@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { parseDocument } from "../../apps/web/node_modules/yaml/dist/index.js";
 
-export const requiredChecks = ["secret-scan", "quality", "browser", "database", "production-audit"];
+export const requiredChecks = [
+  "secret-scan",
+  "quality",
+  "browser",
+  "database",
+  "production-audit",
+  "workers-runtime",
+];
 
 export function validateWorkflow(source, filename) {
   const document = parseDocument(source, { uniqueKeys: true });

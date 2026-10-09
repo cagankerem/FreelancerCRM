@@ -19,6 +19,13 @@ configured by these commands. Never deploy local `dist` or publish `.dev.vars`
 as an artifact. Cloud session cookies require Secure; callback/public proposals
 retain no-referrer and private/no-store. Private form origin checks remain enabled.
 
+On 2026-10-10 the deployed HTTPS staging smoke passed password login,
+Secure/SameSite=Lax cookies, onboarding, client/draft/publish/public resolver,
+cross-user RLS, expired-session refresh, logout and safe invalid callback redirect.
+Both synthetic accounts and dependent rows were cleaned; the test database has
+zero users/profiles/proposals, eight migrations and eight RLS-enabled tables.
+The user deferred real signup/email-verification callback testing.
+
 React/React DOM/RSC are patched to 19.2.8. The narrow `satori → fflate` override
 pins patched 0.7.5 and can be removed when satori requires that patch itself.
 The full audit still reports the known braces root advisory, including vinext's
