@@ -1,42 +1,77 @@
 # FreelancerCRM
 
-## Workers staging (controlled vinext beta adapter)
+## Workers staging kurulumu — kontrollü adaptör denemesi
 
-Native Next.js commands remain available. Workers uses pinned vinext 1.1.0,
-Vite 8.3.4, Wrangler 4.149.0 and compatibility date 2026-10-06.
+Native Next.js komutları korunur. Workers için sabitlenmiş vinext 1.1.0 (beta),
+Vite 8.3.4 ve Wrangler 4.149.0 kullanılır. Uyumluluk tarihi, kurulu workerd'in
+desteklediği `2026-10-06` değeridir; tarihin ileri alınması ayrıca test gerektirir.
 
-- `npm run workers:dev` / `npm run workers:build`: local workerd development/build.
-- `npm run test:workers:runtime`: built workerd browser/Auth boundary tests and local product smoke; port 3000 must be free.
-- `npm run workers:build:staging`: isolated build without local env/secret files; production project metadata is excluded.
-- `npm run workers:deploy:staging -- <build-directory> --from-cli`: test-only deployment using macOS Supabase CLI Keychain access; secrets are never printed and temporary secret files are removed. Without the flag, use hidden input in your own terminal.
-- `npm run auth:configure:test`: configure and verify only the test project's exact staging Site URL/callback; email confirmation remains unchanged.
-- `npm run test:workers:staging`: HTTPS smoke with exact synthetic accounts and cleanup; never run in PR quality CI. Real email verification is a separate acceptance check.
-- `npm run ci:workers`: fresh GitHub-hosted CI only; disposable local Supabase, migrations/seed/DB checks, built workerd browser/product checks and owned-resource cleanup.
+Kökten çalıştırılabilir komutlar:
 
-Staging: `https://freelancercrm-staging.cagankeremergun.workers.dev` →
-`FreelancerCRM-test`. Production deployment and PR preview automation are not
-configured by these commands. Never deploy local `dist` or publish `.dev.vars`
-as an artifact. Cloud session cookies require Secure; callback/public proposals
-retain no-referrer and private/no-store. Private form origin checks remain enabled.
+- `npm run workers:check`: adaptör ön incelemesi.
+- `npm run workers:dev`: yerel Workers geliştirme sunucusu, port 3000.
+- `npm run workers:build`: yerel ortam için workerd production derlemesi.
+- `npm run test:workers:runtime`: port 3000 boşken derlenmiş workerd'i başlatır;
+  44 tarayıcı/Auth sınırı testi ve yerel ürün smoke akışını çalıştırıp sunucuyu kapatır.
+- `npm run workers:build:staging`: yerel `.env`/`.dev.vars` dosyalarını kopyalamayan
+  geçici kaynak klasöründe, yalnız test public ayarlarıyla derler. Çıktı klasörü
+  terminalde yazılır; production proje kaydı derlemeye dahil edilmez.
+- `npm run workers:deploy:staging -- <çıktı-klasörü>`: yalnız kendi interaktif
+  terminalinizde çalıştırın. Test projesinin modern secret anahtarı gizli girişle
+  alınır; test Auth erişimi ve profil şeması doğrulanmadan yüklenmez. Anahtarı
+  sohbete, komut satırına veya git'e yazmayın. Geçici secret dosyası işlem sonunda
+  silinir; mevcut Worker'ın paylaşım HMAC anahtarı yeniden üretilmez.
+- Aynı komuta `--from-cli` eklenirse macOS Supabase CLI Anahtar Zinciri
+  kimlik bilgisiyle yalnız test secret'ı alınır; değerler loglanmaz.
+- `npm run auth:configure:test`: test Site URL/callback ayarlarını uygular ve
+  yeniden doğrular; e-posta doğrulama zorunluluğunu değiştirmez.
+- `npm run test:workers:staging`: yalnız test projesinde sentetik hesaplarla
+  HTTPS giriş, çerez, profil/müşteri/teklif, public resolver, RLS, refresh ve
+  çıkış akışını sınar; oluşturduğu hesapları ve bağlı kayıtları temizler.
+  Gerçek e-posta doğrulaması bu otomatik testin kapsamı değildir.
+- `npm run ci:workers`: yalnız bağımsız GitHub-hosted CI ortamında geçici yerel
+  Supabase, migration/seed/DB ve Workers tarayıcı/ürün kontrollerini çalıştırır;
+  kendi oluşturduğu kaynakları temizler.
 
-On 2026-10-10 the deployed HTTPS staging smoke passed password login,
-Secure/SameSite=Lax cookies, onboarding, client/draft/publish/public resolver,
-cross-user RLS, expired-session refresh, logout and safe invalid callback redirect.
-Both synthetic accounts and dependent rows were cleaned; the test database has
-zero users/profiles/proposals, eight migrations and eight RLS-enabled tables.
-The user deferred real signup/email-verification callback testing.
+Yerel derlemenin `dist/server/.dev.vars` dosyası yerel sunucu sırlarını içerebilir;
+bu çıktı yayımlanmamalı veya artefakt olarak yüklenmemelidir. Staging yayını yalnız
+izole staging çıktısından yapılır. Free plan için ek ücretli binding kurulmaz.
+Production yayını ve PR preview otomasyonu bu kurulumun tamamlanmış kısmı değildir.
 
-All seven checks passed in [CI run 37999446531](https://github.com/cagankerem/FreelancerCRM/actions/runs/37999446531).
-`workers-runtime` is now required alongside the existing five protected checks.
-In [negative run 37999942035](https://github.com/cagankerem/FreelancerCRM/actions/runs/37999942035),
-only Workers failed and PR #8 was BLOCKED; the temporary failing step was removed.
-CI logs passed secret scanning and runs produced zero artifacts. Until this PR
-is merged, other branches based on old main may lack the newly required job.
+`workers-runtime` CI işi yalnız bağımsız GitHub-hosted runner'da geçici yerel
+Supabase başlatır; migration/seed/SQL kontrollerinden sonra workerd build ve
+tarayıcı/ürün testlerini çalıştırır. Uzak Supabase veya uygulama secret'ı almaz;
+kendi oluşturduğu DB kaynaklarını ve yerel env dosyasını temizler. Workflow'un
+eklenmesi GitHub'da çalıştığı veya required check olduğu anlamına gelmez.
+PR #8 için CI koşusu `37999446531` tüm kapıları geçti; `workers-runtime`
+mevcut beş required check korunarak eklendi. Negatif `37999942035` koşusunda
+yalnız Workers kontrolü başarısızken PR `BLOCKED` oldu; geçici hata adımı
+kaldırıldı. CI log secret taraması temiz, artefakt sayısı sıfırdır. Workers CI
+kapısı PR #9 ile `main`e alındı.
 
-React/React DOM/RSC are patched to 19.2.8. The narrow `satori → fflate` override
-pins patched 0.7.5 and can be removed when satori requires that patch itself.
-The full audit still reports the known braces root advisory, including vinext's
-indirect chain; the production audit and runtime bundle review are distinct checks.
+Test Auth Site URL hedefi
+`https://freelancercrm-staging.cagankeremergun.workers.dev`; izinli callback yalnız
+bu origin'in `/auth/callback` yoludur. Preview origin'leri ayrıca onaylanıp
+allowlist'e ve uygulama doğrulamasına eklenmeden kullanılamaz. Local/CI callback
+varsayılanı `http://localhost:3000/auth/callback` olur; `NEXT_PUBLIC_SITE_URL`
+yalnız doğrulanmış origin'e ayarlanabilir. `next` yalnız açık uygulama yollarını
+kabul eder. Workers giriş katmanı dinamik yanıt/redirect'lere güvenlik başlıkları
+ekler; özel form POST'larını origin kontrolünden geçirir. Public teklif ve
+callback yanıtları `no-referrer`, özel formlar `same-origin` kullanır.
+Uzak staging yayını ve bu otomatik HTTPS testleri 2026-10-10'da doğrulandı;
+bulut oturum çerezleri `Secure` ve `SameSite=Lax` kullanır. Gerçek kayıt →
+e-posta doğrulaması → callback kabulü kullanıcı isteğiyle sonraya bırakıldı.
+Staging smoke ayrıca onboarding, yayınlama, süresi dolmuş oturumun yenilenmesi
+ve geçersiz callback yönlendirmesini doğruladı. Test bitiminde iki sentetik hesap
+ve bağlı kayıtları temizlendi; test DB'de kullanıcı/profil/teklif sayısı sıfır,
+uygulanan migration ve RLS etkin tablo sayısı sekiz olarak doğrulandı.
+
+Adaptörün getirdiği RSC paketi için React/React DOM ve react-server-dom-webpack
+19.2.8'e sabitlenmiştir. `satori → fflate` override'ı yalnız ZIP64 açığının
+düzeltilmiş 0.7.5 yamasını uygular; üst satori bağımlılığı bu sürümü gerektirdiğinde
+override kaldırılabilir. Tam audit'teki beklenen `braces` kök bulgusu çözülmüş
+sayılmaz; vinext'in dolaylı zinciri de aynı bulguya eklenir. Production audit ile
+runtime bundle incelemesi birbirinin yerine geçmez.
 
 ## v0.1.0
 
@@ -94,12 +129,20 @@ npm run install-all
 npm run dev
 ~~~
 
-Production çalıştırması:
+Yerel Node.js ortamında production build ve çalıştırma:
 
 ~~~bash
 npm run build
 npm run start
 ~~~
+
+Bu komutlar mevcut native Next.js runtime'ını çalıştırır; Workers build veya
+deployment komutları değildir. Hosting hedefi 2026-10-09 kullanıcı kararıyla
+Cloudflare Workers'tır; Cloudflare Pages kullanılmayacaktır. Next.js ve Supabase
+korunur. Adaptör/build altyapısı henüz seçilmedi ve kurulmadı; Workers uyumluluk
+incelemesi [ARCHITECTURE.md](./ARCHITECTURE.md#cloudflare-workers-hosting-kararı)
+içindedir. Normatif yayın sırası [plan.md Bölüm 27](./plan.md#27-ortamlar-ve-dağıtım)
+ile tanımlanır.
 
 Kalite kontrolleri:
 
@@ -239,7 +282,9 @@ bağımsız provisioning sırasında hazırlanmalı; çalışma anında verilen 
 bir anahtardan otomatik türetilmemelidir. Eksik/uyuşmayan bağda admin istemcisi
 oluşturulmaz. Anahtar veya özeti loglanmamalı, secret değerleri sohbet/git'e
 konulmamalıdır. Bu aşamada uzak sunucu anahtarı alınmadı veya deployment
-değişkeni kurulmadı; Vercel dağıtımında bu değerler ortam kapsamında sağlanacak.
+değişkeni kurulmadı; Workers yayını hazırlanırken bunlar yalnız ilgili
+sunucu ortamına secret olarak sağlanacak. Seçilen adaptörün bu değerleri mevcut
+sunucu env okuyucularına nasıl aktaracağı henüz doğrulanmadı.
 
 2026-10-09 kullanıcı onayıyla iki uzak Supabase projesi hedeflenir:
 preview ve staging ortak test projesini, production ayrı projeyi kullanır.
@@ -251,8 +296,36 @@ production'a otomatik migration uygulanmaz.
 
 `.env.local` buluta kopyalanmamalıdır. Production ile ortak test projesinin
 public URL/key ve sunucu secret'ları ayrı tutulur; deployment kurulduğunda
-platformun ortam ayarlarına uygun kapsamla eklenir. Vercel kurulumu ve gerçek
-ürün yayını bu aşamada ertelenir.
+Workers ortamlarına açık kapsamla eklenir. Preview/staging build ve runtime
+yapılandırmasına production URL'si veya hiçbir production anahtarı aktarılmaz.
+`NEXT_PUBLIC_*` değerleri tarayıcıya açılır; ortamına ait public değerler build
+sırasında da doğru olmalıdır. Sunucu sırları public değişkenlere, bundle'a veya
+loglara girmez. Workers build değişkenleri ile runtime secret/binding aktarımı,
+preview oluşturma yöntemi, deployment etiketleri ve CLI/CI entegrasyonu
+adaptör seçimi sonrası belirlenecek/doğrulanacak; bu belgede kurulmuş bir
+deployment komutu varsayılmaz. Workers kurulumu ve gerçek ürün yayını bekler.
+
+### Workers yayın adresleri ve Auth — bekliyor
+
+Preview, staging ve production HTTPS uygulama adresleri henüz doğrulanmadı.
+Supabase API adresleri yukarıdaki tabloda kayıtlıdır; bunlar uygulama yayın
+adresi veya Auth Site URL değildir. Domain veya `workers.dev` adresi belirlenip
+doğrulanmadan Auth yapılandırmasına gerçek adres gibi yazılmaz.
+
+Ortak test Supabase projesinin Site URL'si doğrulanmış staging uygulama adresi
+olacak; izin verilen yönlendirmeler yalnız bu staging ve onaylı preview
+adreslerinin gerekli callback/reset yollarını içerecek. Production Supabase
+Site URL ve allowlist'i yalnız doğrulanmış production uygulama adreslerini
+kullanacak. Mevcut callback yolu `/auth/callback`; reset yolları TASK-007
+kapsamında uygulanıp doğrulanacak. Site URL varsayılan yönlendirmedir; preview
+akışının kendi izinli callback adresine dönmesi ayrıca test edilecek.
+[Supabase Auth yönlendirme belgesi](https://supabase.com/docs/guides/auth/redirect-urls)
+2026-10-09'da kontrol edildi; uzak Auth ayarları bu dokümantasyon işiyle değişmedi.
+
+Sıra: önce yerel Workers runtime'ında yerel Supabase ile uyumluluk testi,
+sonra yalnız ortak test Supabase'e bağlı staging deployment, ardından gerçek
+HTTPS üzerinde Auth/cookie/session ve test–production izolasyon doğrulaması.
+Production yayını ancak ilgili görevlerin kabulü ve release onayıyla yapılır.
 
 Kullanıcı mevcut FreelancerCRM bulut projesinde yalnız deneme verileri
 olduğunu bildirdi; bu bildirim sıfırlama veya veri silme onayı değildir.
@@ -326,6 +399,12 @@ değişirse GitHub branch protection ayarı da güncellenmelidir.
 `dependency-report` bulguları ayrıca raporlar; high/critical production
 bulgusu `production-audit` üzerinden engellenir. Audit servisine erişim
 veya rapor doğrulama hatası ilgili işi başarısız yapar.
+
+Mevcut CI ve native Next.js build kanıtları korunur; Workers runtime kabulü
+sayılmaz. Adaptör seçildikten sonra Workers build/runtime, bundle secret sınırı
+ve kritik akış kontrollerinin kalite kapılarına nasıl ekleneceği doğrulanacak.
+CI bağımsız geçici yerel Supabase kullanmayı sürdürecek; bu dokümantasyon işi
+workflow veya required check ayarlarını değiştirmez.
 
 Kırmızı check için aynı satırdaki yerel komutu çalıştırın. Typecheck Next.js
 tiplerini kendisi üretir; integration testleri build'den sonra çalışır.
