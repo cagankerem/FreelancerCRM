@@ -4,7 +4,11 @@ import { createHash } from "node:crypto";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { legacyKeyClaims, parsePublicSupabaseEnv } from "@/lib/shared/schemas/supabase-env";
+import {
+  legacyKeyClaims,
+  parsePublicSupabaseEnv,
+  supabaseCookieOptions,
+} from "@/lib/shared/schemas/supabase-env";
 
 export function publicSupabaseSettings() {
   const settings = parsePublicSupabaseEnv({
@@ -20,8 +24,9 @@ export function publicSupabaseSettings() {
 export async function userClient() {
   const store = await cookies();
   // Establish request-time rendering before validating runtime settings.
-  const { url, key } = publicSupabaseSettings();
+  const { url, key, environment } = publicSupabaseSettings();
   return createServerClient(url, key, {
+    cookieOptions: supabaseCookieOptions(environment),
     cookies: {
       getAll: () => store.getAll(),
       setAll: (values) => {

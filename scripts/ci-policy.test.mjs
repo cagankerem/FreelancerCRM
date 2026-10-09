@@ -21,6 +21,7 @@ for (const [name, mutate] of [
   ["soft failure", (s) => s.replace("name: quality", "name: quality\n    continue-on-error: true")],
   ["production secret", (s) => s.replace("npm run build", "echo ${{ secrets.PRODUCTION_KEY }}")],
   ["missing format", (s) => s.replace("npm run format:check", "npm run format")],
+  ["missing Workers runtime gate", (s) => s.replace("npm run ci:workers", "npm run workers:check")],
   ["missing cleanup", (s) => s.replace("if: always()", "if: success()")],
   [
     "missing install",

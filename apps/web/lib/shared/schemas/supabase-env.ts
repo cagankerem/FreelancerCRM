@@ -2,6 +2,9 @@ import { z } from "zod";
 import { supabaseProjects } from "@/lib/shared/supabase-projects";
 
 const invalid = () => new Error("Supabase environment/project mismatch or invalid key.");
+export function supabaseCookieOptions(environment: string) {
+  return { secure: !["local", "ci"].includes(environment) };
+}
 export const publicSupabaseEnvSchema = z.object({
   environment: z.enum(["local", "ci", "preview", "staging", "production"]).optional(),
   url: z.url(),
@@ -53,6 +56,7 @@ export function parsePublicSupabaseEnv(input: unknown) {
     return { url: parsed.origin, publishableKey, environment, projectRef: "local" };
   }
   const project = supabaseProjects[environment === "production" ? "production" : "test"];
-  if (parsed.origin !== project.url || publishableKey !== project.publishableKey) throw invalid();
+  if (!project || parsed.origin !== project.url || publishableKey !== project.publishableKey)
+    throw invalid();
   return { url: project.url, publishableKey, environment, projectRef: project.ref };
 }

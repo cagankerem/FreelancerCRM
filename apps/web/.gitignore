@@ -16,6 +16,11 @@
 /test-results
 
 # next.js
+/.wrangler/
+/.vinext/
+/.workers/
+/dist/
+.dev.vars*
 /.next/
 /out/
 

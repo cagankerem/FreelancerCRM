@@ -231,15 +231,7 @@ test("keeps the landing and clickable prototype contracts explicit", async () =>
     ...Object.keys(packageManifest.dependencies ?? {}),
     ...Object.keys(packageManifest.devDependencies ?? {}),
   ]);
-  const removedPrototypePackages = [
-    "@cloudflare/vite-plugin",
-    "drizzle-kit",
-    "drizzle-orm",
-    "react-loading-skeleton",
-    "vinext",
-    "vite",
-    "wrangler",
-  ];
+  const removedPrototypePackages = ["drizzle-kit", "drizzle-orm", "react-loading-skeleton"];
 
   for (const packageName of removedPrototypePackages) {
     assert.equal(

@@ -98,7 +98,7 @@ function cleanup() {
 try {
   assertHostedCI(process.env);
   assert.ok(
-    !phase || (phase === "cleanup" && process.argv.length === 3),
+    !phase || (["cleanup", "workers"].includes(phase) && process.argv.length === 3),
     "Unknown DB CI operation",
   );
   if (phase === "cleanup") cleanup();
@@ -133,7 +133,16 @@ try {
         ],
         "Create CI-local network",
       );
-      supabase(["db", "start"], "Start disposable local Postgres");
+      supabase(
+        phase === "workers"
+          ? [
+              "start",
+              "-x",
+              "studio,storage-api,imgproxy,realtime,edge-runtime,logflare,vector,supavisor",
+            ]
+          : ["db", "start"],
+        "Start disposable local Supabase",
+      );
       supabase(["db", "reset", "--local"], "Apply migrations and synthetic seed from scratch");
       const [container] = JSON.parse(
         run("docker", ["inspect", `supabase_db_${projectId}`], "Inspect CI database"),
@@ -177,6 +186,28 @@ try {
         "Local security advisors",
       );
       console.log("SQL isolation/concurrency and local security advisors passed.");
+      if (phase === "workers") {
+        const envFile = join(root, "apps/web/.env.local");
+        assert.equal(
+          existsSync(envFile),
+          false,
+          "Refusing to overwrite local application environment",
+        );
+        try {
+          run(
+            process.execPath,
+            [join(root, "scripts/setup-local-app-env.mjs")],
+            "Create CI-local credentials",
+          );
+          run("npm", ["run", "workers:build"], "Build Workers against local Supabase");
+          run("npm", ["run", "test:workers:runtime"], "Built Workers browser and product checks");
+          console.log(
+            "Built Workers browser, callback, CSRF and local product smoke checks passed.",
+          );
+        } finally {
+          if (existsSync(envFile)) unlinkSync(envFile);
+        }
+      }
     } finally {
       cleanup();
     }
