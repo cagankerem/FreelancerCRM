@@ -29,6 +29,9 @@ Kökten çalıştırılabilir komutlar:
   HTTPS giriş, çerez, profil/müşteri/teklif, public resolver, RLS, refresh ve
   çıkış akışını sınar; oluşturduğu hesapları ve bağlı kayıtları temizler.
   Gerçek e-posta doğrulaması bu otomatik testin kapsamı değildir.
+- `npm run ci:workers`: yalnız bağımsız GitHub-hosted CI ortamında geçici yerel
+  Supabase, migration/seed/DB ve Workers tarayıcı/ürün kontrollerini çalıştırır;
+  kendi oluşturduğu kaynakları temizler.
 
 Yerel derlemenin `dist/server/.dev.vars` dosyası yerel sunucu sırlarını içerebilir;
 bu çıktı yayımlanmamalı veya artefakt olarak yüklenmemelidir. Staging yayını yalnız
@@ -43,8 +46,8 @@ eklenmesi GitHub'da çalıştığı veya required check olduğu anlamına gelmez
 PR #8 için CI koşusu `37999446531` tüm kapıları geçti; `workers-runtime`
 mevcut beş required check korunarak eklendi. Negatif `37999942035` koşusunda
 yalnız Workers kontrolü başarısızken PR `BLOCKED` oldu; geçici hata adımı
-kaldırıldı. CI log secret taraması temiz, artefakt sayısı sıfırdır. PR henüz
-birleştirilmediğinden eski main'den açılan başka PR'lar yeni kontrolü bekleyebilir.
+kaldırıldı. CI log secret taraması temiz, artefakt sayısı sıfırdır. Workers CI
+kapısı PR #9 ile `main`e alındı.
 
 Test Auth Site URL hedefi
 `https://freelancercrm-staging.cagankeremergun.workers.dev`; izinli callback yalnız
@@ -58,6 +61,10 @@ callback yanıtları `no-referrer`, özel formlar `same-origin` kullanır.
 Uzak staging yayını ve bu otomatik HTTPS testleri 2026-10-10'da doğrulandı;
 bulut oturum çerezleri `Secure` ve `SameSite=Lax` kullanır. Gerçek kayıt →
 e-posta doğrulaması → callback kabulü kullanıcı isteğiyle sonraya bırakıldı.
+Staging smoke ayrıca onboarding, yayınlama, süresi dolmuş oturumun yenilenmesi
+ve geçersiz callback yönlendirmesini doğruladı. Test bitiminde iki sentetik hesap
+ve bağlı kayıtları temizlendi; test DB'de kullanıcı/profil/teklif sayısı sıfır,
+uygulanan migration ve RLS etkin tablo sayısı sekiz olarak doğrulandı.
 
 Adaptörün getirdiği RSC paketi için React/React DOM ve react-server-dom-webpack
 19.2.8'e sabitlenmiştir. `satori → fflate` override'ı yalnız ZIP64 açığının

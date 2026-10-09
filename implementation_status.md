@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-10-09
+Son güncelleme: 2026-10-10
 
 ## Takip Sistemi
 
@@ -13,6 +13,7 @@ Son güncelleme: 2026-10-09
 
 ## Kullanıcının İstediği Proje Araçları
 
+- 2026-10-10: Kullanıcının dal birleştirme talebiyle PR #9 merge commit yöntemiyle `main`e alındı; PR #8 güncel `main`le birleştirilirken yalnız README ve ilerleme kaydı çakışmaları her iki dalın doğrulanmış bilgileri korunarak çözüldü. Uygulama kodu iki dalda aynı; TASK kabul durumları değiştirilmedi. PR #8 için güncel birleşim CI doğrulaması bekleniyor.
 - 2026-10-09: `asd-ste100` v0.4.0 skill'i `.agents/skills/asd-ste100` altına [upstream commit](https://github.com/danyuchn/asd-ste100-skill/commit/32511c6992ecb5f1971e46a2943f2e6adceedafe) üzerinden eklendi; yedi dosyanın Git blob hash'i kaynakla eşleşti. Mac'in aktif Homebrew `python3` sürümü 3.14.5'ten Python.org ve Homebrew'da doğrulanan güncel kararlı 3.14.8'e yükseltildi. Linter `--selftest`, temiz stdin ve iki beklenen bulgulu negatif fixture kontrolleri yeni Python ile geçti; pip ve SSL import'u doğrulandı. Bu kullanıcı talebi TASK kabul durumlarını değiştirmez.
 
 ## Faz 1A: Proje Temeli
@@ -39,6 +40,7 @@ Son güncelleme: 2026-10-09
   - 2026-09-04: `shadcn@4.18.0` korunarak transitive `browserslist`, `fast-uri` ve `qs` güvenli sürümlere kilitlendi; production ve tam bağımlılık auditleri sıfır bulguyla geçti.
 - [ ] TASK-003: Supabase, ortam ve local geliştirmeyi yapılandır — Kısmi
   - 2026-10-10: PR #8'in CI koşusu 37999446531 tüm kalite/Workers/tarayıcı/migration/seed/DB/production-audit kapılarını geçti; altıncı gerekli check workers-runtime mevcut beş kontrol ve yönetici zorunluluğu korunarak eklendi, negatif koşu 37999942035'te yalnız Workers başarısızken PR BLOCKED oldu; CI log secret taraması temiz ve artefakt sayısı 0; HTTPS staging sentetik giriş/çerez/ürün/RLS/refresh/çıkış testleri ve temizlik geçti; e-posta doğrulaması kullanıcı isteğiyle ertelendi, preview otomasyonu henüz yok, PR birleştirilmedi ve production değiştirilmedi.
+  - 2026-10-10: Kontrollü vinext/Workers adaptörü, test-only izole staging build/yayını, 8 uzak test migration’ı ve RLS/advisor kontrolü, kesin HTTPS Auth Site URL/callback ve bağımsız yerel Workers CI kapısı kuruldu; gerçek e-posta doğrulama callback testi kullanıcı isteğiyle ertelendi, preview ve CI kabul kanıtı henüz tamamlanmadı; production değiştirilmedi.
   - 2026-10-10: Yalnız FreelancerCRM-test'e 8 migration uygulandı, 8 tablonun RLS'i ve security advisor doğrulandı; kesin HTTPS Site URL/callback ve Workers staging yayını tamamlandı; sentetik HTTPS giriş/çerez/profil/müşteri/teklif/public resolver/RLS/refresh/çıkış testleri geçti ve hesaplar temizlendi, 85 unit ve 25 CI politika testi geçti; gerçek e-posta doğrulaması kullanıcı isteğiyle ertelendi, PR #8 CI/required-check kanıtı ve preview otomasyonu bekliyor; production değiştirilmedi.
   - 2026-09-15: Local config'te explicit Data API grant, HTTP Auth callback/reset allowlist, en az 8 karakter + harf/rakam politikası uygulandı; S3/vector/pgdelta ve seed oluşturulana kadar seeding kapatıldı. Parola negatif testleri ve onaylı local reset sonrası tablo izin testi geçti; localhost Docker ağına rağmen host port bağları tüm arayüzlerde kaldığından başlatma kontrolü servisleri verileri korunarak durdurdu. Ağ sorunu açık; seed.sql sonraki adım.
   - 2026-09-15: Docker Desktop'ın ağ varsayılanını uygulamaması, yalnız projeye ait Supabase alt süreçlerinde açık 127.0.0.1 port bağı kullanan adaptörle çözüldü; başlatma, tekrar başlatma ve onaylı boş local reset sonrası beş yayınlanan port localhost olarak doğrulandı, otomatik tablo izinleri kapalı kaldı ve 5 adaptör testi geçti. Seed.sql henüz oluşturulmadı; sonraki adım.
