@@ -1361,7 +1361,7 @@ Her kategori için release öncesinde şu kayıt tamamlanmalıdır:
 - Public teklif sayfası takip bildirimi
 - Veri silme talebi süreci
 - AI sağlayıcısına gönderilen veriler ve alt işleyenler
-- Ödeme, Supabase, Vercel, analitik ve hata sağlayıcılarının amaçları
+- Ödeme, Supabase, Cloudflare Workers hosting, analitik ve hata sağlayıcılarının amaçları
 - Teklifin fatura olmadığı ve AI doğruluğunun kullanıcıca kontrol edilmesi
 - Kimlik doğrulamasız kabul/ret işleminin hukuki ispat sınırı
 
@@ -1432,7 +1432,7 @@ Ek güvenlik başlıkları:
 - `X-Content-Type-Options: nosniff`
 - `frame-ancestors`
 - HTTPS-only
-- Ayrı dev/preview/production secrets
+- Local/CI, ortak preview/staging test ve production kapsamları arasında ayrı secrets; production bağlantısı veya anahtarı test ortamına taşınmaz (Bölüm 27)
 - Migration ve RLS CI
 - Secret rotation ve incident runbook
 
@@ -1756,12 +1756,18 @@ Sev-1/2, veri sızıntısı/kaybı, ödeme tutarsızlığı veya ana akışı en
 
 ## 27. Ortamlar ve Dağıtım
 
+2026-10-09 kullanıcı kararı: uygulamanın hosting platformu **Cloudflare Workers**
+olacak; Cloudflare Pages kullanılmayacak. Mevcut Next.js App Router uygulaması ve
+Supabase korunur. Bu karar framework/veritabanı geçişine veya adaptörün otomatik
+seçimine izin vermez; adaptör/build altyapısı ayrıca belirlenecek ve doğrulanacak.
+
 | Ortam | Amaç ve veri |
 |---|---|
 | Local | Local Supabase, sentetik seed, mock/sandbox AI ve ödeme |
+| CI | Bağımsız geçici yerel Supabase; production bağlantısı veya anahtarı yok |
 | Preview | PR build ve entegrasyon; staging ile ortak, production’dan ayrı test Supabase/secrets |
 | Staging | Webhook, Edge, migration ve ödeme için kalıcı test ortamı; preview ile ortak Supabase |
-| Production | Ayrı Vercel/Supabase, least privilege, backup ve alarm |
+| Production | Testten ayrı Workers yayın/secret kapsamı ve ayrı production Supabase; least privilege, backup ve alarm |
 
 2026-10-09 kullanıcı kararı: Maliyeti azaltmak için iki uzak Supabase projesi
 kullanılır: ortak preview/staging test projesi ve ayrı production projesi.
@@ -1770,26 +1776,42 @@ production–test izolasyonunu gevşetmez. Test projesi yalnız sentetik veri i�
 production verisi veya sunucu secret’ları bu projeye taşınmaz. PR kalite CI’sı
 ortak uzak DB’ye değil bağımsız geçici yerel DB’ye bağlanır. Ortak test
 projesindeki migration dağıtımları kontrollü ve sıralı yapılır; production’a
-otomatik uygulanmaz. Vercel kurulumu ve ürünün gerçek yayını ayrıca ele alınır.
+otomatik uygulanmaz. Workers kurulumu ve ürünün gerçek yayını ayrıca ele alınır.
 
 Kurallar:
 
 - Environment değişkenleri Zod ile fail-fast doğrulanır.
-- Public ve secret değişkenler açıkça ayrılır.
+- Public ve secret değişkenler açıkça ayrılır; `NEXT_PUBLIC_*` değerleri tarayıcıya açılır.
 - Service role, AI ve webhook secret client bundle’a girmez.
+- Workers sunucu sırları secret olarak ortam kapsamında sağlanır; build değişkenleri ve runtime binding/env aktarımı seçilen adaptörde doğrulanır. Preview/staging build ve runtime kapsamlarına production URL’si veya hiçbir production anahtarı aktarılmaz.
 - Migration’lar version control’dedir.
 - Production şeması dashboard’dan elle değiştirilmez.
 - CI temiz DB üzerinde migration ve sentetik seed çalıştırır.
-- Vercel preview deployment’ları production verisi kullanmaz.
+- Workers preview/staging deployment’ları yalnız ortak test Supabase’i ve sentetik veriyi kullanır; production verisi kullanmaz. Preview oluşturma yöntemi, deployment etiketleri, CLI komutları ve build/CI entegrasyonu henüz belirlenecek/doğrulanacak.
 - Production süreci: backup doğrula → expand migration → deploy → gerekiyorsa backfill → contract.
 - Veri kaybettiren otomatik down migration yerine forward-fix tercih edilir.
 - Rollback ve backup restore prova edilir.
 - Domain, DNS, HTTPS ve security header’lar doğrulanır.
-- Auth redirect allowlist ortam bazlıdır.
+- Auth Site URL ve redirect allowlist gerçek, doğrulanmış Workers HTTPS uygulama adresleriyle yapılandırılır. Ortak test projesinde Site URL staging adresidir; allowlist gerekli staging ve onaylı preview callback/reset yollarıyla sınırlıdır. Production projesi yalnız kendi production adreslerini kullanır. Mevcut callback `/auth/callback`; reset yolları TASK-007’de doğrulanır. Preview’ın kendi izinli callback adresine dönüşü ayrıca sınanır.
+- Preview/staging/production HTTPS uygulama adresleri henüz doğrulanmadı; domain veya `workers.dev` adresi varsayılmaz. Supabase API URL’si uygulama Site URL’si değildir.
 - AI ve ödeme anahtarları ortam bazında farklıdır.
 - Supabase sürüm ve breaking change kontrolü implementasyon öncesi [resmi changelog](https://supabase.com/changelog) üzerinden yapılır.
 - Kullanılan paket sürümleri pinlenir ve lockfile commit edilir.
 - Deploy sonrası auth, public teklif, view, yanıt, AI degrade ve webhook smoke testleri çalışır.
+
+Workers uyumluluk ve yayın sırası:
+
+1. Adaptör/build altyapısı seçimini mevcut Next.js sürümü ve API kullanımıyla değerlendir; sürümleri ve yapılandırmayı ayrı uygulama çalışmasında doğrula. 2026-10-09 resmî belge incelemesi ve vinext/OpenNext riskleri [ARCHITECTURE.md](./ARCHITECTURE.md#nextjs-uyumluluk-değerlendirmesi--2026-10-09) içindedir. vinext seçimi Vite tabanlı build altyapısı değişikliğidir; hosting ayarı sayılmaz.
+2. Önce yerel Workers runtime’ında yerel Supabase ile `proxy.ts`, Auth callback, Server Actions, Route Handlers, cookie/session, güvenlik başlıkları ve bundle secret sınırını test et. Mevcut native Next.js build/CI başarısı bu kabulün yerine geçmez.
+3. Yerel uyumluluk geçince yalnız ortak test Supabase’e bağlı staging deployment hazırla; production bağlantısı/anahtarı verme.
+4. Gerçek staging HTTPS adresini doğrula; test projesinde Site URL/allowlist’i yapılandır ve Auth, cookie/session, güvenli yönlendirme ile test–production izolasyonunu uçtan uca doğrula. Preview Auth adreslerini aynı test projesinde ayrıca sınırla ve doğrula.
+5. İlgili görevlerin release kapıları ve yayın onayı sonrasında ayrı production yapılandırmasıyla backup/migration/deploy sırasını uygula; production HTTPS/Auth/smoke ve rollback doğrulamasını tamamla.
+
+Bu dokümantasyon kararı kurulum, deployment veya tamamlanmış görev kabulü değildir.
+Platformdan bağımsız local Supabase, RLS, secret scan ve GitHub CI kanıtları
+korunur; platforma bağlı build/runtime/Auth/bundle doğrulamaları Workers üzerinde
+tekrarlanır. Workers planı ve maliyet hesabı henüz belirlenmedi; ücretsiz yayın
+veya sabit hosting ücreti varsayılmaz.
 
 ## 28. Geliştirme Fazları
 
@@ -2032,7 +2054,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Bağımlılıklar:** TASK-001.
 
-**Teknik Notlar:** Eksik env fail-fast olmalıdır.
+**Teknik Notlar:** Eksik env fail-fast olmalıdır. Bölüm 27’deki Workers ortam eşlemesi uygulanıp gerçek HTTPS Site URL/callback ve uçtan uca test–production izolasyonu doğrulanmadan TASK-003 tamamlanmaz; dokümantasyon revizyonu kabul kanıtı değildir.
 
 **Güvenlik ve Veri Notları:** Service, AI ve ödeme secret’ları browser bundle’a girmez.
 
@@ -2142,7 +2164,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Bağımlılıklar:** TASK-003–TASK-005.
 
-**Teknik Notlar:** Server session yaklaşımı kullanılır.
+**Teknik Notlar:** Server session yaklaşımı kullanılır. Yerel Auth kanıtı korunur; callback, kayıt/giriş/çıkış ve cookie davranışı Bölüm 27 sırasıyla Workers staging’de gerçek HTTPS üzerinde tekrar doğrulanır.
 
 **Güvenlik ve Veri Notları:** User enumeration önlenir; secure cookie kullanılır.
 
@@ -2178,7 +2200,7 @@ Faz 2 özellikleri için doğrulama kapısı geçilmeden executable implementasy
 
 **Bağımlılıklar:** TASK-006.
 
-**Teknik Notlar:** Auth e-postaları ürün otomatik gönderimi sayılmaz.
+**Teknik Notlar:** Auth e-postaları ürün otomatik gönderimi sayılmaz. Mevcut `proxy.ts` için adaptör uyumluluğu, session yenileme ve route guard yerel Workers’ta; callback/reset ve expiry/reuse gerçek HTTPS staging’de doğrulanır. Test/production Site URL ve allowlist’leri ayrı tutulur (Bölüm 27).
 
 **Güvenlik ve Veri Notları:** Reset token URL ve loglarda maskelenir.
 
@@ -3735,13 +3757,13 @@ Ad/şirket alanları Bölüm 11.6'daki 200 karakter sınırıyla API ve DB'de tu
 
 **Amaç:** Kontrollü ve geri alınabilir yayın yapmak.
 
-**Kapsam:** Vercel, Supabase, domain, HTTPS, secrets, migration, backup, rollback, smoke ve sorumlular.
+**Kapsam:** Cloudflare Workers, mevcut Next.js uygulamasının doğrulanmış adaptör/build altyapısı, Supabase, domain, HTTPS, secrets, migration, backup, rollback, smoke ve sorumlular.
 
 **Kapsam Dışı:** Faz 2 rollout.
 
 **Bağımlılıklar:** TASK-043–TASK-049 ve release onayı.
 
-**Teknik Notlar:** Expand-contract ve forward-fix yaklaşımı.
+**Teknik Notlar:** Expand-contract ve forward-fix yaklaşımı. Adaptör seçimi ve yerel Workers uyumluluğu → test Supabase’e bağlı staging → gerçek HTTPS Auth/izolasyon doğrulaması → release onaylı production sırası Bölüm 27’ye uyar. Adaptör, build/CI entegrasyonu ve gerçek yayın adresleri henüz belirlenmiş/doğrulanmış değildir; eski platform/native runtime doğrulamaları Workers yayınının kabulü yerine geçmez.
 
 **Güvenlik ve Veri Notları:** Least privilege, rotasyon ve production veri sınırı.
 

@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { parseDocument } from "../../apps/web/node_modules/yaml/dist/index.js";
 
-export const requiredChecks = ["secret-scan", "quality", "browser", "database", "production-audit"];
+export const requiredChecks = [
+  "secret-scan",
+  "quality",
+  "browser",
+  "database",
+  "production-audit",
+  "workers-runtime",
+];
 
 export function validateWorkflow(source, filename) {
   const document = parseDocument(source, { uniqueKeys: true });
@@ -46,7 +53,14 @@ export function validateWorkflow(source, filename) {
   if (filename === "ci.yml") {
     assert.deepEqual(workflow.on.pull_request, { branches: ["main"] });
     assert.deepEqual(workflow.on.push, { branches: ["main"] });
-    const ids = ["quality", "browser", "database", "production-audit", "dependency-report"];
+    const ids = [
+      "quality",
+      "browser",
+      "database",
+      "production-audit",
+      "dependency-report",
+      "workers-runtime",
+    ];
     assert.deepEqual(Object.keys(workflow.jobs).sort(), ids.sort());
     for (const [id, job] of Object.entries(workflow.jobs)) {
       assert.equal(job.name, id, "Stable required check name");
@@ -90,6 +104,17 @@ export function validateWorkflow(source, filename) {
     );
     assert.ok(runs("production-audit").includes("npm run audit:production"));
     assert.ok(runs("dependency-report").includes("npm run audit:all"));
+    assert.ok(runs("workers-runtime").includes("npm run ci:workers"));
+    assert.ok(
+      runs("workers-runtime").some((run) =>
+        /playwright install --with-deps chromium firefox webkit/.test(run),
+      ),
+    );
+    assert.equal(
+      workflow.jobs["workers-runtime"].steps.find((step) => step.run === "npm run ci:db:cleanup")
+        .if,
+      "always()",
+    );
   }
   return workflow;
 }
