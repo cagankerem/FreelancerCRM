@@ -1,6 +1,6 @@
 # FreelancerCRM
 
-## Onaylı PR preview otomasyonu — uzak kabul bekliyor
+## Onaylı PR preview otomasyonu
 
 Her onaylı PR için ayrı `freelancercrm-pr-<PR>.cagankeremergun.workers.dev`
 Worker'ı kullanılır; staging Worker'ı değiştirilmez. Ortak test Supabase'i
@@ -46,7 +46,13 @@ en yeni orijinal link aynı Chromium'da açılır; hesap/parola değiştirilmez 
 oluşan test oturumu sonunda sonlandırılır. Yeni e-posta için insan onayı gerekir.
 
 PR kapanınca secretsız `Preview cleanup signal`, main'deki cleanup denetleyicisini
-tetikler. Aynı korumalı environment nedeniyle temizlik de onay bekleyebilir;
+tetikler. Yalnız `pull_request_target: closed` olayı kullanılır; bu sinyalde
+checkout, PR kodu, secret veya dinamik shell komutu yoktur. Böylece merge
+conflict içeren kapalı PR'lar da temizlenebilir. Sabit workflow kimliği/yolu ve
+sayısal run başlığı doğrulanır; GitHub API'sinden alınan kapalı, aynı-repo/main
+PR'ın HEAD/ref'i sinyalle eşleşmelidir. API'nin HEAD metadata'sı çalıştırılan
+main kodunun referansı olarak yorumlanmaz. Aynı korumalı environment nedeniyle
+temizlik de onay bekleyebilir;
 GitHub Actions'ta pending deployment incelenip onaylanmalıdır. Denetleyici kapalı
 PR ve `PREVIEW_OWNER` binding eşleşmesiyle yalnız o Worker'ı siler ve kesin
 callback'ini kaldırır; staging, diğer preview'lar ve DB kayıtlarına dokunmaz.
@@ -83,6 +89,9 @@ Kökten çalıştırılabilir komutlar:
   kimlik bilgisiyle yalnız test secret'ı alınır; değerler loglanmaz.
 - `npm run auth:configure:test`: test Site URL/callback ayarlarını uygular ve
   yeniden doğrular; e-posta doğrulama zorunluluğunu değiştirmez.
+  Bu başlangıç komutu allowlist'i yalnız staging callback'ine ayarlar;
+  açık preview'lar varken çalıştırılmaz. PR callback ekleme/kaldırma işlemi
+  allowlist'in diğer girdilerini koruyan preview denetleyicisine bırakılır.
 - `npm run test:workers:staging`: yalnız test projesinde sentetik hesaplarla
   HTTPS giriş, çerez, profil/müşteri/teklif, public resolver, RLS, refresh ve
   çıkış akışını sınar; oluşturduğu hesapları ve bağlı kayıtları temizler.
@@ -100,7 +109,8 @@ Kökten çalıştırılabilir komutlar:
 Yerel derlemenin `dist/server/.dev.vars` dosyası yerel sunucu sırlarını içerebilir;
 bu çıktı yayımlanmamalı veya artefakt olarak yüklenmemelidir. Staging yayını yalnız
 izole staging çıktısından yapılır. Free plan için ek ücretli binding kurulmaz.
-Production yayını ve PR preview otomasyonu bu kurulumun tamamlanmış kısmı değildir.
+Production yayını bu kurulumun kapsamı değildir. Onaylı PR preview otomasyonu
+üstteki bölümde açıklanır; kabul kanıtları `implementation_status.md` içindedir.
 
 `workers-runtime` CI işi yalnız bağımsız GitHub-hosted runner'da geçici yerel
 Supabase başlatır; migration/seed/SQL kontrollerinden sonra workerd build ve
@@ -208,8 +218,8 @@ npm run start
 Bu komutlar mevcut native Next.js runtime'ını çalıştırır; Workers build veya
 deployment komutları değildir. Hosting hedefi 2026-10-09 kullanıcı kararıyla
 Cloudflare Workers'tır; Cloudflare Pages kullanılmayacaktır. Next.js ve Supabase
-korunur. Adaptör/build altyapısı henüz seçilmedi ve kurulmadı; Workers uyumluluk
-incelemesi [ARCHITECTURE.md](./ARCHITECTURE.md#cloudflare-workers-hosting-kararı)
+korunur. Workers adaptörü vinext'tir (beta); native Next.js komutları da korunur.
+Workers uyumluluk ve sınırları [ARCHITECTURE.md](./ARCHITECTURE.md#cloudflare-workers-hosting-kararı)
 içindedir. Normatif yayın sırası [plan.md Bölüm 27](./plan.md#27-ortamlar-ve-dağıtım)
 ile tanımlanır.
 
@@ -350,10 +360,10 @@ gerekir (local için ref `local`). Bu bağ hedef projenin doğrulanmış anahtar
 bağımsız provisioning sırasında hazırlanmalı; çalışma anında verilen herhangi
 bir anahtardan otomatik türetilmemelidir. Eksik/uyuşmayan bağda admin istemcisi
 oluşturulmaz. Anahtar veya özeti loglanmamalı, secret değerleri sohbet/git'e
-konulmamalıdır. Bu aşamada uzak sunucu anahtarı alınmadı veya deployment
-değişkeni kurulmadı; Workers yayını hazırlanırken bunlar yalnız ilgili
-sunucu ortamına secret olarak sağlanacak. Seçilen adaptörün bu değerleri mevcut
-sunucu env okuyucularına nasıl aktaracağı henüz doğrulanmadı.
+konulmamalıdır. Staging ve onaylı preview Worker'larına yalnız test projesinin
+sunucu anahtarı ve doğrulanmış bağı runtime secret olarak aktarılır. Vinext'in
+sunucu env erişimi HTTPS kabul testlerinde doğrulanır; production anahtarı
+alınmaz veya test deployment'ına aktarılmaz.
 
 2026-10-09 kullanıcı onayıyla iki uzak Supabase projesi hedeflenir:
 preview ve staging ortak test projesini, production ayrı projeyi kullanır.
@@ -368,28 +378,29 @@ public URL/key ve sunucu secret'ları ayrı tutulur; deployment kurulduğunda
 Workers ortamlarına açık kapsamla eklenir. Preview/staging build ve runtime
 yapılandırmasına production URL'si veya hiçbir production anahtarı aktarılmaz.
 `NEXT_PUBLIC_*` değerleri tarayıcıya açılır; ortamına ait public değerler build
-sırasında da doğru olmalıdır. Sunucu sırları public değişkenlere, bundle'a veya
-loglara girmez. Workers build değişkenleri ile runtime secret/binding aktarımı,
-preview oluşturma yöntemi, deployment etiketleri ve CLI/CI entegrasyonu
-adaptör seçimi sonrası belirlenecek/doğrulanacak; bu belgede kurulmuş bir
-deployment komutu varsayılmaz. Workers kurulumu ve gerçek ürün yayını bekler.
+sırasında da doğru olmalıdır. Sunucu sırları public değişkenlere, tarayıcı bundle'ına veya
+loglara girmez. Workers build değişkenleri, runtime secret/binding aktarımı ve
+PR sahiplik etiketi trusted main denetleyicilerinde uygulanır; preview ve
+şifreli artefakt aktarımının komutları üstte açıklanır. Gerçek ürünün production
+yayını ayrı release onayı ve ilgili görevlerin kabulünü gerektirir.
 
-### Workers yayın adresleri ve Auth — bekliyor
+### Workers yayın adresleri ve Auth
 
-Preview, staging ve production HTTPS uygulama adresleri henüz doğrulanmadı.
-Supabase API adresleri yukarıdaki tabloda kayıtlıdır; bunlar uygulama yayın
-adresi veya Auth Site URL değildir. Domain veya `workers.dev` adresi belirlenip
-doğrulanmadan Auth yapılandırmasına gerçek adres gibi yazılmaz.
+Staging uygulama adresi `https://freelancercrm-staging.cagankeremergun.workers.dev`;
+onaylı PR preview adresi `https://freelancercrm-pr-<PR>.cagankeremergun.workers.dev`.
+Supabase API adresleri uygulama yayın adresi değildir. Production uygulama
+adresi/yayını henüz yoktur; varsayımsal bir production Auth URL'si tanımlanmaz.
 
 Ortak test Supabase projesinin Site URL'si doğrulanmış staging uygulama adresi
-olacak; izin verilen yönlendirmeler yalnız bu staging ve onaylı preview
+olarak ayarlanmıştır; izin verilen yönlendirmeler yalnız bu staging ve onaylı preview
 adreslerinin gerekli callback/reset yollarını içerecek. Production Supabase
 Site URL ve allowlist'i yalnız doğrulanmış production uygulama adreslerini
 kullanacak. Mevcut callback yolu `/auth/callback`; reset yolları TASK-007
 kapsamında uygulanıp doğrulanacak. Site URL varsayılan yönlendirmedir; preview
-akışının kendi izinli callback adresine dönmesi ayrıca test edilecek.
+akışının kendi izinli callback adresine dönmesi ayrıca sınanır ve PR kapanınca
+yalnız o PR'ın kesin callback adresi kaldırılır.
 [Supabase Auth yönlendirme belgesi](https://supabase.com/docs/guides/auth/redirect-urls)
-2026-10-09'da kontrol edildi; uzak Auth ayarları bu dokümantasyon işiyle değişmedi.
+referanstır. Uzak test Auth kabul sonuçları `implementation_status.md` içinde tutulur.
 
 Sıra: önce yerel Workers runtime'ında yerel Supabase ile uyumluluk testi,
 sonra yalnız ortak test Supabase'e bağlı staging deployment, ardından gerçek
