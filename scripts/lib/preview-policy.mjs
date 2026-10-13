@@ -101,3 +101,13 @@ export function validateArtifactConfig(config, number) {
     "Shared resource bindings forbidden",
   );
 }
+export function cleanupSignalNumber(run) {
+  assert.equal(run.path, ".github/workflows/preview-cleanup-signal.yml");
+  assert.equal(run.name, "Preview cleanup signal");
+  assert.equal(run.event, "pull_request_target");
+  assert.equal(run.head_branch, "main");
+  assert.equal(run.conclusion, "success");
+  const match = /^Closed preview PR #([1-9][0-9]{0,8})$/.exec(run.display_title ?? "");
+  assert.ok(match, "Cleanup signal requires a strictly numeric PR identity");
+  return match[1];
+}

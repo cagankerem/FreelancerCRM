@@ -6,6 +6,19 @@ import { validateWorkflow } from "./lib/ci-policy.mjs";
 const directory = new URL("../.github/workflows/", import.meta.url);
 const ci = readFileSync(new URL("ci.yml", directory), "utf8");
 const preview = readFileSync(new URL("workers-preview.yml", directory), "utf8");
+const signal = readFileSync(new URL("preview-cleanup-signal.yml", directory), "utf8");
+for (const [name, mutate] of [
+  ["checkout", (s) => s.replace("- run: echo", "- uses: actions/checkout@v4\n      - run: echo")],
+  ["write permission", (s) => s.replace("contents: read", "contents: write")],
+  ["secret env", (s) => s + "\nenv:\n  TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n"],
+  ["untrusted title", (s) => s.replace("pull_request.number", "pull_request.title")],
+  ["arbitrary command", (s) => s.replace("- run: echo", "- run: npm run build #")],
+  ["additional event", (s) => s.replace("types: [closed]", "types: [closed, opened]")],
+]) {
+  test(`closure signal refuses ${name}`, () => {
+    assert.throws(() => validateWorkflow(mutate(signal), "preview-cleanup-signal.yml"));
+  });
+}
 test("preview workflow refuses plaintext artifact upload", () =>
   assert.throws(() =>
     validateWorkflow(

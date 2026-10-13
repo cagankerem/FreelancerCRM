@@ -1,7 +1,12 @@
 // Trusted main-branch controller. Never run a PR copy of this script with credentials.
 import assert from "node:assert/strict";
 import { appendFileSync, readFileSync } from "node:fs";
-import { approvePullRequest, repository, target } from "./lib/preview-policy.mjs";
+import {
+  approvePullRequest,
+  cleanupSignalNumber,
+  repository,
+  target,
+} from "./lib/preview-policy.mjs";
 
 export async function github(path) {
   assert.ok(process.env.GH_TOKEN, "GitHub read token required");
@@ -40,24 +45,12 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
       assert.equal(operation, "cleanup");
       const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
       const run = await github(`/actions/runs/${event.workflow_run.id}`);
-      assert.equal(run.path, ".github/workflows/preview-cleanup-signal.yml");
-      assert.equal(run.event, "pull_request");
-      assert.equal(run.conclusion, "success");
-      const candidates = await github(`/commits/${run.head_sha}/pulls`);
-      const closed = candidates.filter(
-        (pr) =>
-          pr.state === "closed" &&
-          pr.base.ref === "main" &&
-          pr.base.repo.full_name === repository &&
-          pr.head.repo?.full_name === repository &&
-          (pr.head.sha === run.head_sha || pr.merge_commit_sha === run.head_sha),
-      );
-      assert.equal(
-        closed.length,
-        1,
-        "Cleanup signal must identify exactly one closed same-repository PR",
-      );
-      number = String(closed[0].number);
+      number = cleanupSignalNumber(run);
+      const closed = await github(`/pulls/${number}`);
+      assert.equal(closed.state, "closed", "Cleanup signal requires a closed PR");
+      assert.equal(closed.base.ref, "main");
+      assert.equal(closed.base.repo.full_name, repository);
+      assert.equal(closed.head.repo?.full_name, repository);
     }
     target(number);
     if (operation === "deploy") await eligible(number, process.env.PR_SHA);
