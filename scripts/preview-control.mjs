@@ -73,7 +73,7 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
   } catch (error) {
     console.error(
       error instanceof assert.AssertionError
-        ? error.message
+        ? error.message.split("\n")[0]
         : "Preview preflight failed; raw error omitted",
     );
     process.exitCode = 1;

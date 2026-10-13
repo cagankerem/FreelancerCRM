@@ -6,6 +6,23 @@ import { validateWorkflow } from "./lib/ci-policy.mjs";
 const directory = new URL("../.github/workflows/", import.meta.url);
 const ci = readFileSync(new URL("ci.yml", directory), "utf8");
 const preview = readFileSync(new URL("workers-preview.yml", directory), "utf8");
+test("preview workflow refuses plaintext artifact upload", () =>
+  assert.throws(() =>
+    validateWorkflow(
+      preview.replace("path: preview-sealed/preview.enc", "path: preview-dist"),
+      "workers-preview.yml",
+    ),
+  ));
+test("preview workflow requires sealing before upload", () =>
+  assert.throws(() =>
+    validateWorkflow(
+      preview.replace(
+        "node control/scripts/seal-preview-build.mjs preview-dist preview-sealed",
+        "echo skip-sealing",
+      ),
+      "workers-preview.yml",
+    ),
+  ));
 for (const [name, mutate] of [
   [
     "unprotected publication",

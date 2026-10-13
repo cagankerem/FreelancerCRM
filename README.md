@@ -10,8 +10,12 @@ kullanılır; migration, seed veya reset uzak test DB üzerinde otomatik çalı�
 Deploy girdileri `operation=deploy`, `pr_number` ve incelenmiş tam `pr_sha`dır.
 PR aynı repoda, açık, draft olmayan ve main hedefli olmalı; aynı SHA üzerinde
 altı gerekli kontrol başarılı olmalıdır. PR HEAD değişirse yeniden onay gerekir.
-Secretsız build ayrı runner'da çalışır; yalnız public test ayarları içeren derleme
-artefaktı bir gün saklanır. Deploy runner'ı PR scriptlerini çalıştırmaz; trusted
+Platform secretsız build ayrı runner'da çalışır. Vinext'in ürettiği dahili
+prerender sırrı nedeniyle server çıktısı düz artefakt olarak yüklenmez:
+tar arşivi AES-256-GCM ile şifrelenir, tek kullanımlık AES anahtarı repo public
+RSA anahtarıyla OAEP-SHA256 kullanılarak sarılır; yalnız `preview.enc` bir gün
+saklanır. Private RSA anahtarı yalnız korumalı publish adımındadır; build'e
+verilmez. Deploy runner'ı PR scriptlerini çalıştırmaz; trusted
 main denetleyicisi artefaktı, PR SHA'sını ve kontrolleri tekrar doğrular.
 
 `workers-preview` GitHub environment'ında cagankerem onayı, yalnız korumalı
@@ -19,9 +23,18 @@ branch'ler ve kapalı admin bypass uygulanır. Secret'lar yalnız publish adım�
 verilir. Cloudflare token'ı seçili hesabın Workers Scripts Edit ve Account
 Settings Read izinleriyle sınırlıdır; bu account kapsamı Worker başına izolasyon
 sağlamaz, bu nedenle denetleyici sahiplik ve PR namespace kontrollerini uygular.
-Supabase token'ı yalnız test projesi Auth Config Read/Write ve API Keys/Secrets
-Read kapsamındadır; production/DB yazma izni yoktur. Supabase token'ının bitişi
+Supabase token'ı yalnız test projesi Auth Config Read/Write, API Keys/Secrets
+Read ve kullanıcının açık onayıyla Project Settings Read/Write kapsamındadır;
+Auth PATCH endpoint'i son iki write iznini birlikte gerektirir. Project Settings
+izni test projesini silme/duraklatma yetkisi de içerdiğinden token yalnız bu
+proje ve onaylı main denetleyicisiyle kullanılır; production/Database write
+izni yoktur. Supabase token'ının bitişi
 2026-11-12; o tarihten önce aynı dar kapsamla yenilenip GitHub secret'ı güncellenir.
+`PREVIEW_ARTIFACT_PRIVATE_KEY` de aynı environment'da korunur. Şifre çözümünde
+MAC/anahtar hatası, arşiv traversal/link/device veya config/SHA uyuşmazlığı
+yayını durdurur; plaintext yalnız private geçici deploy klasöründe açılır ve
+işlem sonunda kaldırılır. Anahtar rotasyonunda public PEM ve environment private
+key eşleşmeli; eski şifreli artefaktı retry etmek yerine yeniden build alınmalıdır.
 
 Site URL staging olarak kalır. Yalnız ilgili PR'ın kesin `/auth/callback` adresi
 allowlist'e eklenir; wildcard kullanılmaz. HTTPS sentetik giriş, Secure/Lax çerez,

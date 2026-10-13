@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash, randomBytes } from "node:crypto";
-import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -16,6 +16,7 @@ import {
   validateArtifactConfig,
 } from "./lib/preview-policy.mjs";
 import { eligible, github } from "./preview-control.mjs";
+import { openPreview, validateArchiveListing } from "./lib/preview-envelope.mjs";
 
 const app = resolve(import.meta.dirname, "../apps/web");
 const number = process.env.PR_NUMBER;
@@ -23,6 +24,7 @@ const { name, origin } = target(number);
 const operation = process.env.PREVIEW_OPERATION;
 const cfToken = process.env.CLOUDFLARE_API_TOKEN;
 const managementToken = process.env.SUPABASE_TEST_MANAGEMENT_TOKEN;
+let extractedBuild;
 const owner = `${repository}:pr:${number}`;
 const owned = (settings) =>
   settings?.bindings?.some(
@@ -58,7 +60,7 @@ async function supabase(path, body) {
   });
   assert.ok(
     response.ok,
-    `Test management operation failed (HTTP ${response.status}); raw response omitted`,
+    `Test management ${body ? "PATCH" : "GET"} ${path} failed (HTTP ${response.status}); raw response omitted`,
   );
   return response.json();
 }
@@ -102,7 +104,45 @@ try {
   } else {
     assert.equal(operation, "deploy");
     await eligible(number, process.env.PR_SHA);
-    const directory = resolve(process.argv[2]);
+    const privateKey = process.env.PREVIEW_ARTIFACT_PRIVATE_KEY;
+    assert.ok(privateKey, "Protected artifact decryption key missing");
+    const sealedDirectory = resolve(process.argv[2]);
+    assert.deepEqual(
+      readdirSync(sealedDirectory),
+      ["preview.enc"],
+      "Only encrypted artifact allowed",
+    );
+    extractedBuild = mkdtempSync(join(tmpdir(), "freelancercrm-open-preview-"));
+    const archive = join(extractedBuild, "build.tar.gz");
+    const plaintext = openPreview(readFileSync(join(sealedDirectory, "preview.enc")), privateKey);
+    try {
+      writeFileSync(archive, plaintext, { mode: 0o600, flag: "wx" });
+    } finally {
+      plaintext.fill(0);
+    }
+    const list = (flags) => {
+      const listed = spawnSync("tar", [flags, archive], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        timeout: 30000,
+        maxBuffer: 4 * 1024 * 1024,
+      });
+      assert.equal(
+        listed.status,
+        0,
+        "Encrypted build archive inspection failed; raw output omitted",
+      );
+      return listed.stdout;
+    };
+    validateArchiveListing(list("-tzf"), list("-tvzf"));
+    const unpacked = spawnSync(
+      "tar",
+      ["-xzf", archive, "-C", extractedBuild, "--no-same-owner", "--no-same-permissions"],
+      { stdio: ["ignore", "pipe", "pipe"], timeout: 30000 },
+    );
+    assert.equal(unpacked.status, 0, "Encrypted artifact extraction failed; raw output omitted");
+    unlinkSync(archive);
+    const directory = extractedBuild;
     const metadata = JSON.parse(readFileSync(join(directory, "preview-metadata.json"), "utf8"));
     assert.deepEqual(metadata, { pr: Number(number), sha: process.env.PR_SHA });
     const configPath = join(directory, "server/wrangler.json");
@@ -226,8 +266,10 @@ try {
 } catch (error) {
   console.error(
     error instanceof assert.AssertionError
-      ? error.message
+      ? error.message.split("\n")[0]
       : "Preview operation failed; raw error omitted",
   );
   process.exitCode = 1;
+} finally {
+  if (extractedBuild) rmSync(extractedBuild, { recursive: true });
 }
