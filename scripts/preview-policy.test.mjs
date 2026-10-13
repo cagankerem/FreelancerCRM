@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { revokeSyntheticSession } from "./lib/synthetic-session-cleanup.mjs";
 import {
   approvePullRequest,
   assertSecretFreeArtifactText,
@@ -11,6 +12,44 @@ import {
 } from "./lib/preview-policy.mjs";
 
 const sha = "a".repeat(40);
+test("synthetic session cleanup accepts only success or an explicitly absent session", async () => {
+  for (const error of [null, { code: "session_not_found", status: 403 }]) {
+    await revokeSyntheticSession(
+      {
+        signOut: async (token, scope) => {
+          assert.equal(token, "synthetic-test-token");
+          assert.equal(scope, "global");
+          return { error };
+        },
+      },
+      "synthetic-test-token",
+    );
+  }
+  for (const error of [
+    { code: "not_admin", status: 403 },
+    { code: "bad_jwt", status: 401 },
+    { code: "session_expired", status: 403 },
+    { code: "unexpected_failure", status: 500 },
+    { status: 404 },
+    { message: "session_not_found" },
+  ]) {
+    await assert.rejects(
+      revokeSyntheticSession({ signOut: async () => ({ error }) }, "synthetic-test-token"),
+      /refusing account deletion/,
+    );
+  }
+  await assert.rejects(
+    revokeSyntheticSession(
+      {
+        signOut: async () => {
+          throw new Error("Network unavailable");
+        },
+      },
+      "synthetic-test-token",
+    ),
+    /Network unavailable/,
+  );
+});
 const pr = {
   number: 12,
   state: "open",
