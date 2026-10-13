@@ -1,0 +1,16 @@
+name: Preview cleanup signal
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  signal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - run: echo 'A PR closed; trusted main controller will verify cleanup eligibility.'

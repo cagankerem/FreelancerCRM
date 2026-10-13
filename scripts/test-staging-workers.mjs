@@ -2,15 +2,30 @@ import assert from "node:assert/strict";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
-import { stagingOrigin, testProjectRef, testSecretKey } from "./lib/supabase-management.mjs";
+import {
+  stagingOrigin as defaultStagingOrigin,
+  testProjectRef,
+  testSecretKey,
+} from "./lib/supabase-management.mjs";
+
+const stagingOrigin = process.env.PREVIEW_TEST_ORIGIN ?? defaultStagingOrigin;
+if (process.env.PREVIEW_TEST_ORIGIN)
+  assert.match(
+    stagingOrigin,
+    /^https:\/\/freelancercrm-pr-[1-9][0-9]{0,8}\.cagankeremergun\.workers\.dev$/,
+  );
 
 assert.notEqual(process.env.CI, "true", "Remote staging tests must never run in PR quality CI.");
 const require = createRequire(resolve(import.meta.dirname, "../apps/web/package.json"));
 const { chromium } = require("@playwright/test");
 const { createClient } = require("@supabase/supabase-js");
-const db = createClient(`https://${testProjectRef}.supabase.co`, await testSecretKey(), {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
+const db = createClient(
+  `https://${testProjectRef}.supabase.co`,
+  process.env.PREVIEW_TEST_ORIGIN ? process.env.SUPABASE_PREVIEW_TEST_KEY : await testSecretKey(),
+  {
+    auth: { persistSession: false, autoRefreshToken: false },
+  },
+);
 const accounts = [];
 const browser = await chromium.launch({ headless: true });
 let context;

@@ -1,0 +1,116 @@
+name: Approved Workers preview
+
+on:
+  workflow_run:
+    workflows: [Preview cleanup signal]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Deploy an approved commit or clean a closed PR
+        type: choice
+        options: [deploy, cleanup]
+        required: true
+      pr_number:
+        description: Same-repository PR number
+        type: string
+        required: true
+      pr_sha:
+        description: Exact reviewed 40-character HEAD SHA (deploy only)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+  actions: read
+
+concurrency:
+  group: workers-preview-management
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PREVIEW_OPERATION: ${{ github.event_name == 'workflow_run' && 'cleanup' || inputs.operation }}
+  PR_NUMBER: ${{ inputs.pr_number }}
+  PR_SHA: ${{ inputs.pr_sha }}
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      operation: ${{ steps.preflight.outputs.operation }}
+      number: ${{ steps.preflight.outputs.number }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.3"
+      - run: node scripts/preview-control.mjs
+        id: preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+  build:
+    if: needs.preflight.outputs.operation == 'deploy'
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: main
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ inputs.pr_sha }}
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.3"
+      - run: node control/scripts/build-workers-preview.mjs source preview-dist
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: preview-dist
+          path: preview-dist
+          include-hidden-files: false
+          retention-days: 1
+          if-no-files-found: error
+  publish:
+    if: ${{ !cancelled() && needs.preflight.result == 'success' && (needs.build.result == 'success' || needs.preflight.outputs.operation == 'cleanup') }}
+    needs: [preflight, build]
+    environment: workers-preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PR_NUMBER: ${{ needs.preflight.outputs.number }}
+      PREVIEW_OPERATION: ${{ needs.preflight.outputs.operation }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.3"
+      - run: npm ci --prefix apps/web
+      - run: cd apps/web && npx --no-install playwright install --with-deps chromium
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        if: needs.preflight.outputs.operation == 'deploy'
+        with:
+          name: preview-dist
+          path: preview-dist
+      - run: node scripts/publish-workers-preview.mjs preview-dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SUPABASE_TEST_MANAGEMENT_TOKEN: ${{ secrets.SUPABASE_TEST_MANAGEMENT_TOKEN }}

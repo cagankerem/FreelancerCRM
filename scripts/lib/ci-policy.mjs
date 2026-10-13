@@ -14,6 +14,88 @@ export function validateWorkflow(source, filename) {
   const document = parseDocument(source, { uniqueKeys: true });
   assert.deepEqual(document.errors, [], `${filename}: invalid YAML`);
   const workflow = document.toJS();
+  if (filename === "preview-cleanup-signal.yml") {
+    assert.deepEqual(workflow.on, { pull_request: { branches: ["main"], types: ["closed"] } });
+    assert.deepEqual(workflow.permissions, { contents: "read" });
+    assert.deepEqual(workflow.jobs, {
+      signal: {
+        "runs-on": "ubuntu-24.04",
+        "timeout-minutes": 1,
+        steps: [
+          { run: "echo 'A PR closed; trusted main controller will verify cleanup eligibility.'" },
+        ],
+      },
+    });
+    return workflow;
+  }
+  if (filename === "workers-preview.yml") {
+    assert.deepEqual(
+      Object.keys(workflow.on),
+      ["workflow_run", "workflow_dispatch"],
+      "Preview publication requires manual dispatch",
+    );
+    assert.deepEqual(workflow.permissions, {
+      contents: "read",
+      "pull-requests": "read",
+      checks: "read",
+      actions: "read",
+    });
+    assert.deepEqual(workflow.on.workflow_run, {
+      workflows: ["Preview cleanup signal"],
+      types: ["completed"],
+    });
+    assert.deepEqual(Object.keys(workflow.jobs), ["preflight", "build", "publish"]);
+    assert.equal(workflow.jobs.publish.environment, "workers-preview");
+    assert.deepEqual(workflow.jobs.publish.needs, ["preflight", "build"]);
+    assert.equal(workflow.concurrency["cancel-in-progress"], false);
+    assert.equal(workflow.concurrency.group, "workers-preview-management");
+    assert.equal(workflow.jobs.build.if, "needs.preflight.outputs.operation == 'deploy'");
+    assert.equal(
+      workflow.jobs.publish.if,
+      "${{ !cancelled() && needs.preflight.result == 'success' && (needs.build.result == 'success' || needs.preflight.outputs.operation == 'cleanup') }}",
+    );
+    for (const [id, job] of Object.entries(workflow.jobs)) {
+      assert.equal(job["runs-on"], "ubuntu-24.04");
+      assert.ok(job["timeout-minutes"] > 0 && job["timeout-minutes"] <= 20);
+      assert.ok(!job.permissions && !job["continue-on-error"]);
+      for (const step of job.steps) {
+        assert.ok(!step["continue-on-error"]);
+        if (step.uses) {
+          assert.match(step.uses, /^[\w.-]+\/[\w./-]+@[a-f0-9]{40}$/);
+          if (step.uses.startsWith("actions/checkout@")) {
+            assert.equal(step.with?.["persist-credentials"], false);
+            assert.ok(
+              step.with.ref === "main" ||
+                (id === "build" && step.with.ref === "${{ inputs.pr_sha }}"),
+            );
+          }
+          if (step.uses.startsWith("actions/upload-artifact@")) {
+            assert.equal(id, "build");
+            assert.equal(step.with.path, "preview-dist");
+            assert.equal(step.with["retention-days"], 1);
+            assert.equal(step.with["include-hidden-files"], false);
+          }
+        }
+        const secrets = JSON.stringify(step).match(/secrets\.[A-Z_]+/g) ?? [];
+        if (secrets.length) {
+          assert.equal(id, "publish");
+          assert.equal(step.run, "node scripts/publish-workers-preview.mjs preview-dist");
+          assert.deepEqual(secrets.sort(), [
+            "secrets.CLOUDFLARE_API_TOKEN",
+            "secrets.SUPABASE_TEST_MANAGEMENT_TOKEN",
+          ]);
+        }
+      }
+      if (id !== "publish") assert.doesNotMatch(JSON.stringify(job), /secrets\./);
+    }
+    assert.doesNotMatch(source, /pull_request_target|--force|PRODUCTION|SUPABASE_ACCESS_TOKEN/);
+    assert.equal(
+      (source.match(/secrets\./g) ?? []).length,
+      2,
+      "No credentials outside protected publish step",
+    );
+    return workflow;
+  }
   assert.ok(
     workflow.on?.pull_request !== undefined || Object.hasOwn(workflow.on ?? {}, "pull_request"),
     "PR trigger required",

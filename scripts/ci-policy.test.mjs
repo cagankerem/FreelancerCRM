@@ -5,6 +5,32 @@ import { validateWorkflow } from "./lib/ci-policy.mjs";
 
 const directory = new URL("../.github/workflows/", import.meta.url);
 const ci = readFileSync(new URL("ci.yml", directory), "utf8");
+const preview = readFileSync(new URL("workers-preview.yml", directory), "utf8");
+for (const [name, mutate] of [
+  [
+    "unprotected publication",
+    (s) => s.replace("environment: workers-preview", "environment: unprotected"),
+  ],
+  ["privileged PR deployment", (s) => s.replace("workflow_dispatch:", "pull_request_target:")],
+  [
+    "secret in build",
+    (s) => s.replace("path: source", "path: ${{ secrets.CLOUDFLARE_API_TOKEN }}"),
+  ],
+  [
+    "floating artifact Action",
+    (s) => s.replace(/actions\/upload-artifact@[a-f0-9]{40}/, "actions/upload-artifact@v4"),
+  ],
+  [
+    "soft publication failure",
+    (s) =>
+      s.replace(
+        "environment: workers-preview",
+        "environment: workers-preview\n    continue-on-error: true",
+      ),
+  ],
+])
+  test(`preview workflow rejects ${name}`, () =>
+    assert.throws(() => validateWorkflow(mutate(preview), "workers-preview.yml")));
 test("all workflows enforce SHA pins, minimal permissions and mandatory PR gates", () => {
   for (const file of readdirSync(directory).filter((file) => /\.ya?ml$/.test(file))) {
     validateWorkflow(readFileSync(new URL(file, directory), "utf8"), file);

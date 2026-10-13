@@ -4,14 +4,14 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { supabaseProjects } from "./lib/shared/supabase-projects";
 
 export default defineConfig({
-  envDir: process.env.WORKERS_TARGET === "staging" ? false : undefined,
+  envDir: ["staging", "preview"].includes(process.env.WORKERS_TARGET ?? "") ? false : undefined,
   plugins: [
     {
       name: "supabase-project-build-isolation",
       enforce: "pre",
       transform(_code, id) {
         if (
-          process.env.WORKERS_TARGET !== "staging" ||
+          !["staging", "preview"].includes(process.env.WORKERS_TARGET ?? "") ||
           !id.endsWith("/lib/shared/supabase-projects.ts")
         )
           return;
