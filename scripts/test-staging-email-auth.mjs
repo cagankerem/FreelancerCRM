@@ -7,7 +7,15 @@ import { setTimeout } from "node:timers/promises";
 
 // Human-assisted acceptance: no inbox access, admin confirmation, generated link,
 // password login, screenshots, traces, or raw URL/token logging.
-const origin = "https://freelancercrm-staging.cagankeremergun.workers.dev";
+const preview = process.env.AUTH_TEST_FLOW === "preview-magiclink";
+const origin = preview
+  ? process.env.AUTH_TEST_ORIGIN
+  : "https://freelancercrm-staging.cagankeremergun.workers.dev";
+if (preview)
+  assert.match(
+    origin ?? "",
+    /^https:\/\/freelancercrm-pr-[1-9][0-9]{0,8}\.cagankeremergun\.workers\.dev$/,
+  );
 const project = "pbqgjfzylnhaiadlpvkq";
 const require = createRequire(resolve(import.meta.dirname, "../apps/web/package.json"));
 const { chromium } = require("@playwright/test");
@@ -108,12 +116,43 @@ try {
       }),
     );
   });
-  step = "registration";
-  await page.goto(`${origin}/auth/register`);
-  await page.locator('input[name="email"]').fill(email);
-  await page.locator('input[name="password"]').fill(`${randomBytes(24).toString("base64url")}!aA1`);
-  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
-  await page.getByRole("status").filter({ hasText: "e-posta doğrulama" }).waitFor();
+  if (preview) {
+    step = "existing-account-magiclink";
+    await page.goto(`${origin}/auth/login`);
+    const { createServerClient } = require("@supabase/ssr");
+    const jar = [];
+    const client = createServerClient(`https://${project}.supabase.co`, publicKey, {
+      cookieOptions: { secure: true, sameSite: "lax", path: "/" },
+      cookies: { getAll: () => [], setAll: (values) => jar.push(...values) },
+    });
+    const started = await client.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false, emailRedirectTo: `${origin}/auth/callback` },
+    });
+    assert.ok(
+      !started.error && !started.data.session,
+      "Existing-account magic link failed; raw error omitted",
+    );
+    await context.addCookies(
+      jar.map(({ name, value }) => ({
+        name,
+        value,
+        domain: new URL(origin).hostname,
+        path: "/",
+        secure: true,
+        sameSite: "Lax",
+      })),
+    );
+  } else {
+    step = "registration";
+    await page.goto(`${origin}/auth/register`);
+    await page.locator('input[name="email"]').fill(email);
+    await page
+      .locator('input[name="password"]')
+      .fill(`${randomBytes(24).toString("base64url")}!aA1`);
+    await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+    await page.getByRole("status").filter({ hasText: "e-posta doğrulama" }).waitFor();
+  }
   const prefix = `sb-${project}-auth-token`;
   const pending = await context.cookies();
   assert.ok(
@@ -133,7 +172,7 @@ try {
     document.querySelector("main")?.prepend(note);
   });
   console.log(
-    "WAITING_FOR_EMAIL: signup requested; no session before verification; Secure PKCE verifier present. Paste the ORIGINAL email confirmation link into this Chromium window, not into chat or another browser.",
+    `WAITING_FOR_EMAIL: ${preview ? "existing-account magic link" : "signup"} requested; no session before verification; Secure PKCE verifier present. Paste the ORIGINAL latest email link into this Chromium window, not into chat or another browser.`,
   );
 
   step = "email_callback_wait";
@@ -176,7 +215,7 @@ try {
   await authenticatedPage.getByRole("heading", { name: "Profilini tamamla" }).waitFor();
   assert.equal(blockedRequests, 0);
   console.log(
-    "PASS: actual signup, human email verification, HTTPS code callback, confirmed Auth identity, Secure/SameSite=Lax session and protected route access. No production requests.",
+    `PASS: actual ${preview ? "preview magic link" : "signup"}, human email verification, HTTPS code callback, confirmed Auth identity, Secure/SameSite=Lax session and protected route access. No production requests.`,
   );
   step = "signout";
   const signedOut = await fetch(`https://${project}.supabase.co/auth/v1/logout`, {

@@ -27,6 +27,10 @@ Site URL staging olarak kalır. Yalnız ilgili PR'ın kesin `/auth/callback` adr
 allowlist'e eklenir; wildcard kullanılmaz. HTTPS sentetik giriş, Secure/Lax çerez,
 ürün/RLS/refresh/logout ve geçersiz callback kontrolleri yayın sonrası çalışır.
 Gerçek e-posta teslimi/başarılı email callback kabulü ayrı insan destekli testtir.
+Onaylı mevcut test hesabıyla `AUTH_TEST_ORIGIN` ve `AUTH_TEST_EMAIL` verilerek
+`npm run test:auth:email:preview` çalıştırılır: tek magic-link e-postası gönderilir,
+en yeni orijinal link aynı Chromium'da açılır; hesap/parola değiştirilmez ve
+oluşan test oturumu sonunda sonlandırılır. Yeni e-posta için insan onayı gerekir.
 
 PR kapanınca secretsız `Preview cleanup signal`, main'deki cleanup denetleyicisini
 tetikler. Aynı korumalı environment nedeniyle temizlik de onay bekleyebilir;
