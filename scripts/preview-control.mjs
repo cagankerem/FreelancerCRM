@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { appendFileSync, readFileSync } from "node:fs";
 import {
   approvePullRequest,
+  approveCleanupPullRequest,
   cleanupSignalNumber,
   repository,
   target,
@@ -47,10 +48,7 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
       const run = await github(`/actions/runs/${event.workflow_run.id}`);
       number = cleanupSignalNumber(run);
       const closed = await github(`/pulls/${number}`);
-      assert.equal(closed.state, "closed", "Cleanup signal requires a closed PR");
-      assert.equal(closed.base.ref, "main");
-      assert.equal(closed.base.repo.full_name, repository);
-      assert.equal(closed.head.repo?.full_name, repository);
+      approveCleanupPullRequest(closed, run, number);
     }
     target(number);
     if (operation === "deploy") await eligible(number, process.env.PR_SHA);

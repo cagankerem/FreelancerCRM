@@ -103,11 +103,20 @@ export function validateArtifactConfig(config, number) {
 }
 export function cleanupSignalNumber(run) {
   assert.equal(run.path, ".github/workflows/preview-cleanup-signal.yml");
-  assert.equal(run.name, "Preview cleanup signal");
+  assert.equal(run.workflow_id, 383382634);
   assert.equal(run.event, "pull_request_target");
-  assert.equal(run.head_branch, "main");
   assert.equal(run.conclusion, "success");
   const match = /^Closed preview PR #([1-9][0-9]{0,8})$/.exec(run.display_title ?? "");
   assert.ok(match, "Cleanup signal requires a strictly numeric PR identity");
   return match[1];
+}
+
+export function approveCleanupPullRequest(pr, run, number) {
+  assert.equal(String(pr.number), number);
+  assert.equal(pr.state, "closed", "Cleanup signal requires a closed PR");
+  assert.equal(pr.base.ref, "main");
+  assert.equal(pr.base.repo.full_name, repository);
+  assert.equal(pr.head.repo?.full_name, repository);
+  assert.equal(pr.head.sha, run.head_sha, "Cleanup signal must match the PR head SHA");
+  assert.equal(pr.head.ref, run.head_branch, "Cleanup signal must match the PR head ref");
 }
