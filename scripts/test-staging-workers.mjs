@@ -27,6 +27,7 @@ const db = createClient(
   },
 );
 const accounts = [];
+const sessionTokens = [];
 const browser = await chromium.launch({ headless: true });
 let context;
 try {
@@ -66,6 +67,21 @@ try {
     ),
     "Cloud session cookie security attributes are invalid.",
   );
+  const firstSession = JSON.parse(
+    Buffer.from(
+      cookies
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((cookie) => cookie.value)
+        .join("")
+        .slice(7),
+      "base64url",
+    ).toString(),
+  );
+  assert.ok(
+    typeof firstSession.access_token === "string",
+    "Synthetic session token unavailable; values omitted",
+  );
+  sessionTokens.push(firstSession.access_token);
   console.log("ok - session cookies are scoped to staging and Secure/SameSite=Lax");
   await page.locator('input[name="full_name"]').fill("Workers Sentetik Kullanıcı");
   await page.locator('input[name="profession"]').fill("Yazılım geliştirici");
@@ -128,6 +144,8 @@ try {
   });
   const signed = await other.auth.signInWithPassword({ email: secondEmail, password });
   assert.ok(!signed.error, "Second user login failed.");
+  assert.ok(signed.data.session, "Second synthetic session missing");
+  sessionTokens.push(signed.data.session.access_token);
   const isolated = await other.from("proposals").select("id").eq("id", proposalId);
   assert.ok(!isolated.error && isolated.data.length === 0, "Cross-user RLS isolation failed.");
   await other.auth.signOut();
@@ -204,6 +222,11 @@ try {
     "ok - logout/anonymous route guard and invalid callback safe redirect; no production requests",
   );
 } finally {
+  // Revoke even on an early test failure; deleting users alone does not invalidate JWTs.
+  for (const token of sessionTokens) {
+    const revoked = await db.auth.admin.signOut(token, "global");
+    assert.ok(!revoked.error, "Synthetic session revocation failed; refusing account deletion");
+  }
   await browser.close();
   for (const account of accounts.reverse()) {
     const identity = await db.auth.admin.getUserById(account.id);
