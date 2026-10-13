@@ -74,7 +74,8 @@ export function validateWorkflow(source, filename) {
           }
           if (step.uses.startsWith("actions/upload-artifact@")) {
             assert.equal(id, "build");
-            assert.equal(step.with.path, "preview-dist");
+            assert.equal(step.with.path, "preview-sealed/preview.enc");
+            assert.equal(step.with.name, "preview-sealed");
             assert.equal(step.with["retention-days"], 1);
             assert.equal(step.with["include-hidden-files"], false);
           }
@@ -82,9 +83,10 @@ export function validateWorkflow(source, filename) {
         const secrets = JSON.stringify(step).match(/secrets\.[A-Z_]+/g) ?? [];
         if (secrets.length) {
           assert.equal(id, "publish");
-          assert.equal(step.run, "node scripts/publish-workers-preview.mjs preview-dist");
+          assert.equal(step.run, "node scripts/publish-workers-preview.mjs preview-sealed");
           assert.deepEqual(secrets.sort(), [
             "secrets.CLOUDFLARE_API_TOKEN",
+            "secrets.PREVIEW_ARTIFACT_PRIVATE_KEY",
             "secrets.SUPABASE_TEST_MANAGEMENT_TOKEN",
           ]);
         }
@@ -92,9 +94,21 @@ export function validateWorkflow(source, filename) {
       if (id !== "publish") assert.doesNotMatch(JSON.stringify(job), /secrets\./);
     }
     assert.doesNotMatch(source, /pull_request_target|--force|PRODUCTION|SUPABASE_ACCESS_TOKEN/);
+    const buildSteps = workflow.jobs.build.steps;
+    const sealIndex = buildSteps.findIndex(
+      (step) =>
+        step.run === "node control/scripts/seal-preview-build.mjs preview-dist preview-sealed",
+    );
+    const uploadIndex = buildSteps.findIndex((step) =>
+      step.uses?.startsWith("actions/upload-artifact@"),
+    );
+    assert.ok(
+      sealIndex >= 0 && sealIndex < uploadIndex,
+      "Build must seal the archive before upload",
+    );
     assert.equal(
       (source.match(/secrets\./g) ?? []).length,
-      2,
+      3,
       "No credentials outside protected publish step",
     );
     return workflow;

@@ -30,7 +30,7 @@
     "format": "node apps/web/node_modules/prettier/bin/prettier.cjs . --write --ignore-unknown",
     "format:check": "node apps/web/node_modules/prettier/bin/prettier.cjs . --check --ignore-unknown",
     "test:integration": "npm run test:integration --prefix apps/web",
-    "test:ci": "node --test scripts/ci-policy.test.mjs scripts/dependency-audit.test.mjs scripts/ci-database.test.mjs scripts/local-docker.test.mjs scripts/preview-policy.test.mjs",
+    "test:ci": "node --test scripts/ci-policy.test.mjs scripts/dependency-audit.test.mjs scripts/ci-database.test.mjs scripts/local-docker.test.mjs scripts/preview-policy.test.mjs scripts/preview-envelope.test.mjs",
     "ci:clean": "node scripts/check-clean-install.mjs",
     "ci:validate": "node scripts/validate-ci.mjs",
     "ci:evidence": "node scripts/check-ci-evidence.mjs",
