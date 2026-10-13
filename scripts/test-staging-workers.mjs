@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
+import { revokeSyntheticSession } from "./lib/synthetic-session-cleanup.mjs";
 import {
   stagingOrigin as defaultStagingOrigin,
   testProjectRef,
@@ -224,8 +225,7 @@ try {
 } finally {
   // Revoke even on an early test failure; deleting users alone does not invalidate JWTs.
   for (const token of sessionTokens) {
-    const revoked = await db.auth.admin.signOut(token, "global");
-    assert.ok(!revoked.error, "Synthetic session revocation failed; refusing account deletion");
+    await revokeSyntheticSession(db.auth.admin, token);
   }
   await browser.close();
   for (const account of accounts.reverse()) {
