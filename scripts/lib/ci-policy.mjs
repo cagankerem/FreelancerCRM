@@ -29,6 +29,8 @@ export function validateWorkflow(source, filename) {
     return workflow;
   }
   if (filename === "workers-preview.yml") {
+    assert.doesNotMatch(JSON.stringify(workflow.env), /secrets/);
+    assert.doesNotMatch(source, /secrets\s*\[/, "Dynamic secret selectors forbidden");
     assert.deepEqual(
       Object.keys(workflow.on),
       ["workflow_run", "workflow_dispatch"],
@@ -58,6 +60,7 @@ export function validateWorkflow(source, filename) {
       assert.equal(job["runs-on"], "ubuntu-24.04");
       assert.ok(job["timeout-minutes"] > 0 && job["timeout-minutes"] <= 20);
       assert.ok(!job.permissions && !job["continue-on-error"]);
+      assert.doesNotMatch(JSON.stringify(job.env ?? {}), /secrets/);
       for (const step of job.steps) {
         assert.ok(!step["continue-on-error"]);
         if (step.uses) {
