@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { revokeSyntheticSession } from "./lib/synthetic-session-cleanup.mjs";
 import {
   approvePullRequest,
+  approveCleanupPullRequest,
   assertSecretFreeArtifactText,
   callbackList,
   cleanupSignalNumber,
@@ -16,20 +17,28 @@ import {
 const sha = "a".repeat(40);
 const cleanupRun = {
   path: ".github/workflows/preview-cleanup-signal.yml",
-  name: "Preview cleanup signal",
+  workflow_id: 383382634,
+  name: "Closed preview PR #11",
   event: "pull_request_target",
-  head_branch: "main",
+  head_branch: "codex/preview-lifecycle-acceptance",
+  head_sha: "a7eb81342715acf9cb4a92ca86b8ec133b14cbf2",
   conclusion: "success",
   display_title: "Closed preview PR #11",
 };
-test("main-only closure signal identifies its exact numeric PR without a merge ref", () => {
+const closedPR = {
+  number: 11,
+  state: "closed",
+  base: { ref: "main", repo: { full_name: repository } },
+  head: { ref: cleanupRun.head_branch, sha: cleanupRun.head_sha, repo: { full_name: repository } },
+};
+test("observed GitHub pull_request_target metadata identifies the closed PR head, not execution ref", () => {
   assert.equal(cleanupSignalNumber(cleanupRun), "11");
+  approveCleanupPullRequest(closedPR, cleanupRun, "11");
 });
 for (const [field, value] of [
   ["path", ".github/workflows/ci.yml"],
-  ["name", "Untrusted signal"],
+  ["workflow_id", 1],
   ["event", "pull_request"],
-  ["head_branch", "feature"],
   ["conclusion", "failure"],
   ["display_title", "Closed preview PR #11; echo attack"],
   ["display_title", "Closed preview PR #0"],
@@ -37,6 +46,56 @@ for (const [field, value] of [
 ]) {
   test(`cleanup signal refuses invalid ${field}: ${value}`, () => {
     assert.throws(() => cleanupSignalNumber({ ...cleanupRun, [field]: value }));
+  });
+}
+for (const [name, mutate] of [
+  [
+    "open",
+    (p) => {
+      p.state = "open";
+    },
+  ],
+  [
+    "wrong number",
+    (p) => {
+      p.number = 12;
+    },
+  ],
+  [
+    "different base",
+    (p) => {
+      p.base.ref = "other";
+    },
+  ],
+  [
+    "different base repository",
+    (p) => {
+      p.base.repo.full_name = "other/repository";
+    },
+  ],
+  [
+    "fork",
+    (p) => {
+      p.head.repo.full_name = "other/repository";
+    },
+  ],
+  [
+    "changed head",
+    (p) => {
+      p.head.sha = "b".repeat(40);
+    },
+  ],
+  [
+    "different head ref",
+    (p) => {
+      p.head.ref = "other";
+    },
+  ],
+]) {
+  test(`cleanup rejects ${name}`, () => {
+    const candidate = structuredClone(closedPR);
+    mutate(candidate);
+    assert.throws(() => approveCleanupPullRequest(candidate, cleanupRun, "11"));
   });
 }
 const require = createRequire(new URL("../apps/web/package.json", import.meta.url));
