@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { createRequire } from "node:module";
 import { revokeSyntheticSession } from "./lib/synthetic-session-cleanup.mjs";
 import {
   approvePullRequest,
@@ -12,8 +13,34 @@ import {
 } from "./lib/preview-policy.mjs";
 
 const sha = "a".repeat(40);
+const require = createRequire(new URL("../apps/web/package.json", import.meta.url));
+const { createClient, AuthSessionMissingError } = require("@supabase/supabase-js");
+test("real SDK maps the logout session_not_found response to an accepted missing-session error", async () => {
+  const client = createClient("http://127.0.0.1:54321", "synthetic-test-key", {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: async (url, options) => {
+        assert.equal(new URL(url).pathname, "/auth/v1/logout");
+        assert.equal(new URL(url).searchParams.get("scope"), "global");
+        assert.equal(options.method, "POST");
+        return new Response(JSON.stringify({ code: "session_not_found", msg: "Session missing" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json", "X-Supabase-Api-Version": "2024-01-01" },
+        });
+      },
+    },
+  });
+  const result = await client.auth.admin.signOut("synthetic-test-token", "global");
+  assert.ok(result.error instanceof AuthSessionMissingError);
+  assert.equal(result.error.code, undefined);
+  await revokeSyntheticSession(client.auth.admin, "synthetic-test-token");
+});
 test("synthetic session cleanup accepts only success or an explicitly absent session", async () => {
-  for (const error of [null, { code: "session_not_found", status: 403 }]) {
+  for (const error of [
+    null,
+    { code: "session_not_found", status: 403 },
+    new AuthSessionMissingError(),
+  ]) {
     await revokeSyntheticSession(
       {
         signOut: async (token, scope) => {
@@ -32,6 +59,7 @@ test("synthetic session cleanup accepts only success or an explicitly absent ses
     { code: "unexpected_failure", status: 500 },
     { status: 404 },
     { message: "session_not_found" },
+    { name: "AuthSessionMissingError" },
   ]) {
     await assert.rejects(
       revokeSyntheticSession({ signOut: async () => ({ error }) }, "synthetic-test-token"),
