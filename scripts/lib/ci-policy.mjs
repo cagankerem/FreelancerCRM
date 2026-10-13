@@ -15,7 +15,21 @@ export function validateWorkflow(source, filename) {
   assert.deepEqual(document.errors, [], `${filename}: invalid YAML`);
   const workflow = document.toJS();
   if (filename === "preview-cleanup-signal.yml") {
-    assert.deepEqual(workflow.on, { pull_request: { branches: ["main"], types: ["closed"] } });
+    assert.deepEqual(Object.keys(workflow).sort(), [
+      "jobs",
+      "name",
+      "on",
+      "permissions",
+      "run-name",
+    ]);
+    assert.equal(workflow.name, "Preview cleanup signal");
+    assert.equal(
+      workflow["run-name"],
+      "Closed preview PR #${{ github.event.pull_request.number }}",
+    );
+    assert.deepEqual(workflow.on, {
+      pull_request_target: { branches: ["main"], types: ["closed"] },
+    });
     assert.deepEqual(workflow.permissions, { contents: "read" });
     assert.deepEqual(workflow.jobs, {
       signal: {

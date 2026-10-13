@@ -6,6 +6,7 @@ import {
   approvePullRequest,
   assertSecretFreeArtifactText,
   callbackList,
+  cleanupSignalNumber,
   checks,
   repository,
   staging,
@@ -13,6 +14,31 @@ import {
 } from "./lib/preview-policy.mjs";
 
 const sha = "a".repeat(40);
+const cleanupRun = {
+  path: ".github/workflows/preview-cleanup-signal.yml",
+  name: "Preview cleanup signal",
+  event: "pull_request_target",
+  head_branch: "main",
+  conclusion: "success",
+  display_title: "Closed preview PR #11",
+};
+test("main-only closure signal identifies its exact numeric PR without a merge ref", () => {
+  assert.equal(cleanupSignalNumber(cleanupRun), "11");
+});
+for (const [field, value] of [
+  ["path", ".github/workflows/ci.yml"],
+  ["name", "Untrusted signal"],
+  ["event", "pull_request"],
+  ["head_branch", "feature"],
+  ["conclusion", "failure"],
+  ["display_title", "Closed preview PR #11; echo attack"],
+  ["display_title", "Closed preview PR #0"],
+  ["display_title", "Closed preview PR #1000000000"],
+]) {
+  test(`cleanup signal refuses invalid ${field}: ${value}`, () => {
+    assert.throws(() => cleanupSignalNumber({ ...cleanupRun, [field]: value }));
+  });
+}
 const require = createRequire(new URL("../apps/web/package.json", import.meta.url));
 const { createClient, AuthSessionMissingError } = require("@supabase/supabase-js");
 test("real SDK maps the logout session_not_found response to an accepted missing-session error", async () => {
