@@ -3,7 +3,12 @@ import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync }
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
-import { target, testRef, validateArtifactConfig } from "./lib/preview-policy.mjs";
+import {
+  assertSecretFreeArtifactText,
+  target,
+  testRef,
+  validateArtifactConfig,
+} from "./lib/preview-policy.mjs";
 
 const source = resolve(process.argv[2]);
 const output = resolve(process.argv[3]);
@@ -92,11 +97,7 @@ try {
       assert.ok(!entry.isSymbolicLink(), "Artifact symlinks forbidden");
       const file = join(path, entry.name);
       if (entry.isDirectory()) inspect(file);
-      else
-        assert.ok(
-          !/ammrkpwfznlcbdyrqlkn|sb_secret_/.test(readFileSync(file, "utf8")),
-          "Production reference or server key in preview artifact; do not upload",
-        );
+      else assertSecretFreeArtifactText(readFileSync(file, "utf8"));
     }
   }
   inspect(output);
