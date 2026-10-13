@@ -13,6 +13,19 @@ export const checks = [
   "workers-runtime",
 ];
 
+export function assertSecretFreeArtifactText(text) {
+  assert.ok(
+    !text.includes("ammrkpwfznlcbdyrqlkn"),
+    "Production reference in preview artifact; do not upload",
+  );
+  // The SDK itself contains the type-check prefix. Require an actual key-shaped suffix,
+  // never ignore a file/directory or an actual modern key value.
+  assert.ok(
+    !/sb_secret_[A-Za-z0-9_-]{16,}/.test(text),
+    "Server key in preview artifact; do not upload",
+  );
+}
+
 export function target(number) {
   assert.match(String(number), /^[1-9][0-9]{0,8}$/, "Invalid PR number");
   const name = `freelancercrm-pr-${number}`;

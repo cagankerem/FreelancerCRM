@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   approvePullRequest,
+  assertSecretFreeArtifactText,
   callbackList,
   checks,
   repository,
@@ -25,6 +26,12 @@ const runs = checks.map((name, id) => ({
   conclusion: "success",
   app: { id: 15368 },
 }));
+test("SDK prefix literal is not a credential, real key-shaped values still fail closed", () => {
+  assertSecretFreeArtifactText('key.startsWith("sb_secret_")');
+  assertSecretFreeArtifactText("sb_publishable_" + "A".repeat(32));
+  assert.throws(() => assertSecretFreeArtifactText("sb_secret_" + "A".repeat(32)));
+  assert.throws(() => assertSecretFreeArtifactText("ammrkpwfznlcbdyrqlkn"));
+});
 test("exact reviewed commit with every mandatory check is eligible", () =>
   approvePullRequest(pr, "12", sha, runs));
 for (const [name, mutate] of [

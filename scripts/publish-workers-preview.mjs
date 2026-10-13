@@ -7,6 +7,7 @@ import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 import {
   account,
+  assertSecretFreeArtifactText,
   callbackList,
   repository,
   staging,
@@ -137,10 +138,7 @@ try {
             "Credential file in artifact",
           );
           const text = readFileSync(file, "utf8");
-          assert.ok(
-            !/ammrkpwfznlcbdyrqlkn|sb_secret_/.test(text),
-            "Production reference or secret key in artifact",
-          );
+          assertSecretFreeArtifactText(text);
           assert.ok(
             !text.includes(cfToken) && !text.includes(managementToken),
             "Management credential in artifact",
