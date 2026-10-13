@@ -187,6 +187,7 @@ try {
       );
       console.log("SQL isolation/concurrency and local security advisors passed.");
       if (phase === "workers") {
+        run("npm", ["run", "test:auth:regression:local"], "Local synthetic PKCE regressions");
         const envFile = join(root, "apps/web/.env.local");
         assert.equal(
           existsSync(envFile),

@@ -1,5 +1,50 @@
 # FreelancerCRM
 
+## Onaylı PR preview otomasyonu — uzak kabul bekliyor
+
+Her onaylı PR için ayrı `freelancercrm-pr-<PR>.cagankeremergun.workers.dev`
+Worker'ı kullanılır; staging Worker'ı değiştirilmez. Ortak test Supabase'i
+kullanılır; migration, seed veya reset uzak test DB üzerinde otomatik çalıştırılmaz.
+
+`Approved Workers preview` workflow'u yalnız `main` referansından başlatılır.
+Deploy girdileri `operation=deploy`, `pr_number` ve incelenmiş tam `pr_sha`dır.
+PR aynı repoda, açık, draft olmayan ve main hedefli olmalı; aynı SHA üzerinde
+altı gerekli kontrol başarılı olmalıdır. PR HEAD değişirse yeniden onay gerekir.
+Secretsız build ayrı runner'da çalışır; yalnız public test ayarları içeren derleme
+artefaktı bir gün saklanır. Deploy runner'ı PR scriptlerini çalıştırmaz; trusted
+main denetleyicisi artefaktı, PR SHA'sını ve kontrolleri tekrar doğrular.
+
+`workers-preview` GitHub environment'ında cagankerem onayı, yalnız korumalı
+branch'ler ve kapalı admin bypass uygulanır. Secret'lar yalnız publish adımına
+verilir. Cloudflare token'ı seçili hesabın Workers Scripts Edit ve Account
+Settings Read izinleriyle sınırlıdır; bu account kapsamı Worker başına izolasyon
+sağlamaz, bu nedenle denetleyici sahiplik ve PR namespace kontrollerini uygular.
+Supabase token'ı yalnız test projesi Auth Config Read/Write ve API Keys/Secrets
+Read kapsamındadır; production/DB yazma izni yoktur. Supabase token'ının bitişi
+2026-11-12; o tarihten önce aynı dar kapsamla yenilenip GitHub secret'ı güncellenir.
+
+Site URL staging olarak kalır. Yalnız ilgili PR'ın kesin `/auth/callback` adresi
+allowlist'e eklenir; wildcard kullanılmaz. HTTPS sentetik giriş, Secure/Lax çerez,
+ürün/RLS/refresh/logout ve geçersiz callback kontrolleri yayın sonrası çalışır.
+Gerçek e-posta teslimi/başarılı email callback kabulü ayrı insan destekli testtir.
+Onaylı mevcut test hesabıyla `AUTH_TEST_ORIGIN` ve `AUTH_TEST_EMAIL` verilerek
+`npm run test:auth:email:preview` çalıştırılır: tek magic-link e-postası gönderilir,
+en yeni orijinal link aynı Chromium'da açılır; hesap/parola değiştirilmez ve
+oluşan test oturumu sonunda sonlandırılır. Yeni e-posta için insan onayı gerekir.
+
+PR kapanınca secretsız `Preview cleanup signal`, main'deki cleanup denetleyicisini
+tetikler. Aynı korumalı environment nedeniyle temizlik de onay bekleyebilir;
+GitHub Actions'ta pending deployment incelenip onaylanmalıdır. Denetleyici kapalı
+PR ve `PREVIEW_OWNER` binding eşleşmesiyle yalnız o Worker'ı siler ve kesin
+callback'ini kaldırır; staging, diğer preview'lar ve DB kayıtlarına dokunmaz.
+Gerekirse main'den `operation=cleanup` ve kapalı `pr_number` ile tekrar çalıştırılır.
+Başarısız yayın otomatik başarılı kabul edilmez; onaylı cleanup/retry yapılır.
+
+Yerel sentetik PKCE regresyonları: `npm run test:auth:regression:local`.
+Mevcut yerel Supabase/Mailpit kullanılır; yalnız kendi UUID hesapları/mailleri
+temizlenir, DB reset ve gerçek e-posta gönderimi yoktur. Aynı test Workers CI
+kapısında geçici yerel Supabase'e karşı çalışır.
+
 ## Workers staging kurulumu — kontrollü adaptör denemesi
 
 Native Next.js komutları korunur. Workers için sabitlenmiş vinext 1.1.0 (beta),
@@ -29,6 +74,12 @@ Kökten çalıştırılabilir komutlar:
   HTTPS giriş, çerez, profil/müşteri/teklif, public resolver, RLS, refresh ve
   çıkış akışını sınar; oluşturduğu hesapları ve bağlı kayıtları temizler.
   Gerçek e-posta doğrulaması bu otomatik testin kapsamı değildir.
+- `npm run test:auth:email:staging`: `AUTH_TEST_EMAIL` ile seçilen, test projesinde
+  henüz kayıtlı olmayan organizasyon üyesi adresiyle insan destekli gerçek kayıt
+  testi. Gelen en yeni e-postanın bağlantısı aynı açılmış Chromium penceresine
+  yapıştırılır; kod/link/token değerleri, screenshot veya trace kaydedilmez.
+  Test başarıyla bitince oturum sonlandırılıp pencere kapatılır; hesap silinmez.
+  Var olan test hesabını silmek ayrıca açık onay gerektirir; CI'da çalıştırılmaz.
 - `npm run ci:workers`: yalnız bağımsız GitHub-hosted CI ortamında geçici yerel
   Supabase, migration/seed/DB ve Workers tarayıcı/ürün kontrollerini çalıştırır;
   kendi oluşturduğu kaynakları temizler.
@@ -59,8 +110,13 @@ kabul eder. Workers giriş katmanı dinamik yanıt/redirect'lere güvenlik başl
 ekler; özel form POST'larını origin kontrolünden geçirir. Public teklif ve
 callback yanıtları `no-referrer`, özel formlar `same-origin` kullanır.
 Uzak staging yayını ve bu otomatik HTTPS testleri 2026-10-10'da doğrulandı;
-bulut oturum çerezleri `Secure` ve `SameSite=Lax` kullanır. Gerçek kayıt →
-e-posta doğrulaması → callback kabulü kullanıcı isteğiyle sonraya bırakıldı.
+bulut oturum çerezleri `Secure` ve `SameSite=Lax` kullanır. 2026-10-10'da sonraya
+bırakılan gerçek kayıt → e-posta doğrulaması → HTTPS callback → oturum testi,
+2026-10-13'te onaylı temiz kayıt tekrarında başarıyla geçti; doğrulanmış Auth
+kimliği ve korumalı rota erişimi kontrol edildi. İlk denemenin kök nedeni
+kesinleşmedi; tekrar için eski boş test hesabı açık kullanıcı onayıyla silindi.
+Başarılı test sonrası session sayısı sıfır; yeni doğrulanmış boş test hesabı
+korundu. Rastgele test parolası kaydedilmedi veya paylaşılmadı.
 Staging smoke ayrıca onboarding, yayınlama, süresi dolmuş oturumun yenilenmesi
 ve geçersiz callback yönlendirmesini doğruladı. Test bitiminde iki sentetik hesap
 ve bağlı kayıtları temizlendi; test DB'de kullanıcı/profil/teklif sayısı sıfır,

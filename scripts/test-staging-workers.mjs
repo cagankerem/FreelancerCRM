@@ -2,16 +2,32 @@ import assert from "node:assert/strict";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
-import { stagingOrigin, testProjectRef, testSecretKey } from "./lib/supabase-management.mjs";
+import {
+  stagingOrigin as defaultStagingOrigin,
+  testProjectRef,
+  testSecretKey,
+} from "./lib/supabase-management.mjs";
+
+const stagingOrigin = process.env.PREVIEW_TEST_ORIGIN ?? defaultStagingOrigin;
+if (process.env.PREVIEW_TEST_ORIGIN)
+  assert.match(
+    stagingOrigin,
+    /^https:\/\/freelancercrm-pr-[1-9][0-9]{0,8}\.cagankeremergun\.workers\.dev$/,
+  );
 
 assert.notEqual(process.env.CI, "true", "Remote staging tests must never run in PR quality CI.");
 const require = createRequire(resolve(import.meta.dirname, "../apps/web/package.json"));
 const { chromium } = require("@playwright/test");
 const { createClient } = require("@supabase/supabase-js");
-const db = createClient(`https://${testProjectRef}.supabase.co`, await testSecretKey(), {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
+const db = createClient(
+  `https://${testProjectRef}.supabase.co`,
+  process.env.PREVIEW_TEST_ORIGIN ? process.env.SUPABASE_PREVIEW_TEST_KEY : await testSecretKey(),
+  {
+    auth: { persistSession: false, autoRefreshToken: false },
+  },
+);
 const accounts = [];
+const sessionTokens = [];
 const browser = await chromium.launch({ headless: true });
 let context;
 try {
@@ -51,6 +67,21 @@ try {
     ),
     "Cloud session cookie security attributes are invalid.",
   );
+  const firstSession = JSON.parse(
+    Buffer.from(
+      cookies
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((cookie) => cookie.value)
+        .join("")
+        .slice(7),
+      "base64url",
+    ).toString(),
+  );
+  assert.ok(
+    typeof firstSession.access_token === "string",
+    "Synthetic session token unavailable; values omitted",
+  );
+  sessionTokens.push(firstSession.access_token);
   console.log("ok - session cookies are scoped to staging and Secure/SameSite=Lax");
   await page.locator('input[name="full_name"]').fill("Workers Sentetik Kullanıcı");
   await page.locator('input[name="profession"]').fill("Yazılım geliştirici");
@@ -113,6 +144,8 @@ try {
   });
   const signed = await other.auth.signInWithPassword({ email: secondEmail, password });
   assert.ok(!signed.error, "Second user login failed.");
+  assert.ok(signed.data.session, "Second synthetic session missing");
+  sessionTokens.push(signed.data.session.access_token);
   const isolated = await other.from("proposals").select("id").eq("id", proposalId);
   assert.ok(!isolated.error && isolated.data.length === 0, "Cross-user RLS isolation failed.");
   await other.auth.signOut();
@@ -189,6 +222,11 @@ try {
     "ok - logout/anonymous route guard and invalid callback safe redirect; no production requests",
   );
 } finally {
+  // Revoke even on an early test failure; deleting users alone does not invalidate JWTs.
+  for (const token of sessionTokens) {
+    const revoked = await db.auth.admin.signOut(token, "global");
+    assert.ok(!revoked.error, "Synthetic session revocation failed; refusing account deletion");
+  }
   await browser.close();
   for (const account of accounts.reverse()) {
     const identity = await db.auth.admin.getUserById(account.id);

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test:auth:email:preview": "node scripts/test-preview-email-auth.mjs",
+    "test:auth:regression:local": "node scripts/test-local-auth-regressions.mjs",
+    "test:auth:email:staging": "node scripts/test-staging-email-auth.mjs",
     "test:workers:staging": "node scripts/test-staging-workers.mjs",
     "auth:configure:test": "node scripts/configure-test-auth.mjs",
     "workers:deploy:staging": "node scripts/deploy-workers-staging.mjs",
@@ -27,7 +30,7 @@
     "format": "node apps/web/node_modules/prettier/bin/prettier.cjs . --write --ignore-unknown",
     "format:check": "node apps/web/node_modules/prettier/bin/prettier.cjs . --check --ignore-unknown",
     "test:integration": "npm run test:integration --prefix apps/web",
-    "test:ci": "node --test scripts/ci-policy.test.mjs scripts/dependency-audit.test.mjs scripts/ci-database.test.mjs scripts/local-docker.test.mjs",
+    "test:ci": "node --test scripts/ci-policy.test.mjs scripts/dependency-audit.test.mjs scripts/ci-database.test.mjs scripts/local-docker.test.mjs scripts/preview-policy.test.mjs",
     "ci:clean": "node scripts/check-clean-install.mjs",
     "ci:validate": "node scripts/validate-ci.mjs",
     "ci:evidence": "node scripts/check-ci-evidence.mjs",
