@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "git:setup": "git config --local core.hooksPath .githooks",
     "test:auth:email:preview": "node scripts/test-preview-email-auth.mjs",
     "test:auth:regression:local": "node scripts/test-local-auth-regressions.mjs",
     "test:auth:email:staging": "node scripts/test-staging-email-auth.mjs",

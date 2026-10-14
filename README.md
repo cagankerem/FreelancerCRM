@@ -1,5 +1,44 @@
 # FreelancerCRM
 
+## GitHub'a değişiklik gönderme
+
+`main` dalı altı GitHub Actions kontrolü gerektirir: `secret-scan`, `quality`,
+`browser`, `database`, `production-audit` ve `workers-runtime`.
+Bu kural yönetici hesabına da uygulanır.
+`expected`, GitHub'ın ilgili commit için kontrol sonucunu beklediğini belirtir.
+Önceki commitlerin başarılı kontrolleri yeni commit için yeterli değildir.
+
+CI, `main` hedefli PR açıldığında çalışır.
+`secret-scan` yalnız PR olayında çalışır.
+Yeni bir commit'i doğrudan `main`e göndermek GH006 hatasına neden olur.
+Reddedilen push, `main` üzerindeki CI sürecini başlatmaz.
+
+Her yeni çalışma için şu sırayı kullanın:
+
+1. Yerel Git kancasını bir kez kurun: `npm run git:setup`.
+2. `main` dalına geçin: `git switch main`.
+3. `main` dalını güncelleyin: `git pull --ff-only origin main`.
+4. Çalışma dalı oluşturun: `git switch -c codex/degisiklik-adi`.
+5. Değişiklikleri commit edin.
+6. Çalışma dalını gönderin: `git push -u origin HEAD`.
+7. PR açın: `gh pr create --base main --fill`.
+8. Kontrolleri izleyin: `gh pr checks --watch`.
+9. Altı gerekli kontrol geçince PR'ı GitHub üzerinden birleştirin.
+
+`main` dalında henüz gönderilmemiş commit varsa önce çalışma dalı oluşturun.
+Bu durumda yukarıdaki dördüncü adımdan başlayın.
+Yeni dal mevcut commitleri korur.
+GitHub dalın güncellenmesini isterse çalışma dalında `git fetch origin` çalıştırın.
+Ardından `git merge origin/main` çalıştırın.
+Çakışmaları çözün ve çalışma dalını tekrar gönderin.
+Yeni commit için kontrolleri tekrar bekleyin.
+
+Kanca, hedefi `main` olan push işlemlerini yerelde durdurur.
+Kanca, başka bir dal üzerinden `HEAD:main` gönderimini de durdurur.
+Her yeni clone için `npm run git:setup` komutunu tekrar çalıştırın.
+Git kancasını atlayan araçlarda GitHub koruması uygulanmaya devam eder.
+GitHub koruması kalıcı denetimdir.
+
 ## Onaylı PR preview otomasyonu
 
 Her onaylı PR için ayrı `freelancercrm-pr-<PR>.cagankeremergun.workers.dev`

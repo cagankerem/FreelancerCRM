@@ -1,7 +1,7 @@
 # Implementation Status
 
 Normatif kaynak: [plan.md](./plan.md)  
-Son güncelleme: 2026-10-13
+Son güncelleme: 2026-10-15
 
 ## Takip Sistemi
 
@@ -13,6 +13,7 @@ Son güncelleme: 2026-10-13
 
 ## Kullanıcının İstediği Proje Araçları
 
+- 2026-10-15: Tekrarlayan GH006 reddinin nedeni GitHub API ile doğrulandı: `main` yönetici dahil altı GitHub Actions kontrolü gerektiriyor; yerel `8a5a91b` için kontrol sonucu yok ve `secret-scan` yalnız PR olayında çalışıyor. Commit aynı hash ile `codex/protected-push-workflow` dalında korundu; yerel `main`, güncel `origin/main`e eşitlendi. Hedef ref'i `main` olan push işlemlerini açıklamalı mesajla durduran `.githooks/pre-push`, clone başına `npm run git:setup` kurulumu ve README çalışma dalı/PR adımları eklendi. Kanca bu checkout'ta kuruldu. Geçici depoda çalışma dalına gerçek push başarılı; açık `main` refspec'leri, silme girdisi ve çoklu ref girdisi reddedildi. Biçim kontrolü, diff kontrolü ve 301 dosya/Git geçmişi secret taraması geçti. Uzak koruma ve TASK kabul durumları değiştirilmedi; PR CI sonucu bu yerel doğrulamalardan ayrı izlenir.
 - 2026-10-10: PR #9 (`7700ea9`) ve PR #8 (`2961a87`) tüm required check kontrolleri geçtikten sonra merge commit yöntemiyle `main`e birleştirildi; `2f2782c`, `055faa8`, `f2e5a34`, `4ad616a` ve `9e4a666` hash'leri geçmişte korundu. PR #8 güncel birleşiminde CI 38001625928 ve secret-scan 38001625918 geçti. Yerel `main` ve aktif çalışma dalı güncel uzak `main`e eşitlendi; önceki commitlenmemiş ilerleme kayıtları geri uygulandı. TASK kabul durumları değiştirilmedi.
 - 2026-10-10: Kullanıcının dal birleştirme talebiyle PR #9 merge commit yöntemiyle `main`e alındı; PR #8 güncel `main`le birleştirilirken yalnız README ve ilerleme kaydı çakışmaları her iki dalın doğrulanmış bilgileri korunarak çözüldü. Uygulama kodu iki dalda aynı; TASK kabul durumları değiştirilmedi. PR #8 için güncel birleşim CI doğrulaması bekleniyor.
 - 2026-10-10: Kullanıcının bildirdiği `2f2782c`, `f2e5a34`, `4ad616a` ve `9e4a666` commitlerinin her biri GitHub commit API'sinden hash eşleşmesiyle doğrulandı; dört commit de uzak `codex/workers-staging-setup` geçmişinde mevcut. `origin` fetch/prune ve iki çalışma dalının yeniden push'u tamamlandı; her iki dalda yerel/uzak ahead–behind `0/0`, ikinci worktree temiz. PR #8 CLEAN/MERGEABLE ve PR #9'un yedi kontrolü başarılı; commitler henüz `main`e birleştirilmedi, TASK kabul durumları değişmedi.

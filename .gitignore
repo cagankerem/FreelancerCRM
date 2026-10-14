@@ -2,3 +2,4 @@
 __pycache__/
 .ci-db-owned.json
 /.wrangler/
+.cursor/
