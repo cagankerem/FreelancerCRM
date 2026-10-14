@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Check the destination ref, including explicit refspecs and branch deletions.
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    cat >&2 <<'MESSAGE'
+Push stopped: main requires six GitHub checks.
+Push your changes to a work branch. Open a pull request into main.
+If you are on main, first run: git switch -c codex/your-change
+Then run: git push -u origin HEAD
+Then run: gh pr create --base main --fill
+Merge the pull request after all six required checks pass.
+MESSAGE
+    exit 1
+  fi
+done
+
+exit 0
