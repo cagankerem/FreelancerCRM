@@ -153,14 +153,19 @@ try {
   await page.locator('input[name="privateCanary"]').evaluate((element, value) => {
     element.value = value;
   }, canary);
-  const actionResponse = page.waitForResponse(
-    (r) => r.request().method() === "POST" && r.url().includes("request-error"),
-  );
-  await page.getByRole("button", { name: "Kontrollü hata" }).click();
-  const action = await actionResponse;
+  let actionText = "";
+  const [action] = await Promise.all([
+    page.waitForResponse(async (r) => {
+      if (r.request().method() !== "POST" || !r.url().includes("request-error")) return false;
+      // Next.js may navigate as soon as the action returns; read the body first.
+      actionText = await r.text();
+      return true;
+    }),
+    page.getByRole("button", { name: "Kontrollü hata" }).click(),
+  ]);
   const actionId = action.headers()["x-request-id"];
   assert.equal(
-    (await action.text()).includes(canary),
+    actionText.includes(canary),
     false,
     "Action response exposed private form/error data.",
   );
