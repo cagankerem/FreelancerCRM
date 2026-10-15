@@ -199,6 +199,7 @@ export function validateWorkflow(source, filename) {
       assert.ok(runs("quality").includes(`npm run ${command}`), `Missing quality gate ${command}`);
     }
     assert.ok(runs("browser").includes("npm run test:browser"));
+    assert.ok(runs("browser").includes("npm run test:observability"));
     assert.ok(runs("browser").includes("npm run build"));
     assert.ok(
       runs("browser").some((run) =>

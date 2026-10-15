@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test:observability": "node scripts/test-request-observability.mjs",
+    "test:observability:product": "node scripts/test-request-observability.mjs --product",
+    "test:observability:workers": "node scripts/test-request-observability.mjs --workers",
+    "test:observability:platform-urls": "node scripts/test-request-observability.mjs --workers --audit-platform-urls",
     "git:setup": "git config --local core.hooksPath .githooks",
     "test:auth:email:preview": "node scripts/test-preview-email-auth.mjs",
     "test:auth:regression:local": "node scripts/test-local-auth-regressions.mjs",

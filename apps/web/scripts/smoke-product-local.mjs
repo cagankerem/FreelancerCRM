@@ -81,6 +81,62 @@ try {
   await page.getByRole("heading", { name: "Kurgusal Mobil Uygulama" }).waitFor();
   assert.match(await page.locator("main").textContent(), /150\.02 USD/);
   console.log("ok - draft saved with exact line rounding and owner read");
+
+  // SSR 0.12.6 writes base64-encoded JSON in numerically chunked cookies.
+  // Auth-js refreshes a session whose expires_at is within EXPIRY_MARGIN_MS.
+  // Only this freshly created synthetic browser session is changed; values stay in memory.
+  const jar = await page.context().cookies();
+  const sessionCookies = jar.filter((cookie) => /-auth-token(?:\.\d+)?$/.test(cookie.name));
+  assert.ok(sessionCookies.length > 0, "Synthetic session cookie missing.");
+  const ordered = sessionCookies.sort(
+    (a, b) => Number(a.name.split(".")[1] ?? 0) - Number(b.name.split(".")[1] ?? 0),
+  );
+  const encoded = ordered.map((cookie) => cookie.value).join("");
+  assert.ok(encoded.startsWith("base64-"), "Unexpected SSR cookie encoding.");
+  let session;
+  try {
+    session = JSON.parse(Buffer.from(encoded.slice(7), "base64url").toString("utf8"));
+  } catch {
+    throw new Error("Synthetic cookie could not be decoded; its value is not emitted.");
+  }
+  assert.ok(typeof session.refresh_token === "string", "Synthetic refresh token missing.");
+  session.expires_at = 1;
+  const expired = `base64-${Buffer.from(JSON.stringify(session)).toString("base64url")}`;
+  const baseName = ordered[0].name.replace(/\.\d+$/, "");
+  await page.context().clearCookies({
+    name: new RegExp(`^${baseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\.\\d+)?$`),
+  });
+  const chunks = [];
+  for (let offset = 0; offset < expired.length; offset += 3000)
+    chunks.push(expired.slice(offset, offset + 3000));
+  await page.context().addCookies(
+    chunks.map((value, index) => ({
+      ...ordered[0],
+      name: chunks.length === 1 ? baseName : `${baseName}.${index}`,
+      value,
+    })),
+  );
+  const refreshed = await page.goto("http://localhost:3000/app");
+  assert.equal(refreshed.status(), 200);
+  assert.ok(
+    (await refreshed.headerValues("set-cookie")).length > 0,
+    "Proxy dropped refresh Set-Cookie.",
+  );
+  assert.match(refreshed.headers()["x-request-id"] ?? "", /^[0-9a-f-]{36}$/);
+  await page.getByRole("heading", { name: /Merhaba, Kurgusal Test Kişisi/ }).waitFor();
+  console.log("ok - expired synthetic cookie refresh preserves response cookies and request ID");
+  const logoutResponse = page.waitForResponse((response) => response.request().method() === "POST");
+  await page.getByRole("button", { name: "Çıkış", exact: true }).click();
+  const signedOut = await logoutResponse;
+  assert.match(signedOut.headers()["x-request-id"] ?? "", /^[0-9a-f-]{36}$/);
+  await page.waitForURL("**/auth/login");
+  assert.equal(
+    (await page.context().cookies()).filter((cookie) => /-auth-token(?:\.\d+)?$/.test(cookie.name))
+      .length,
+    0,
+    "Logout did not clear synthetic session cookies.",
+  );
+  console.log("ok - logout Server Action keeps redirect/request ID and clears session cookies");
 } finally {
   await browser.close();
   if (createdId) {

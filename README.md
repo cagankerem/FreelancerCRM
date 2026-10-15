@@ -1,5 +1,34 @@
 # FreelancerCRM
 
+## Request ID ile hata inceleme
+
+Sunucu cevaplarındaki `X-Request-ID` destek referansıdır. JSON API'ler başarıda
+`{ data, error: null, requestId }`, hatada `{ data: null, error: { code, message }, requestId }`
+döndürür. Public proposal API tüketicileri DTO'yu `data` içinden okumalıdır.
+Hata ekranında veya başarısız Server Action yönlendirmesinde gösterilen referansı
+alın ve uygulamanın JSON loglarında aynı `requestId` ile `operation`/`code` alanlarını
+arayın. Referans bir yetki veya idempotency anahtarı değildir; kullanıcıdan parola,
+paylaşım bağlantısı, callback URL'si, cookie veya token istemeyin.
+
+`OBSERVABILITY.md` log/hata sözlüğünü, cache/runtime sınırlarını ve açık platform
+log risklerini açıklar. Uygulama redaksiyonu framework/Cloudflare loglarını kapsamaz;
+query/path redaksiyonu ve uzak log ayarları ayrı kabul gerektirir.
+
+Repo kökünden doğrulama sırası: `npm run format:check`, `npm run lint`,
+`npm run typecheck`, `npm run test:unit`, `npm run test:ci`, `npm run ci:validate`,
+`npm run build`, `npm run test:integration`, `npm run test:observability`.
+Yerel Supabase ile gerçek kayıt/ürün/cookie refresh/logout regresyonu için
+`npm run test:observability:product` kullanılır; port 3000 boş olmalıdır.
+Ardından sırayla `npm run workers:build`, `npm run test:observability:workers`
+ve yerel Supabase açıkken `npm run test:workers:runtime` çalışır. Native ve Workers
+build'leri ortak üretilmiş route tiplerini kullandığından paralel çalıştırılmaz.
+`npm run secrets:scan` ve `npm run secrets:self-test` de kabulün parçasıdır.
+Observability fixture'ları yalnız doğrulanmış local/ci Supabase ayarında kullanılabilir;
+uzak ortamlarda 404/boş action sonucu verir. Harness logları bellekte tarar ve
+sentetik canary değerlerini çıktı/artefakta yazmaz.
+`npm run test:observability:platform-urls`, otomatik Wrangler URL loglarını ayrı
+sınar; path-token riski nedeniyle şu anda başarısızdır ve TASK-005 kabulünü açık tutar.
+
 ## GitHub'a değişiklik gönderme
 
 `main` dalı altı GitHub Actions kontrolü gerektirir: `secret-scan`, `quality`,
