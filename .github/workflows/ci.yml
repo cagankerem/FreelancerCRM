@@ -83,6 +83,7 @@ jobs:
       - run: npm run test:browser
         env:
           PLAYWRIGHT_SERVER_MODE: production
+      - run: npm run test:observability
 
   database:
     name: database

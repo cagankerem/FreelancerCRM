@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { serviceClient } from "@/lib/server/supabase";
+import { providerError } from "@/lib/server/observability";
 
 function signingKey(version: number): Buffer {
   if (version !== 1) throw new Error("Unknown share key version.");
@@ -72,8 +73,8 @@ export async function publicProposal(token: string) {
     )
     .eq("share_selector", selector)
     .maybeSingle();
+  if (error) throw providerError(error);
   if (
-    error ||
     !row ||
     row.lifecycle_status !== "published" ||
     !row.share_key_version ||
@@ -106,7 +107,7 @@ export async function publicProposal(token: string) {
       .eq("proposal_id", row.id)
       .order("sort_order"),
   ]);
-  if (items.error || sections.error) return null;
+  if (items.error || sections.error) throw providerError(items.error ?? sections.error);
   return {
     projectName: row.project_name,
     clientName: row.client_name,

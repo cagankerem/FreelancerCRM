@@ -3,6 +3,7 @@ import adapter from "vinext/server/fetch-handler";
 import worker from "../../worker-entry.mjs";
 
 vi.mock("vinext/server/fetch-handler", () => ({ default: { fetch: vi.fn() } }));
+vi.mock("server-only", () => ({}));
 const context = { waitUntil: vi.fn(), passThroughOnException: vi.fn() };
 
 describe("Workers security boundary", () => {

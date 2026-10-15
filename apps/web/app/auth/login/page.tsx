@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { login } from "@/app/auth/actions";
+import { SupportReference } from "@/components/ui/request-reference";
 
 export const metadata: Metadata = { title: "Giriş", robots: { index: false } };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; confirmation?: string }>;
+  searchParams: Promise<{ error?: string; confirmation?: string; requestId?: string }>;
 }) {
-  const { error, confirmation } = await searchParams;
+  const { error, confirmation, requestId } = await searchParams;
   return (
     <main className="product-shell product-narrow">
       <h1>Giriş yap</h1>
       <p>Teklif çalışma alanına devam et.</p>
       {error && <p role="alert">E-posta veya parola doğrulanamadı.</p>}
+      {error && <SupportReference requestId={requestId} />}
       {confirmation === "sent" && (
         <p role="status">Devam etmek için e-posta doğrulama bağlantısını kontrol et.</p>
       )}

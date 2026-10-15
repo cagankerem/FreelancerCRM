@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, unstable_rethrow } from "next/navigation";
 import { publicProposal } from "@/lib/server/share";
+import { operation, requestId, safeError } from "@/lib/server/observability";
+import { ErrorState } from "@/components/ui/error-state";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -14,7 +16,17 @@ export default async function PublicProposalPage({
   params: Promise<{ shareToken: string }>;
 }) {
   const { shareToken } = await params;
-  const proposal = await publicProposal(shareToken);
+  let proposal;
+  try {
+    proposal = await operation("proposal.public", () => publicProposal(shareToken));
+  } catch (error) {
+    unstable_rethrow(error);
+    return (
+      <main className="product-shell product-narrow">
+        <ErrorState description={safeError(error).message} requestId={await requestId()} />
+      </main>
+    );
+  }
   if (!proposal) notFound();
   return (
     <main className="product-shell product-narrow">

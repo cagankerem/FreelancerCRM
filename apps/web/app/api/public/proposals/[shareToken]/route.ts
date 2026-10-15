@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
 import { publicProposal } from "@/lib/server/share";
+import { apiResult } from "@/lib/server/api-result";
+import { SafeError } from "@/lib/server/observability";
 
 export const dynamic = "force-dynamic";
 const headers = {
@@ -11,9 +12,14 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ shareToken: string }> },
 ) {
-  const { shareToken } = await params;
-  const data = await publicProposal(shareToken);
-  return data
-    ? NextResponse.json(data, { headers })
-    : NextResponse.json({ error: "not_found" }, { status: 404, headers });
+  return apiResult(
+    "proposal.public",
+    async () => {
+      const { shareToken } = await params;
+      const data = await publicProposal(shareToken);
+      if (!data) throw new SafeError("NOT_FOUND");
+      return data;
+    },
+    headers,
+  );
 }
