@@ -250,13 +250,47 @@ try {
   if (process.argv.includes("--audit-platform-urls")) {
     const urlCanary = `synthetic-path-${randomUUID()}`;
     const queryCanary = `synthetic-query-${randomUUID()}`;
-    await fetch(`${base}/api/public/proposals/${urlCanary}?code=${queryCanary}`);
+    const audited = await fetch(`${base}/api/public/proposals/${urlCanary}?code=${queryCanary}`);
+    const auditedBody = await audited.json();
+    const auditedId = audited.headers.get("x-request-id");
+    assert.ok(audited.status === 404, "URL audit must reach the public Route Handler.");
+    assert.ok(uuid.test(auditedId ?? ""), "URL audit response correlation ID missing.");
+    assert.ok(auditedBody.requestId === auditedId, "URL audit response/header ID mismatch.");
+    assert.ok(
+      auditedBody.data === null && auditedBody.error?.code === "NOT_FOUND",
+      "URL audit must observe the expected safe API error envelope.",
+    );
+    // No matching event / broken parser is inconclusive, never a privacy pass.
+    let positiveControlObserved = false;
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const auditLogs = output.split(/\r?\n/).flatMap((line) => {
+        try {
+          const value = JSON.parse(line.trim());
+          return value?.requestId === auditedId ? [value] : [];
+        } catch {
+          return [];
+        }
+      });
+      positiveControlObserved =
+        auditLogs.some((entry) => entry.event === "request.started") &&
+        auditLogs.some(
+          (entry) => entry.event === "operation.failed" && entry.code === "NOT_FOUND",
+        ) &&
+        (!workers || auditLogs.some((entry) => entry.event === "request.finished"));
+      if (positiveControlObserved) break;
+      await delay(100);
+    }
+    assert.ok(
+      positiveControlObserved,
+      "URL audit inconclusive: matching ingress/operation/response logs were not observed.",
+    );
     await delay(300);
     const pathExposed = output.includes(urlCanary);
     const queryExposed = output.includes(queryCanary);
     console.log(
       "Automatic URL canary audit:",
       JSON.stringify({
+        positiveControlObserved,
         pathExposed,
         queryExposed,
         wranglerOutput: output

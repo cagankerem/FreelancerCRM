@@ -14,6 +14,30 @@ paylaşım bağlantısı, callback URL'si, cookie veya token istemeyin.
 log risklerini açıklar. Uygulama redaksiyonu framework/Cloudflare loglarını kapsamaz;
 query/path redaksiyonu ve uzak log ayarları ayrı kabul gerektirir.
 
+2026-10-16 kontrolünde aktif staging version'ı 9 Ekim tarihliydi ve Git commit
+etiketi taşımıyordu; aşağıdaki yerel kabulü staging'e atfetmeyin. Destek referansı
+görünmüyorsa URL/token istemek yerine deployment/version eşleşmesini doğrulayın.
+Yeni staging yayını ve gerçek Auth/ürün testleri ayrı onay gerektirir. Canlı tail
+gözlemi kalıcı Workers Logs kabulü değildir; güncel politika ve karar tablosu
+`OBSERVABILITY.md` içindedir.
+
+2026-10-19 yeniden doğrulaması: native/workerd correlation ve gerçek SDK yerel
+Auth/ürün kontrolleri geçti; Workers'ın dört Auth regresyonu dahil 44 tarayıcı
+testi çalıştı. Bunlar staging kabulü değildir. `/script-settings` yanıtında
+`observability: null`, `/settings` yanıtında alan eksik; kalıcı log politikası
+doğrulanmış sayılmaz. Yerel URL audit'i ilgili requestId'nin ingress/işlem/cevap
+loglarını görmeden gizlilik sonucu vermez ve path sızıntısında hâlâ başarısızdır.
+Kullanıcının seçtiği C seçeneği için `INGRESS_RELAY_DESIGN.md` yalnız tasarım
+taslağıdır; gateway/DNS/token modeli uygulanmadı, deployment yapılmadı.
+
+Kök lint'in optional proje-içi ClaudeKit `.cursor` betiklerinde takılması için
+onaylı çözüm sürümlenen `scripts/vendor/claudekit` ESM uyarlamasıdır. Kurulu eski
+paketlerde `npm run skills:adapt-local` yalnız incelenmiş yedi sürümü uyarlayıp
+orijinalleri `.upstream` olarak saklar; genel agent ortamını değiştirmez. Temiz
+checkout bu ignored paketlere ihtiyaç duymaz; ESM kodu ve testleri repo içindedir.
+Bilinmeyen/yerelde değiştirilmiş sürümlerde işlem durur; zorla üzerine yazmayın.
+CLI kullanımı ve modül uyumluluğu sınırı için `scripts/vendor/claudekit/README.md`.
+
 Repo kökünden doğrulama sırası: `npm run format:check`, `npm run lint`,
 `npm run typecheck`, `npm run test:unit`, `npm run test:ci`, `npm run ci:validate`,
 `npm run build`, `npm run test:integration`, `npm run test:observability`.
@@ -578,6 +602,16 @@ Hatalar geri alınınca aynı PR'da bütün check'ler geçti ve durum `CLEAN` ol
 Test PR'ı birleştirilmez; kasıtlı girdiler ürün dalına taşınmaz.
 
 ## Mimari
+
+TASK-005'in güncel yerel/uzak kanıtı ve açık kararları:
+[kabul matrisi](TASK_005_ACCEPTANCE.md), [log sözlüğü ve politika](OBSERVABILITY.md).
+Onaylı, yalnız localhost ingress/relay deneyi: `npm run test:relay:poc`;
+[kullanım ve sınırları](scripts/relay-poc/README.md). Bu deney ürün/staging
+entegrasyonu değildir. Gerçek uygulamanın URL gizliliği testi başarısız kalmaktadır;
+matristeki açık platform ve staging kriterleri kapanmadan TASK-005 tamamlanmaz.
+Staging'de workers.dev kullanımı için domain satın almak zorunlu değildir; domain'i
+aynı Worker'a eklemek URL log gizliliği sorununu çözmez. Denetlenebilir dış gateway
+hosting/bütçesi ve etkin log politikası ayrıca kararlaştırılacaktır.
 
 Yerel şema, migration sırası, dar yetkili DB işlemleri ve test komutları:
 [Supabase veritabanı temeli](./supabase/README.md).

@@ -1,0 +1,37 @@
+[
+  {
+    "skill": "brand",
+    "name": "extract-colors",
+    "upstreamSha256": "36d21f3905e5762cfc8054b3f3b7276f6bc656884fe57c6bfa539526044778ed"
+  },
+  {
+    "skill": "brand",
+    "name": "inject-brand-context",
+    "upstreamSha256": "5b98abdeb5c636f247102cd235f1d3421db7a4de53fd853360feaa0c471b5c96"
+  },
+  {
+    "skill": "brand",
+    "name": "sync-brand-to-tokens",
+    "upstreamSha256": "390a760570fdba6d6ecfdfd8907fc802b64659b6178f8920349b0c6a2c822106"
+  },
+  {
+    "skill": "brand",
+    "name": "validate-asset",
+    "upstreamSha256": "4546c9109fb0f4f767426508cb29e60d02b301f8897cf16d8e378b7ce9d997fc"
+  },
+  {
+    "skill": "design-system",
+    "name": "embed-tokens",
+    "upstreamSha256": "23a9ce214e3c0d2fb4c5442b3bf1222c66721f7988a181ab29dcb549a5e5f511"
+  },
+  {
+    "skill": "design-system",
+    "name": "generate-tokens",
+    "upstreamSha256": "aac8a0f4ec4dccf0d371f9ee5a9111e44977bb0cad7e40a3754aba5571aa1231"
+  },
+  {
+    "skill": "design-system",
+    "name": "validate-tokens",
+    "upstreamSha256": "65f03a29290b9029d8cc27537701f226de7bcffc303b3bc361648fadfa09b77d"
+  }
+]
