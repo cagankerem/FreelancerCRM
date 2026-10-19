@@ -4,8 +4,10 @@ import { TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/shared/utils";
+import { isRequestId } from "@/lib/shared/request-id";
 
 type ErrorStateProps = {
+  requestId?: string;
   title?: string;
   description?: string;
   onRetry?: () => void;
@@ -15,6 +17,7 @@ type ErrorStateProps = {
 };
 
 function ErrorState({
+  requestId,
   title = "Bir şeyler ters gitti",
   description = "İçerik şu anda yüklenemiyor. Lütfen kısa bir süre sonra tekrar deneyin.",
   onRetry,
@@ -42,6 +45,11 @@ function ErrorState({
       </div>
       <Heading className="mt-5 text-lg font-semibold text-balance">{title}</Heading>
       <p className="mt-2 text-sm leading-6 text-muted-foreground text-pretty">{description}</p>
+      {isRequestId(requestId) ? (
+        <p className="mt-3 break-all text-sm">
+          Destek referansı: <code>{requestId}</code>
+        </p>
+      ) : null}
       {onRetry ? (
         <Button className="mt-6 px-5" onClick={onRetry}>
           {retryLabel}

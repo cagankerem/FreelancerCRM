@@ -51,6 +51,7 @@ try {
   }
   assert.ok(ready, "Built Workers runtime did not become ready.");
   for (const args of [
+    ["../../scripts/test-request-observability.mjs", "--workers"],
     ["node_modules/@playwright/test/cli.js", "test", "--config", "playwright.workers.config.ts"],
     ["scripts/smoke-product-local.mjs"],
   ]) {

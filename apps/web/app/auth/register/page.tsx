@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { register } from "@/app/auth/actions";
+import { SupportReference } from "@/components/ui/request-reference";
 
 export const metadata: Metadata = { title: "Kayıt", robots: { index: false } };
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; requestId?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, requestId } = await searchParams;
   return (
     <main className="product-shell product-narrow">
       <h1>Hesap oluştur</h1>
       <p>İlk teklifini hazırlamaya başla.</p>
       {error && <p role="alert">Kayıt tamamlanamadı. Bilgilerini kontrol edip yeniden dene.</p>}
+      {error && <SupportReference requestId={requestId} />}
       <form action={register} className="product-form">
         <label>
           E-posta
